@@ -12,17 +12,20 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { openCart, totalQuantity } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
+  const { lang, toggleLanguage, t } = useLanguage();
 
   const navLinks = [
-    { label: '首頁', href: '/' },
-    { label: '關於我們', href: '#about' },
-    { label: '服務項目', href: '#services', hasSub: true },
-    { label: '精選作品 Showcase', href: '#portfolio', hasSub: true },
-    { label: '聯絡我們', href: '#contact' },
+    { label: t('nav.home'), href: '/' },
+    { label: t('nav.about'), href: '#about' },
+    { label: t('nav.services'), href: '#services', hasSub: true },
+    { label: t('nav.portfolio'), href: '#portfolio', hasSub: true },
+    { label: t('nav.contact'), href: '#contact' },
   ];
 
   const categories = [
@@ -73,9 +76,9 @@ export default function Header() {
               {/* Language Switcher */}
               <button 
                 className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95"
-                onClick={() => toast.info('語言切換功能即將上線')}
+                onClick={toggleLanguage}
               >
-                <span className="text-[10px] md:text-xs font-bold tracking-wider">中文</span>
+                <span className="text-[10px] md:text-xs font-bold tracking-wider">{t('lang.label')}</span>
                 <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </button>
 

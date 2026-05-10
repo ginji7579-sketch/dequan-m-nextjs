@@ -1,8 +1,9 @@
+import { useLanguage } from '@/contexts/LanguageContext';
 
-import { lazy, Suspense } from 'react';
 const BlobLogoScene = lazy(() => import('./BlobLogo'));
 
 export default function HeroSection() {
+  const { t } = useLanguage();
   return (
     <section
       className="relative min-h-screen flex items-center overflow-hidden"
@@ -21,13 +22,13 @@ export default function HeroSection() {
           <div className="space-y-6 animate-fade-in-up">
             <div className="space-y-3">
               <h1 className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: '#2B8A8A' }}>
-                穩固基礎，細節致遠
+                {t('hero.title')}
               </h1>
             </div>
 
             <div className="space-y-4 text-2xl md:text-3xl font-semibold leading-relaxed max-w-lg mt-6" style={{ color: '#000000' }}>
               <p>
-                我們在資訊破碎的時代中，不虛華、不妥協，讓每一個選擇都值得被信賴。
+                {t('hero.desc')}
               </p>
             </div>
           </div>

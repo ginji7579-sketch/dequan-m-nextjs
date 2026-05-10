@@ -3,8 +3,11 @@ import { toast } from 'sonner';
 import { services } from '@/data/services';
 import { useCart } from '@/contexts/CartContext';
 
+import { useLanguage } from '@/contexts/LanguageContext';
+
 export default function ServicesSection() {
   const { addItem, openCart } = useCart();
+  const { t } = useLanguage();
 
   const handleAddToCart = (service: (typeof services)[number]) => {
     addItem(service);
@@ -16,11 +19,10 @@ export default function ServicesSection() {
       <div className="container px-4">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16 md:mb-24 animate-fade-in">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-brand-primary">服務項目 Services</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-brand-primary">{t('services.title')}</h2>
           <div className="h-1.5 w-20 bg-accent mx-auto mb-8"></div>
           <p className="text-lg md:text-xl text-brand-dark/80 leading-relaxed font-medium">
-            德全有限公司致力於提供最專業的品牌設計與行銷推廣解決方案。
-            我們以穩固的專業基礎與對細節的極致追求，協助您的品牌在數位時代中建立獨特的競爭優勢，讓每一個選擇都值得被信賴。
+            {t('services.desc')}
           </p>
         </div>
 
@@ -75,7 +77,7 @@ export default function ServicesSection() {
             onClick={openCart}
             className="px-10 py-3 border border-black text-black font-medium hover:bg-black hover:text-white transition-all duration-300 rounded-sm"
           >
-            查看目前購物車
+            {t('cart.view')}
           </button>
         </div>
       </div>
