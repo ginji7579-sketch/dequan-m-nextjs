@@ -20,6 +20,8 @@ import { auth } from '../lib/firebase';
 const GOOGLE_RETURN_KEY = 'dequan_google_auth_return';
 const COOKIE_NAME = 'dequan_oauth_ret';
 const RETURN_TTL_MS = 12 * 60 * 1000;
+const WEBVIEW_GOOGLE_LOGIN_MESSAGE =
+  '為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！';
 
 type ReturnPayload = { path: string; exp: number };
 
@@ -152,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     const isLineWebview = /Line/i.test(ua);
-    const isFbIgWebview = /FBAN|FBAV|Instagram/i.test(ua);
+    const isMetaWebview = /FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
 
     // Google blocks OAuth from WebView (Error 403: disallowed_useragent).
@@ -163,9 +165,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         window.location.href = currentUrl.toString();
         return new Promise<'redirect'>(() => {});
       }
-    } else if (isFbIgWebview) {
-      alert("為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！");
-      throw new Error("WebView not supported");
+    } else if (isMetaWebview) {
+      alert(WEBVIEW_GOOGLE_LOGIN_MESSAGE);
+      throw new Error(WEBVIEW_GOOGLE_LOGIN_MESSAGE);
     }
     
     try {
