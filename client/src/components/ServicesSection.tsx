@@ -38,7 +38,7 @@ export default function ServicesSection() {
                     <img
                       src={service.image}
                       alt={service.title}
-                      className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
                     <Icon className="w-16 h-16 text-brand-primary opacity-40" />
