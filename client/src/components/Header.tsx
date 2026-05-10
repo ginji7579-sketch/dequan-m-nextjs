@@ -14,6 +14,8 @@ import {
 
 import { useLanguage } from '@/contexts/LanguageContext';
 
+const logoSrc = '/images/logo.jpg';
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { openCart, totalQuantity } = useCart();
@@ -43,9 +45,9 @@ export default function Header() {
           <Link href="/">
             <a className="flex items-center gap-2 md:gap-3 transition-opacity opacity-100 hover:opacity-80">
               <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
+                src={logoSrc}
                 alt="德全有限公司 Logo"
-                loading="lazy"
+                loading="eager"
                 decoding="async"
                 className="h-10 md:h-12 w-auto object-contain"
               />
@@ -129,7 +131,7 @@ export default function Header() {
                   </SheetClose>
                   <div className="flex-1 flex justify-center items-center gap-2">
                     <img
-                      src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
+                      src={logoSrc}
                       alt="Logo"
                       className="h-8 w-auto"
                     />
