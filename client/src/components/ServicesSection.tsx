@@ -32,13 +32,6 @@ export default function ServicesSection() {
                 key={service.id}
                 className="group relative flex flex-col transition-all duration-300"
               >
-                {/* Badge */}
-                {service.isNew && (
-                  <div className="absolute top-0 left-0 z-10 bg-[#BC4130] text-white text-[10px] md:text-xs font-bold px-2 py-1">
-                    本週新品
-                  </div>
-                )}
-                
                 {/* Image/Icon Container */}
                 <div className="relative w-full aspect-[4/5] mb-4 flex items-center justify-center bg-gray-50 overflow-hidden">
                   {service.image ? (
