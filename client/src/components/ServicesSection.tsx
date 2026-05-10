@@ -26,54 +26,59 @@ export default function ServicesSection() {
             return (
               <div
                 key={service.id}
-                className="group bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
-                style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
+                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-brand-muted flex flex-col"
               >
-                <div className="mb-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-lg transition-colors duration-300" style={{ backgroundColor: 'rgba(43, 138, 138, 0.1)' }}>
-                    <Icon className="w-7 h-7" style={{ color: '#2B8A8A' }} />
+                {service.image && (
+                  <div className="relative aspect-video overflow-hidden">
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
                   </div>
-                </div>
+                )}
+                
+                <div className="p-8 flex-grow flex flex-col">
+                  <div className="mb-6 flex items-center justify-between">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white" style={{ backgroundColor: 'rgba(43, 138, 138, 0.1)', color: '#2B8A8A' }}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    {service.price && (
+                      <span className="text-sm font-bold text-brand-secondary">
+                        NT$ {service.price.toLocaleString()} 起
+                      </span>
+                    )}
+                  </div>
 
-                <h3 className="text-xl font-semibold mb-3 transition-colors duration-300" style={{ color: '#2C3E50' }}>
-                  {service.title}
-                </h3>
-                <p style={{ color: 'rgba(44, 62, 80, 0.7)' }} className="leading-relaxed">
-                  {service.description}
-                </p>
+                  <h3 className="text-xl font-bold mb-3 transition-colors duration-300" style={{ color: '#2C3E50' }}>
+                    {service.title}
+                  </h3>
+                  <p style={{ color: 'rgba(44, 62, 80, 0.7)' }} className="leading-relaxed text-sm mb-6 flex-grow">
+                    {service.description}
+                  </p>
 
-                <div className="mt-6 flex flex-wrap items-center gap-3 pt-6 transition-opacity duration-300" style={{ borderTop: '1px solid #E8E6E1' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleAddToCart(service)}
-                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all hover:shadow-md"
-                    style={{ backgroundColor: '#2B8A8A' }}
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                    加入購物車
-                  </button>
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center gap-2 font-semibold transition-colors"
-                    style={{ color: '#2B8A8A' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#2B8A8A'}
-                  >
-                    了解更多
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <div className="flex items-center justify-between pt-6 border-t border-brand-muted mt-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleAddToCart(service)}
+                      className="text-sm font-bold flex items-center gap-2 transition-all duration-300"
+                      style={{ color: '#2B8A8A' }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </a>
+                      <ShoppingCart className="h-4 w-4" />
+                      加入購物車
+                    </button>
+                    <a
+                      href="#contact"
+                      className="text-sm font-bold flex items-center gap-1 transition-all duration-300 group-hover:gap-2"
+                      style={{ color: '#F5A623' }}
+                    >
+                      了解更多
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </div>
                 </div>
               </div>
             );
