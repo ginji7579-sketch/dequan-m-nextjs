@@ -14,7 +14,7 @@ export default function ServicesSection() {
   return (
     <section id="services" className="py-12 md:py-20 bg-white">
       <div className="container px-4">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {services.map((service) => {
             const Icon = service.icon;
             return (
