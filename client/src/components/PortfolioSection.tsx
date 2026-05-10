@@ -1,16 +1,18 @@
 import { portfolioItems } from '@/data/portfolio';
 import { ArrowRight } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function PortfolioSection() {
+  const { t, lang } = useLanguage();
   return (
     <section id="portfolio" className="section-spacing" style={{ backgroundColor: '#F8F9FA' }}>
       <div className="container">
         <div className="text-center mb-16 space-y-4">
           <p className="font-bold text-sm tracking-[0.2em] uppercase" style={{ color: '#F5A623' }}>
-            Featured Works
+            {t('portfolio.subtitle')}
           </p>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight" style={{ color: '#2C3E50' }}>
-            精選作品 Showcase
+            {t('portfolio.title')}
           </h2>
           <div className="w-12 h-1.5 bg-orange-400 mx-auto rounded-full mt-4"></div>
         </div>
@@ -29,7 +31,7 @@ export default function PortfolioSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
                   <span className="text-white font-medium flex items-center gap-2">
-                    查看詳情 <ArrowRight className="w-4 h-4" />
+                    {t('portfolio.viewDetails')} <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </div>
@@ -47,11 +49,11 @@ export default function PortfolioSection() {
                 </div>
                 
                 <h3 className="text-xl font-bold group-hover:text-orange-500 transition-colors duration-300" style={{ color: '#2C3E50' }}>
-                  {item.title}
+                  {lang === 'en' && item.titleEn ? item.titleEn : item.title}
                 </h3>
                 
                 <p className="text-gray-600 text-sm leading-relaxed line-clamp-2">
-                  {item.description}
+                  {lang === 'en' && item.descriptionEn ? item.descriptionEn : item.description}
                 </p>
 
                 <div className="pt-4">
@@ -60,7 +62,7 @@ export default function PortfolioSection() {
                     className="inline-flex items-center gap-2 text-sm font-bold transition-all duration-300 group-hover:gap-4"
                     style={{ color: '#F5A623' }}
                   >
-                    查看作品
+                    {t('portfolio.viewProject')}
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
@@ -74,7 +76,7 @@ export default function PortfolioSection() {
             href="#contact"
             className="btn-secondary px-8 py-4 text-lg shadow-lg hover:shadow-orange-200"
           >
-            開啟您的專案合作
+            {t('portfolio.startProject')}
           </a>
         </div>
       </div>

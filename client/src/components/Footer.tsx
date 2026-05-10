@@ -1,8 +1,10 @@
 import { Mail, Phone, MapPin } from 'lucide-react';
 import { LineIcon } from './LineIcon';
 import { WeChatIcon } from './WeChatIcon';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
 
   return (
     <footer style={{ backgroundColor: '#2C3E50', color: 'white' }}>
@@ -14,33 +16,33 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>快速連結</h3>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>{t('footer.links')}</h3>
             <ul className="space-y-2">
               <li>
                 <a href="#" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  首頁
+                  {t('nav.home')}
                 </a>
               </li>
               <li>
                 <a href="#about" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  關於我們
+                  {t('nav.about')}
                 </a>
               </li>
               <li>
                 <a href="#services" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  服務項目
+                  {t('nav.services')}
                 </a>
               </li>
               <li>
                 <a href="#contact" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  聯絡我們
+                  {t('nav.contact')}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>聯絡方式</h3>
+            <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>{t('footer.contact')}</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
@@ -72,13 +74,13 @@ export default function Footer() {
 
         <div style={{ borderTop: '1px solid #4B5563', paddingTop: '2rem' }}>
           <div className="flex flex-col md:flex-row justify-between items-center text-sm" style={{ color: '#9CA3AF' }}>
-            <p>&copy; 德全有限公司 (DEQUAN-M CO.LTD). 版權所有。</p>
+            <p>{t('footer.copyright')}</p>
             <div className="flex gap-6 mt-4 md:mt-0">
               <a href="/privacy" className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}>
-                隱私政策
+                {t('footer.privacy')}
               </a>
               <a href="/privacy" className="transition-colors" onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#9CA3AF'}>
-                服務條款
+                {t('footer.terms')}
               </a>
             </div>
           </div>

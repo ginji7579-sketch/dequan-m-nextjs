@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ServicesSection() {
   const { addItem, openCart } = useCart();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const handleAddToCart = (service: (typeof services)[number]) => {
     addItem(service);
@@ -50,7 +50,7 @@ export default function ServicesSection() {
                 {/* Content */}
                 <div className="flex flex-col items-center">
                   <h3 className="text-sm md:text-base font-normal text-center mb-1 text-gray-800 leading-snug px-2 line-clamp-2 min-h-[2.5rem] flex items-center">
-                    {service.title}
+                    {lang === 'en' && service.titleEn ? service.titleEn : service.title}
                   </h3>
                   
                   <p className="text-base md:text-lg font-bold text-center mb-4 text-black">

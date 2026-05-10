@@ -1,25 +1,28 @@
 import { Target, Layers, Heart, Zap } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AboutSection() {
+  const { t } = useLanguage();
+
   const values = [
     {
-      title: '極致專注',
-      description: '全心投入每一個環節，以近乎苛求的標準打磨細節，交付經得起時間檢驗的成果。',
+      title: t('about.value1.title'),
+      description: t('about.value1.desc'),
       icon: Target,
     },
     {
-      title: '跨界整合',
-      description: '跨域思考，整合資源，為你找到更好的解法。',
+      title: t('about.value2.title'),
+      description: t('about.value2.desc'),
       icon: Layers,
     },
     {
-      title: '客戶至上',
-      description: '以客戶需求為中心，提供量身定制的解決方案。',
+      title: t('about.value3.title'),
+      description: t('about.value3.desc'),
       icon: Heart,
     },
     {
-      title: '高效透明',
-      description: '流程透明，溝通高效，確保每個環節都符合客戶期望。',
+      title: t('about.value4.title'),
+      description: t('about.value4.desc'),
       icon: Zap,
     },
   ];
@@ -29,7 +32,7 @@ export default function AboutSection() {
       <div className="container">
         <div>
           <h3 className="text-3xl font-bold text-center mb-12" style={{ color: '#2C3E50' }}>
-            我們的核心價值
+            {t('about.title')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {values.map((value, index) => {

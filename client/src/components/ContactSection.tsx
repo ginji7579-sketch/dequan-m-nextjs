@@ -2,8 +2,10 @@ import { Mail, Phone, Send, MapPin } from 'lucide-react';
 import { LineIcon } from './LineIcon';
 import { WeChatIcon } from './WeChatIcon';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ContactSection() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -70,7 +72,7 @@ export default function ContactSection() {
   const contactInfo = [
     {
       icon: Phone,
-      label: '電話',
+      label: t('contact.label.phone'),
       value: '0930137329',
       href: 'tel:0930137329',
     },
@@ -94,7 +96,7 @@ export default function ContactSection() {
     },
     {
       icon: MapPin,
-      label: '地址',
+      label: t('contact.label.address'),
       value: '台北市信義區松德路65號11樓之2',
       href: 'https://maps.google.com/?q=台北市信義區松德路65號11樓之2',
     },
@@ -105,13 +107,13 @@ export default function ContactSection() {
       <div className="container">
         <div className="text-center mb-16 space-y-4">
           <p className="font-semibold text-lg tracking-wide" style={{ color: '#F5A623' }}>
-            聯絡我們
+            {t('contact.subtitle')}
           </p>
           <h2 className="text-4xl md:text-5xl font-bold" style={{ color: '#2C3E50' }}>
-            與我們取得聯繫
+            {t('contact.title')}
           </h2>
           <p className="text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: 'rgba(44, 62, 80, 0.7)' }}>
-            有任何問題或需要更多信息？請填寫下方表單或直接聯絡我們。
+            {t('contact.desc')}
           </p>
         </div>
 
@@ -145,9 +147,9 @@ export default function ContactSection() {
             })}
 
             <div className="mt-12 pt-8" style={{ borderTop: '1px solid #E8E6E1' }}>
-              <h4 className="font-semibold mb-4" style={{ color: '#2C3E50' }}>營業時間</h4>
+              <h4 className="font-semibold mb-4" style={{ color: '#2C3E50' }}>{t('contact.hours')}</h4>
               <div className="space-y-2" style={{ color: 'rgba(44, 62, 80, 0.7)' }}>
-                <p>24小時</p>
+                <p>{t('contact.hours.24')}</p>
                 <p></p>
               </div>
             </div>
@@ -161,7 +163,7 @@ export default function ContactSection() {
               {submitted && (
                 <div className="p-4 rounded-lg" style={{ backgroundColor: '#F0FDF4', borderColor: '#DCFCE7', borderWidth: '1px' }}>
                   <p className="font-semibold" style={{ color: '#166534' }}>
-                    感謝您的消息！我們將盡快回覆您。
+                    {t('contact.form.success')}
                   </p>
                 </div>
               )}
@@ -169,7 +171,7 @@ export default function ContactSection() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold mb-2" style={{ color: '#2C3E50' }}>
-                    姓名 *
+                    {t('contact.form.name')}
                   </label>
                   <input
                     type="text"
@@ -180,13 +182,13 @@ export default function ContactSection() {
                     required
                     className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
                     style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
-                    placeholder="您的姓名"
+                    placeholder={t('contact.form.namePlaceholder')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-semibold mb-2" style={{ color: '#2C3E50' }}>
-                    郵箱 *
+                    {t('contact.form.email')}
                   </label>
                   <input
                     type="email"
@@ -197,14 +199,14 @@ export default function ContactSection() {
                     required
                     className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
                     style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
-                    placeholder="您的mail"
+                    placeholder={t('contact.form.emailPlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <label htmlFor="phone" className="block text-sm font-semibold mb-2" style={{ color: '#2C3E50' }}>
-                  電話
+                  {t('contact.form.phone')}
                 </label>
                 <input
                   type="tel"
@@ -214,13 +216,13 @@ export default function ContactSection() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
                   style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
-                  placeholder="您的電話"
+                  placeholder={t('contact.form.phonePlaceholder')}
                 />
               </div>
 
               <div>
                 <label htmlFor="subject" className="block text-sm font-semibold mb-2" style={{ color: '#2C3E50' }}>
-                  主題 *
+                  {t('contact.form.subject')}
                 </label>
                 <input
                   type="text"
@@ -231,13 +233,13 @@ export default function ContactSection() {
                   required
                   className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
                   style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
-                  placeholder="消息主題"
+                  placeholder={t('contact.form.subjectPlaceholder')}
                 />
               </div>
 
               <div>
                 <label htmlFor="message" className="block text-sm font-semibold mb-2" style={{ color: '#2C3E50' }}>
-                  消息 *
+                  {t('contact.form.message')}
                 </label>
                 <textarea
                   id="message"
@@ -248,7 +250,7 @@ export default function ContactSection() {
                   rows={5}
                   className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none"
                   style={{ borderColor: '#E8E6E1', borderWidth: '1px' }}
-                  placeholder="請輸入您的消息"
+                  placeholder={t('contact.form.messagePlaceholder')}
                 ></textarea>
               </div>
 
@@ -257,7 +259,7 @@ export default function ContactSection() {
                 disabled={isSubmitting}
                 className={`w-full btn-primary justify-center hover:shadow-lg transition-all duration-300 ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
               >
-                {isSubmitting ? '發送中...' : '發送消息'}
+                {isSubmitting ? t('contact.form.submitting') : t('contact.form.submit')}
                 <Send className="w-5 h-5" />
               </button>
             </form>

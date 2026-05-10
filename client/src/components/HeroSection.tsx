@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const BlobLogoScene = lazy(() => import('./BlobLogo'));

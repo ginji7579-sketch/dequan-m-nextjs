@@ -3,8 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei'
 
 const BlobLogo = () => {
-  const mesh1 = useRef<any>()
-  const mesh2 = useRef<any>()
+  const mesh1 = useRef<any>(null)
+  const mesh2 = useRef<any>(null)
 
   // 簡單的互動動畫：讓球體隨時間輕微漂浮晃動
   useFrame((state) => {
