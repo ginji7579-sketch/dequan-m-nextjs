@@ -1,20 +1,6 @@
 
 import { lazy, Suspense } from 'react';
-
-const HeroImage = lazy(() => Promise.resolve({
-  default: () => (
-    <div className="relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-orange-400/10 rounded-full blur-3xl"></div>
-      <img
-        src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
-        alt="德全有限公司 Logo"
-        loading="lazy"
-        decoding="async"
-        className="relative w-80 h-80 object-contain drop-shadow-lg hover:scale-110 transition-transform duration-500"
-      />
-    </div>
-  )
-}));
+const BlobLogoScene = lazy(() => import('./BlobLogo'));
 
 export default function HeroSection() {
   return (
@@ -46,9 +32,9 @@ export default function HeroSection() {
             </div>
           </div>
 
-          <div className="hidden md:flex justify-center items-center animate-fade-in">
+          <div className="flex justify-center items-center animate-fade-in">
             <Suspense fallback={<div className="w-80 h-80" />}>
-              <HeroImage />
+              <BlobLogoScene />
             </Suspense>
           </div>
         </div>
