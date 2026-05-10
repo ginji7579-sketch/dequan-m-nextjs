@@ -7,6 +7,7 @@ import CartDrawer from '@/components/CartDrawer';
 // 使用 code splitting 分割大型組件
 const AboutSection = lazy(() => import('@/components/AboutSection'));
 const ServicesSection = lazy(() => import('@/components/ServicesSection'));
+const PortfolioSection = lazy(() => import('@/components/PortfolioSection'));
 const ContactSection = lazy(() => import('@/components/ContactSection'));
 
 // 簡單的加載骨架屏
@@ -32,6 +33,9 @@ export default function Home() {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <ServicesSection />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <PortfolioSection />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <ContactSection />

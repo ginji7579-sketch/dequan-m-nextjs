@@ -13,6 +13,7 @@ export default function Header() {
     { label: '首頁', href: '/' },
     { label: '關於我們', href: '#about' },
     { label: '服務項目', href: '#services' },
+    { label: '精選作品 Showcase', href: '#portfolio' },
     { label: '聯絡我們', href: '#contact' },
   ];
 
