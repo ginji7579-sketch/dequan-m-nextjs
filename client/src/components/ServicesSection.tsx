@@ -12,89 +12,67 @@ export default function ServicesSection() {
   };
 
   return (
-    <section id="services" className="section-spacing" style={{ backgroundColor: '#F5F1E8' }}>
-      <div className="container">
-        <div className="text-center mb-16 space-y-4">
-          <p className="font-semibold text-lg tracking-wide" style={{ color: '#F5A623' }}>
-            我們的服務
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section id="services" className="py-12 md:py-20 bg-white">
+      <div className="container px-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-8 md:gap-y-16">
           {services.map((service) => {
             const Icon = service.icon;
             return (
               <div
                 key={service.id}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-brand-muted flex flex-col"
+                className="group relative flex flex-col transition-all duration-300"
               >
-                {service.image && (
-                  <div className="relative aspect-video overflow-hidden">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
+                {/* Badge */}
+                {service.isNew && (
+                  <div className="absolute top-0 left-0 z-10 bg-[#BC4130] text-white text-[10px] md:text-xs font-bold px-2 py-1">
+                    本週新品
                   </div>
                 )}
                 
-                <div className="p-8 flex-grow flex flex-col">
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 group-hover:bg-brand-primary group-hover:text-white" style={{ backgroundColor: 'rgba(43, 138, 138, 0.1)', color: '#2B8A8A' }}>
-                      <Icon className="w-6 h-6" />
-                    </div>
-                    {service.price && (
-                      <span className="text-sm font-bold text-brand-secondary">
-                        NT$ {service.price.toLocaleString()} 起
-                      </span>
-                    )}
-                  </div>
+                {/* Image/Icon Container */}
+                <div className="relative w-full aspect-[4/5] mb-4 flex items-center justify-center bg-gray-50 overflow-hidden">
+                  {service.image ? (
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <Icon className="w-16 h-16 text-brand-primary opacity-40" />
+                  )}
+                </div>
 
-                  <h3 className="text-xl font-bold mb-3 transition-colors duration-300" style={{ color: '#2C3E50' }}>
+                {/* Content */}
+                <div className="flex flex-col items-center">
+                  <h3 className="text-sm md:text-base font-normal text-center mb-1 text-gray-800 leading-snug px-2 line-clamp-2 min-h-[2.5rem] flex items-center">
                     {service.title}
                   </h3>
-                  <p style={{ color: 'rgba(44, 62, 80, 0.7)' }} className="leading-relaxed text-sm mb-6 flex-grow">
-                    {service.description}
+                  
+                  <p className="text-base md:text-lg font-bold text-center mb-4 text-black">
+                    NT${service.price?.toLocaleString() || '---'}
                   </p>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-brand-muted mt-auto">
-                    <button
-                      type="button"
-                      onClick={() => handleAddToCart(service)}
-                      className="text-sm font-bold flex items-center gap-2 transition-all duration-300"
-                      style={{ color: '#2B8A8A' }}
-                    >
-                      <ShoppingCart className="h-4 w-4" />
-                      加入購物車
-                    </button>
-                    <a
-                      href="#contact"
-                      className="text-sm font-bold flex items-center gap-1 transition-all duration-300 group-hover:gap-2"
-                      style={{ color: '#F5A623' }}
-                    >
-                      了解更多
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </a>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(service)}
+                    className="w-full max-w-[140px] bg-[#F5F5F5] py-2 md:py-3 flex justify-center items-center rounded-sm hover:bg-gray-200 transition-colors"
+                    aria-label="加入購物車"
+                  >
+                    <ShoppingCart className="h-5 w-5 text-black" />
+                  </button>
                 </div>
               </div>
             );
           })}
         </div>
 
-        <div className="mt-16 text-center">
-          <p className="text-lg mb-6" style={{ color: 'rgba(44, 62, 80, 0.7)' }}>
-            需要更多信息？我們的專業團隊隨時準備為您服務。
-          </p>
+        <div className="mt-20 text-center">
           <button
             type="button"
             onClick={openCart}
-            className="btn-secondary hover:shadow-lg hover:scale-105 transition-all duration-300"
+            className="px-10 py-3 border border-black text-black font-medium hover:bg-black hover:text-white transition-all duration-300 rounded-sm"
           >
-            查看購物車
+            查看目前購物車
           </button>
         </div>
       </div>

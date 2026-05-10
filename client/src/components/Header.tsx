@@ -34,40 +34,46 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted">
+      <div className="bg-[#F25C05] text-white py-2 px-4 text-center text-sm font-medium">
+        加入會員立即送 $100 購物金，現在立刻加入會員🥳
+      </div>
       <div className="container">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/">
-            <a className="flex items-center gap-3 transition-opacity opacity-100 hover:opacity-80">
-              <img
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
-                alt="德全有限公司 Logo"
-                loading="lazy"
-                decoding="async"
-                className="h-10 w-auto"
-              />
-              <div className="hidden sm:flex flex-col">
-                <span className="font-bold text-lg text-brand-primary leading-tight">德全</span>
-                <span className="text-[10px] text-brand-dark leading-tight tracking-wider">DEQUAN-M</span>
-              </div>
-            </a>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="font-medium transition-colors duration-300"
-                style={{ color: '#2C3E50' }}
-                onMouseEnter={(e) => e.currentTarget.style.color = '#2B8A8A'}
-                onMouseLeave={(e) => e.currentTarget.style.color = '#2C3E50'}
-              >
-                {link.label}
+        <div className="flex flex-col md:flex-row items-center justify-between h-auto md:h-20 py-4 md:py-0">
+          <div className="flex-grow flex justify-center md:justify-start">
+            <Link href="/">
+              <a className="flex items-center gap-3 transition-opacity opacity-100 hover:opacity-80">
+                <img
+                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
+                  alt="德全有限公司 Logo"
+                  loading="lazy"
+                  decoding="async"
+                  className="h-10 w-auto"
+                />
+                <div className="flex flex-col">
+                  <span className="font-bold text-lg text-brand-primary leading-tight">德全</span>
+                  <span className="text-[10px] text-brand-dark leading-tight tracking-wider">DEQUAN-M</span>
+                </div>
               </a>
-            ))}
-          </nav>
+            </Link>
+          </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <nav className="hidden lg:flex items-center gap-8 mr-8">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="font-medium transition-colors duration-300"
+                  style={{ color: '#2C3E50' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#2B8A8A'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#2C3E50'}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+
+            <div className="flex items-center gap-2 sm:gap-4">
             <button className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
               <Search className="w-5.5 h-5.5" />
             </button>

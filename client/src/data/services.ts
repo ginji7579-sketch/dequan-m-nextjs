@@ -5,6 +5,7 @@ import { serviceCatalog, type ServiceCatalogItem } from '@shared/services';
 export type ServiceItem = ServiceCatalogItem & {
   icon: LucideIcon;
   image?: string;
+  isNew?: boolean;
 };
 
 export const services: ServiceItem[] = [
@@ -12,21 +13,25 @@ export const services: ServiceItem[] = [
     ...serviceCatalog[0], // 名片設計
     icon: IdCard,
     image: '/images/service-branding.png',
+    isNew: true,
   },
   {
     ...serviceCatalog[1], // logo設計
     icon: Palette,
     image: '/images/service-branding.png',
+    isNew: true,
   },
   {
     ...serviceCatalog[2], // 廣告文宣
     icon: Megaphone,
     image: '/images/service-marketing.png',
+    isNew: true,
   },
   {
     ...serviceCatalog[3], // 靜態網站
     icon: Heart,
     image: '/images/service-webdev.png',
+    isNew: true,
   },
   {
     ...serviceCatalog[4], // 動態網站
