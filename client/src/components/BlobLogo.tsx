@@ -8,52 +8,43 @@ const BlobLogo = () => {
   const mesh3 = useRef<any>()
 
   useFrame((state) => {
+    // 移除大幅度動效，保持穩定感
     const time = state.clock.getElapsedTime()
-    
-    // 稍微增加一點整體的漂浮感
     if (mesh1.current) {
-      mesh1.current.position.y = Math.sin(time * 0.5) * 0.1
-      mesh1.current.rotation.z = Math.PI * 0.2 + Math.sin(time * 0.3) * 0.05
-    }
-    
-    // 橘色組件的動態效果
-    if (mesh2.current && mesh3.current) {
-      const wobble = Math.sin(time) * 0.1
-      mesh2.current.position.x = 0.1 + wobble
-      mesh3.current.position.x = 1.3 + wobble
+      mesh1.current.rotation.z = Math.PI * 0.25 + Math.sin(time * 0.2) * 0.02
     }
   })
 
   return (
-    <group scale={1.2}>
-      {/* 綠色 C 型主體 - 使用 Torus 但調整參數使其更圓潤 */}
-      <mesh ref={mesh1} position={[0, 0, 0]} rotation={[0, 0, Math.PI * 0.2]}>
-        <torusGeometry args={[1, 0.45, 32, 100, Math.PI * 1.6]} />
+    <group scale={1.3}>
+      {/* 深綠色 C 型主體 */}
+      <mesh ref={mesh1} position={[0, 0, 0]} rotation={[0, 0, Math.PI * 0.25]}>
+        <torusGeometry args={[1, 0.5, 32, 100, Math.PI * 1.65]} />
         <meshStandardMaterial 
-          color="#3E867E" 
-          roughness={0.4} 
+          color="#00312D" 
+          roughness={0.5} 
           metalness={0.1}
         />
       </mesh>
 
-      {/* 橘色連接部分 - 由兩個球體和一個連接處組成 */}
-      <group ref={mesh2} position={[0.1, 0, 0]}>
+      {/* 咖啡色組件 */}
+      <group position={[0.1, -0.1, 0]}>
         {/* 內側球體 */}
         <mesh>
           <sphereGeometry args={[0.55, 64, 64]} />
-          <meshStandardMaterial color="#F49424" roughness={0.3} />
+          <meshStandardMaterial color="#864B11" roughness={0.4} />
         </mesh>
         
-        {/* 連接頸部 */}
-        <mesh position={[0.6, 0, 0]} rotation={[0, 0, Math.PI * 0.5]}>
-          <capsuleGeometry args={[0.25, 0.8, 20, 20]} />
-          <meshStandardMaterial color="#F49424" roughness={0.3} />
+        {/* 連接橋接 */}
+        <mesh position={[0.55, 0.35, 0]} rotation={[0, 0, -Math.PI * 0.2]}>
+          <capsuleGeometry args={[0.22, 0.7, 20, 20]} />
+          <meshStandardMaterial color="#864B11" roughness={0.4} />
         </mesh>
 
         {/* 外側球體 */}
-        <mesh ref={mesh3} position={[1.2, 0.4, 0]}>
-          <sphereGeometry args={[0.6, 64, 64]} />
-          <meshStandardMaterial color="#F49424" roughness={0.3} />
+        <mesh position={[1.1, 0.7, 0]}>
+          <sphereGeometry args={[0.58, 64, 64]} />
+          <meshStandardMaterial color="#864B11" roughness={0.4} />
         </mesh>
       </group>
     </group>
