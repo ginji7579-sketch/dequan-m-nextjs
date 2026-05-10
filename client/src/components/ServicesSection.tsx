@@ -12,8 +12,18 @@ export default function ServicesSection() {
   };
 
   return (
-    <section id="services" className="py-12 md:py-20 bg-white">
+    <section id="services" className="py-12 md:py-24 bg-white">
       <div className="container px-4">
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center mb-16 md:mb-24 animate-fade-in">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-brand-primary">服務項目 Services</h2>
+          <div className="h-1.5 w-20 bg-accent mx-auto mb-8"></div>
+          <p className="text-lg md:text-xl text-brand-dark/80 leading-relaxed font-medium">
+            德全有限公司致力於提供最專業的品牌設計與行銷推廣解決方案。
+            我們以穩固的專業基礎與對細節的極致追求，協助您的品牌在數位時代中建立獨特的競爭優勢，讓每一個選擇都值得被信賴。
+          </p>
+        </div>
+
         <div className="mobile-grid-2">
           {services.map((service) => {
             const Icon = service.icon;
