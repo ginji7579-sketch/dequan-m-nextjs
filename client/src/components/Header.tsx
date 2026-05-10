@@ -137,14 +137,33 @@ export default function Header() {
                   <div className="py-2">
                     {navLinks.map((link) => (
                       <div key={link.label} className="border-b border-gray-50 last:border-none">
-                        <a
-                          href={link.href}
-                          className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {link.label}
-                          {link.hasSub && <ChevronDown className="w-4 h-4 text-gray-400" />}
-                        </a>
+                        {link.href.startsWith('#') ? (
+                          <a
+                            href={link.href}
+                            className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                            onClick={(e) => {
+                              setIsMenuOpen(false);
+                              // 延遲一點點讓選單關閉後再跳轉，避免 Chrome 選項卡死
+                              setTimeout(() => {
+                                const el = document.querySelector(link.href);
+                                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                              }, 300);
+                            }}
+                          >
+                            {link.label}
+                            {link.hasSub && <ChevronDown className="w-4 h-4 text-gray-400" />}
+                          </a>
+                        ) : (
+                          <Link href={link.href}>
+                            <a
+                              className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {link.label}
+                              {link.hasSub && <ChevronDown className="w-4 h-4 text-gray-400" />}
+                            </a>
+                          </Link>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -209,7 +228,9 @@ export default function Header() {
                           <Link href="/login">
                             <a
                               className="block px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 border-b border-gray-50"
-                              onClick={() => setIsMenuOpen(false)}
+                              onClick={(e) => {
+                                setIsMenuOpen(false);
+                              }}
                             >
                               會員登入
                             </a>
@@ -232,6 +253,7 @@ export default function Header() {
           </div>
         </div>
       </div>
-    </header>
-  );
+    </div>
+  </header>
+);
 }
