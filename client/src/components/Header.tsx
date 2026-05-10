@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { Menu, ShoppingCart, X, User as UserIcon, LogOut, ChevronDown, ChevronRight, Search } from 'lucide-react';
+import { Menu, ShoppingCart, X, User as UserIcon, LogOut, ChevronDown, ChevronRight, Search, Globe } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -70,36 +70,45 @@ export default function Header() {
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-4">
-            <button className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-              <Search className="w-5.5 h-5.5" />
-            </button>
+              {/* Language Switcher */}
+              <button 
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95"
+                onClick={() => toast.info('語言切換功能即將上線')}
+              >
+                <span className="text-[10px] md:text-xs font-bold tracking-wider">中文</span>
+                <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              </button>
 
-            {isAuthenticated ? (
-              <Link href="/admin">
-                <a className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-                  <UserIcon className="w-5.5 h-5.5" />
-                </a>
-              </Link>
-            ) : (
-              <Link href="/login">
-                <a className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-                  <UserIcon className="w-5.5 h-5.5" />
-                </a>
-              </Link>
-            )}
+              <button className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
+                <Search className="w-5.5 h-5.5" />
+              </button>
 
-            <button
-              className="relative p-2 text-gray-700 hover:text-brand-primary transition-colors"
-              onClick={openCart}
-              aria-label="開啟購物車"
-            >
-              <ShoppingCart className="w-5.5 h-5.5" />
-              {totalQuantity > 0 && (
-                <span className="absolute right-0 top-0 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#F5A623] px-1 text-[10px] font-bold text-white">
-                  {totalQuantity}
-                </span>
+              {isAuthenticated ? (
+                <Link href="/admin">
+                  <a className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
+                    <UserIcon className="w-5.5 h-5.5" />
+                  </a>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <a className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
+                    <UserIcon className="w-5.5 h-5.5" />
+                  </a>
+                </Link>
               )}
-            </button>
+
+              <button
+                className="relative p-2 text-gray-700 hover:text-brand-primary transition-colors"
+                onClick={openCart}
+                aria-label="開啟購物車"
+              >
+                <ShoppingCart className="w-5.5 h-5.5" />
+                {totalQuantity > 0 && (
+                  <span className="absolute right-0 top-0 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-[#F5A623] px-1 text-[10px] font-bold text-white">
+                    {totalQuantity}
+                  </span>
+                )}
+              </button>
 
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
