@@ -31,7 +31,7 @@ export default function Header() {
   ];
 
   const categories = [
-    { label: '品牌設計', href: '#services' },
+    { label: '網站架設報價', href: '#services' },
     { label: '行銷推廣', href: '#services' },
     { label: '網頁開發', href: '#services', hasSub: true },
     { label: '工業服務', href: '#services' },
