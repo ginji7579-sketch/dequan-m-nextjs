@@ -34,28 +34,24 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted">
-      <div className="bg-[#F25C05] text-white py-2 px-4 text-center text-sm font-medium">
-        加入會員立即送 $100 購物金，現在立刻加入會員🥳
-      </div>
+      <div className="bg-[#F25C05] h-1 md:h-1.5 w-full"></div>
       <div className="container">
-        <div className="flex flex-col md:flex-row items-center justify-between h-auto md:h-20 py-4 md:py-0">
-          <div className="flex-grow flex justify-center md:justify-start">
-            <Link href="/">
-              <a className="flex items-center gap-3 transition-opacity opacity-100 hover:opacity-80">
-                <img
-                  src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
-                  alt="德全有限公司 Logo"
-                  loading="lazy"
-                  decoding="async"
-                  className="h-10 w-auto"
-                />
-                <div className="flex flex-col">
-                  <span className="font-bold text-lg text-brand-primary leading-tight">德全</span>
-                  <span className="text-[10px] text-brand-dark leading-tight tracking-wider">DEQUAN-M</span>
-                </div>
-              </a>
-            </Link>
-          </div>
+        <div className="flex items-center justify-between h-20">
+          <Link href="/">
+            <a className="flex items-center gap-2 md:gap-3 transition-opacity opacity-100 hover:opacity-80">
+              <img
+                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663070144485/aSt5pv6mkSff6ez8cLV8EV/logo_ff0fe2ce.jpg"
+                alt="德全有限公司 Logo"
+                loading="lazy"
+                decoding="async"
+                className="h-10 md:h-12 w-auto object-contain"
+              />
+              <div className="flex flex-col">
+                <span className="font-bold text-base md:text-xl text-brand-primary leading-tight">德全有限公司</span>
+                <span className="text-[9px] md:text-[11px] text-brand-dark leading-tight tracking-widest uppercase">DEQUAN-M CO.LTD</span>
+              </div>
+            </a>
+          </Link>
 
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             <nav className="hidden lg:flex items-center gap-8 mr-8">
