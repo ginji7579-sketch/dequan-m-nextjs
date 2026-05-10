@@ -18,7 +18,7 @@ export default function Header() {
   const { user, logout, isAuthenticated } = useAuth();
 
   const navLinks = [
-    { label: '最新商品', href: '/' },
+    { label: '首頁', href: '/' },
     { label: '關於我們', href: '#about' },
     { label: '服務項目', href: '#services', hasSub: true },
     { label: '精選作品 Showcase', href: '#portfolio', hasSub: true },
