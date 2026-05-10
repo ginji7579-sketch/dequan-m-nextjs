@@ -23,7 +23,7 @@ const BlobLogo = () => {
       <mesh ref={mesh1} position={[0, 0, 0]} rotation={[0, 0, Math.PI * 0.2]}>
         <torusGeometry args={[1, 0.4, 32, 100, Math.PI * 1.5]} />
         <meshPhysicalMaterial 
-          color="#3A8E7D" 
+          color="#2B8A8A" 
           roughness={0.3} 
           clearcoat={1}
         />
@@ -33,7 +33,7 @@ const BlobLogo = () => {
       <mesh ref={mesh2} position={[1.2, 0, 0]}>
         <sphereGeometry args={[0.5, 64, 64]} />
         <meshPhysicalMaterial 
-          color="#F28C28" 
+          color="#F5A623" 
           roughness={0.2}
         />
       </mesh>
