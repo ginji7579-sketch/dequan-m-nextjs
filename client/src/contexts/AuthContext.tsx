@@ -193,18 +193,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return 'popup' as const;
       } catch (popupErr: any) {
         const code = popupErr?.code ?? "";
+        const message = popupErr?.message ?? "未知錯誤";
         console.warn('Popup failed, falling back to redirect:', code);
         
-        // 只有在彈窗被阻擋或環境不支援時才跳轉
+        // 如果是常見的 Popup 被阻擋，嘗試 Redirect
         if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
           persistGoogleReturnPath(returnTo);
           await signInWithRedirect(auth, provider);
           return "redirect" as const;
         }
+        
+        // 診斷用彈窗：幫助我們知道手機上到底發生了什麼錯誤
+        alert(`登入失敗 (${code}): ${message}\n如果您使用的是 Safari，請嘗試關閉「防止跨網站追蹤」或改用 Chrome。`);
         throw popupErr;
       }
     } catch (e: any) {
-      console.error('Google Login Final Error:', e);
+      const code = e?.code ?? "";
+      console.error('Google login total error:', e);
+      if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
+        alert(`系統異常 (${code}): ${e?.message ?? "請稍後再試"}`);
+      }
       throw e;
     }
   };
