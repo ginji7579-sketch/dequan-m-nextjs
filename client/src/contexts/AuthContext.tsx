@@ -172,35 +172,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // 在行動裝置上，直接使用 Redirect 是最穩定的做法，避開彈窗攔截與 ITP 限制
-      if (isMobile) {
+      const isMobileDevice = isMobile || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0);
+      
+      // 在行動裝置上，如果是在 LINE 或 FB 內建瀏覽器，強制跳轉
+      if (isLineWebview || isMetaWebview) {
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
         return "redirect" as const;
       }
 
-      await signInWithPopup(auth, provider);
-      clearGoogleReturnMarkers();
-      return 'popup' as const;
-    } catch (e: unknown) {
-      const code =
-        e && typeof e === "object" && "code" in e
-          ? String((e as { code: string }).code)
-          : "";
+      // 否則先嘗試 Popup，因為在 iOS Safari 上 Popup 有時比 Redirect 更能繞過 ITP 限制
+      try {
+        await signInWithPopup(auth, provider);
+        clearGoogleReturnMarkers();
+        return 'popup' as const;
+      } catch (popupErr: any) {
+        const code = popupErr?.code ?? "";
+        console.error('Popup failed, falling back to redirect:', popupErr);
+        
+        // 如果是被阻擋、不支援或內部錯誤，才嘗試 Redirect
+        if (
+          code === "auth/popup-blocked" ||
+          code === "auth/operation-not-supported-in-this-environment" ||
+          code === "auth/internal-error" ||
+          isMobileDevice
+        ) {
+          persistGoogleReturnPath(returnTo);
+          await signInWithRedirect(auth, provider);
+          return "redirect" as const;
+        }
+        throw popupErr;
+      }
+    } catch (e: any) {
+      const code = e?.code ?? '';
+      const message = e?.message ?? 'Unknown error';
+      console.error('Google Login Final Error:', e);
       
-      console.error('Google Login Error Details:', e);
-
-      if (
-        code === "auth/popup-blocked" ||
-        code === "auth/operation-not-supported-in-this-environment" ||
-        code === "auth/internal-error" || 
-        code === "auth/network-request-failed" || 
-        code === "auth/web-storage-unsupported"
-      ) {
-        // 如果 Popup 失敗，嘗試最後一次 Redirect
-        persistGoogleReturnPath(returnTo);
-        await signInWithRedirect(auth, provider);
-        return "redirect" as const;
+      // 強制在手機端彈出錯誤，確保使用者看得到
+      if (typeof window !== 'undefined') {
+        alert(`登入程序發生錯誤：\nCode: ${code}\nMessage: ${message}`);
       }
       throw e;
     }
