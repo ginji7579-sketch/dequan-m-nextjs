@@ -41,7 +41,7 @@
   "rewrites": [
     {
       "source": "/__/auth/:path*",
-      "destination": "https://iron-burner-491014-s3.firebaseapp.com/__/auth/:path*"
+      "destination": "https://dequan-m.firebaseapp.com/__/auth/:path*"
     },
     {
       "source": "/(.*)",
