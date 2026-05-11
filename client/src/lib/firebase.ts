@@ -34,12 +34,17 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 優先使用明確設定的 env variable（若你在 Vercel 設定了 VITE_FIREBASE_AUTH_DOMAIN）
+  // 優先使用明確設定的 env variable
   if (domain && domain.trim() !== '') return domain;
 
+  // 優先使用當前網域 (這能解決手機版 Safari/LINE 的 auth/internal-error)
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (currentHost.includes('vercel.app')) {
+    return currentHost;
+  }
+
   // 預設回退到 projectId 的 firebaseapp domain
-  // 這能解決 redirect_uri_mismatch 問題，因為 firebaseapp.com 是預設被 Google 授權的
-  return projectId ? `${projectId}.firebaseapp.com` : "dequan-m.firebaseapp.com";
+  return projectId ? `${projectId}.firebaseapp.com` : "dequan-m.vercel.app";
 };
 
 const appConfig = {
