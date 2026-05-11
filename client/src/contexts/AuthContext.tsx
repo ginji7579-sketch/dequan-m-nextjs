@@ -170,10 +170,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const provider = new GoogleAuthProvider();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
     try {
-      // 第三步：在系統瀏覽器中，優先使用彈窗
-      // 配合同網域代理 (Auth Proxy)，彈窗是穩定且推薦的做法
+      // 第三步：在手機上，為了最高穩定性，直接使用 Redirect 流程
+      if (isMobile) {
+        console.info('[Auth] Mobile detected, using redirect flow...');
+        persistGoogleReturnPath(returnTo);
+        await signInWithRedirect(auth, provider);
+        return 'redirect' as const;
+      }
+
+      // 第四步：在電腦版，優先使用彈窗 (Popup)
       try {
         await signInWithPopup(auth, provider);
         clearGoogleReturnMarkers();
@@ -183,19 +191,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const message = popupErr?.message ?? '未知錯誤';
         console.warn('[Auth] Popup login failed:', code, message);
 
-        // popup 失敗時的降級方案：使用 redirect 流程
-        // 這是更穩定的備方案，特別是在某些特殊瀏覽器環境
+        // 如果 Popup 被阻擋，降級到 Redirect
         console.info('[Auth] Falling back to redirect method...');
-        try {
-          persistGoogleReturnPath(returnTo);
-          await signInWithRedirect(auth, provider);
-          return 'redirect' as const;
-        } catch (redirectErr: any) {
-          // 如果 redirect 也失敗，提示用戶檢查環境
-          const fallbackMsg = `登入失敗 (${code})。請確保：\n1. 你使用的是系統瀏覽器（Safari/Chrome）\n2. 瀏覽器允許快顯視窗\n3. 網際網路連線正常`;
-          console.error('[Auth] Both popup and redirect failed:', redirectErr);
-          throw new Error(fallbackMsg);
-        }
+        persistGoogleReturnPath(returnTo);
+        await signInWithRedirect(auth, provider);
+        return 'redirect' as const;
       }
     } catch (e: any) {
       console.error('[Auth] Google login total error:', e);
