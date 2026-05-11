@@ -275,25 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {loading ? (
-        <div className="min-h-screen flex items-center justify-center bg-[#F5F1E8] p-4 text-center">
-          <div className="flex flex-col items-center gap-6 max-w-sm">
-            <div className="w-12 h-12 border-4 border-[#2B8A8A] border-t-transparent rounded-full animate-spin"></div>
-            <div className="space-y-2">
-              <p className="text-[#2B8A8A] font-bold text-lg">正在準備登入環境...</p>
-              <p className="text-gray-500 text-sm">如果等候超過 5 秒，請點擊下方按鈕重整，或確保您使用的是系統瀏覽器（Safari/Chrome）。</p>
-            </div>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-[#2B8A8A] text-white rounded-full font-medium shadow-md hover:opacity-90 active:scale-95 transition-all"
-            >
-              重新整理頁面
-            </button>
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      {children}
     </AuthContext.Provider>
   );
 }
