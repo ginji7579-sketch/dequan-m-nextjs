@@ -34,10 +34,9 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 動態讀取設定，避免寫死域名導致不匹配
-  if (domain) return domain;
-  if (projectId) return `${projectId}.firebaseapp.com`;
-  return "dequan-m.firebaseapp.com"; // 最後的後備
+  // 這是解決 Safari/iOS auth/internal-error 的最終方案：同網域代理
+  // 注意：這需要在 Google Cloud Console 加入 https://dequan-m.vercel.app/__/auth/handler
+  return "dequan-m.vercel.app";
 };
 
 const appConfig = {
