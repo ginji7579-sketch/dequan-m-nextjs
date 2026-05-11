@@ -34,8 +34,9 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 終極解決方案：使用「同網域代理」。這讓 Safari 認為驗證是在 dequan-m.vercel.app 完成的
-  return "dequan-m.vercel.app";
+  // 為了確保立即恢復登入功能，使用 Firebase 預設域名
+  // 這能解決截圖中的 redirect_uri_mismatch 錯誤
+  return "dequan-m.firebaseapp.com";
 };
 
 const appConfig = {
