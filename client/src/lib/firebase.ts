@@ -34,8 +34,15 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 還原為預設域名，確保電腦版能 100% 登入
-  return "iron-burner-491014-s3.firebaseapp.com";
+  // 自動偵測模式：優先使用當前域名（這對解決 Safari 報錯最有效）
+  const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
+  
+  if (currentHost.includes('vercel.app')) {
+    return currentHost;
+  }
+  
+  // 如果不在 Vercel，則使用傳入的 domain 或專案 ID
+  return domain || (projectId ? `${projectId}.firebaseapp.com` : "iron-burner-491014-s3.firebaseapp.com");
 };
 
 const appConfig = {
