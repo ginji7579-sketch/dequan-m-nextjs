@@ -194,14 +194,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (popupErr: any) {
         const code = popupErr?.code ?? "";
         const message = popupErr?.message ?? "未知錯誤";
-        console.warn('Popup failed, falling back to redirect:', code);
-        
-        // 只有在彈窗被阻擋或環境不支援時才跳轉
-        if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
-          persistGoogleReturnPath(returnTo);
-          await signInWithRedirect(auth, provider);
-          return "redirect" as const;
-        }
+        console.warn('Popup failed, not falling back to redirect (popupErr):', code, message);
+
+        // 不自動 fallback 到 redirect：改為提示使用者改用系統瀏覽器或 Chrome
+        const userMsg = `無法開啟登入視窗（${code}）。請使用系統瀏覽器或 Chrome 開啟此頁面後重試。`;
+        try { alert(userMsg); } catch (e) { /* ignore */ }
+        // 提供記錄以利 debug
+        console.info('[Auth] popup error, recommend user open system browser or use Chrome', { code, message });
         throw popupErr;
       }
     } catch (e: any) {

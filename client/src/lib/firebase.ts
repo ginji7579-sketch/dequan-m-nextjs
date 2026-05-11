@@ -34,15 +34,17 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 自動偵測模式：優先使用當前域名（這對解決 Safari 報錯最有效）
+  // 優先使用明確設定的 env variable（若你在 Vercel 設定了 VITE_FIREBASE_AUTH_DOMAIN）
+  if (domain && domain.trim() !== '') return domain;
+
+  // 否則根據當前 host 決定（保留原有自動偵測以改善 Safari 相容性）
   const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
-  
   if (currentHost.includes('vercel.app')) {
     return currentHost;
   }
-  
-  // 如果不在 Vercel，則使用傳入的 domain 或專案 ID
-  return domain || (projectId ? `${projectId}.firebaseapp.com` : "iron-burner-491014-s3.firebaseapp.com");
+
+  // 最後 fallback 到 projectId 的 firebaseapp domain
+  return projectId ? `${projectId}.firebaseapp.com` : "iron-burner-491014-s3.firebaseapp.com";
 };
 
 const appConfig = {

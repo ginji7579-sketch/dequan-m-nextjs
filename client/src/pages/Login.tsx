@@ -8,6 +8,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showOpenInBrowser, setShowOpenInBrowser] = useState(false);
   const [, setLocation] = useLocation();
   const { login, loginWithGoogle, user, redirectError } = useAuth();
 
@@ -48,16 +49,29 @@ export default function Login() {
       
       if (code === 'auth/internal-error') {
         setError('系統連線異常。請確認您的瀏覽器是否開啟了「防止跨網站追蹤」，或嘗試改用 Chrome 瀏覽器。');
+        setShowOpenInBrowser(true);
       } else if (code === 'auth/unauthorized-domain') {
         setError('此網域尚未獲得授權，請聯絡管理員檢查 Firebase 設定。');
       } else {
         setError(`登入失敗: ${code}。如果持續發生，請點擊右上角以預設瀏覽器開啟。`);
+        setShowOpenInBrowser(true);
       }
     }
   };
 
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
   const isWebView = /Line|FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
+
+  const openInSystemBrowser = () => {
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('openExternalBrowser', '1');
+      window.location.href = u.toString();
+    } catch (e) {
+      // fallback
+      window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'openExternalBrowser=1';
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAFA]">
@@ -147,6 +161,18 @@ export default function Login() {
             </svg>
             使用 Google 登入
           </button>
+
+          {showOpenInBrowser && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={openInSystemBrowser}
+                className="w-full py-3 px-4 rounded-lg bg-[#F5A623] text-white font-medium transition-transform active:scale-[0.98]"
+              >
+                以系統瀏覽器開啟（推薦）
+              </button>
+            </div>
+          )}
 
           <div className="mt-8 text-center text-sm">
             <span className="text-gray-500">還沒有帳號嗎？</span>
