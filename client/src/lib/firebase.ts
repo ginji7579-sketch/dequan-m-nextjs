@@ -37,14 +37,9 @@ const sanitizeAuthDomain = (domain: string | undefined, projectId: string | unde
   // 優先使用明確設定的 env variable（若你在 Vercel 設定了 VITE_FIREBASE_AUTH_DOMAIN）
   if (domain && domain.trim() !== '') return domain;
 
-  // 否則根據當前 host 決定（保留原有自動偵測以改善 Safari 相容性）
-  const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
-  if (currentHost.includes('vercel.app')) {
-    return currentHost;
-  }
-
-  // 最後 fallback 到 projectId 的 firebaseapp domain
-  return projectId ? `${projectId}.firebaseapp.com` : "iron-burner-491014-s3.firebaseapp.com";
+  // 預設回退到 projectId 的 firebaseapp domain
+  // 這能解決 redirect_uri_mismatch 問題，因為 firebaseapp.com 是預設被 Google 授權的
+  return projectId ? `${projectId}.firebaseapp.com` : "dequan-m.firebaseapp.com";
 };
 
 const appConfig = {
