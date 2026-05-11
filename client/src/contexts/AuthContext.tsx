@@ -227,6 +227,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     void (async () => {
+      // 環境變數檢測
+      const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+      const authDomain = auth.config.authDomain;
+      
+      if (!apiKey) {
+        alert("⚠️ 關鍵錯誤：找不到 Firebase API Key！\n請檢查 Vercel 後台的環境變數是否設定為 VITE_FIREBASE_API_KEY (必須以 VITE_ 開頭)。");
+      }
+
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
@@ -234,7 +242,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error: any) {
         console.error('getRedirectResult failed:', error);
-        setRedirectError(error.message || 'Google 登入跳轉驗證失敗，請改用一般瀏覽器重試。');
+        const code = error?.code || "unknown";
+        const msg = error?.message || "驗證失敗";
+        alert(`❌ 登入驗證失敗 (${code}):\n${msg}\n\n這通常是 Google Console 或 Firebase 後台設定不匹配導致。`);
+        setRedirectError(msg);
       }
     })();
 
