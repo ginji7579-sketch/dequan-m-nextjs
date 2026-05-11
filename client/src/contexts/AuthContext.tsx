@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
   GoogleAuthProvider,
@@ -38,15 +37,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    // 手機版自動使用 Redirect，電腦版自動使用 Popup，這是 Firebase SDK 的內建行為
+    // 統一使用 Redirect 流程，這是跨裝置最穩定的方案
     try {
-      await signInWithPopup(auth, provider);
+      await signInWithRedirect(auth, provider);
     } catch (error: any) {
-      if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-        await signInWithRedirect(auth, provider);
-      } else {
-        throw error;
-      }
+      console.error('Login with Google failed:', error);
+      alert(`登入發生錯誤: ${error.message}`);
+      throw error;
     }
   };
 
@@ -60,9 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    // 處理 Redirect 回來後的結果
+    // 處理重新導向後的結果
     getRedirectResult(auth).catch((error) => {
-      console.error('Redirect result error:', error);
+      if (error.code !== 'auth/internal-error') {
+        console.error('Redirect result error:', error);
+      }
     });
 
     return () => unsubscribe();
