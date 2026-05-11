@@ -181,37 +181,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return "redirect" as const;
       }
 
-      // 否則先嘗試 Popup，因為在 iOS Safari 上 Popup 有時比 Redirect 更能繞過 ITP 限制
-      try {
-        await signInWithPopup(auth, provider);
-        clearGoogleReturnMarkers();
-        return 'popup' as const;
-      } catch (popupErr: any) {
-        const code = popupErr?.code ?? "";
-        console.error('Popup failed, falling back to redirect:', popupErr);
-        
-        // 如果是被阻擋、不支援或內部錯誤，才嘗試 Redirect
-        if (
-          code === "auth/popup-blocked" ||
-          code === "auth/operation-not-supported-in-this-environment" ||
-          code === "auth/internal-error" ||
-          isMobileDevice
-        ) {
-          persistGoogleReturnPath(returnTo);
-          await signInWithRedirect(auth, provider);
-          return "redirect" as const;
-        }
-        throw popupErr;
+      // 對於其他行動裝置，直接使用跳轉是最穩定的，避免彈窗攔截
+      if (isMobileDevice) {
+        persistGoogleReturnPath(returnTo);
+        await signInWithRedirect(auth, provider);
+        return "redirect" as const;
       }
+
+      // 電腦端使用彈窗
+      await signInWithPopup(auth, provider);
+      clearGoogleReturnMarkers();
+      return 'popup' as const;
     } catch (e: any) {
-      const code = e?.code ?? '';
-      const message = e?.message ?? 'Unknown error';
-      console.error('Google Login Final Error:', e);
-      
-      // 強制在手機端彈出錯誤，確保使用者看得到
-      if (typeof window !== 'undefined') {
-        alert(`登入程序發生錯誤：\nCode: ${code}\nMessage: ${message}`);
-      }
+      console.error('Google Login Error:', e);
       throw e;
     }
   };

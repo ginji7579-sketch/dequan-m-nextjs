@@ -45,7 +45,14 @@ export default function Login() {
     } catch (err: any) {
       const code = err?.code ?? '';
       const message = err?.message ?? 'Unknown error';
-      setError(`登入失敗 (${code}): ${message}\n如果是使用 LINE 或 Facebook，請點擊右上角以「系統預設瀏覽器」開啟。`);
+      
+      if (code === 'auth/internal-error') {
+        setError('系統連線異常。請確認您的瀏覽器是否開啟了「防止跨網站追蹤」，或嘗試改用 Chrome 瀏覽器。');
+      } else if (code === 'auth/unauthorized-domain') {
+        setError('此網域尚未獲得授權，請聯絡管理員檢查 Firebase 設定。');
+      } else {
+        setError(`登入失敗: ${code}。如果持續發生，請點擊右上角以預設瀏覽器開啟。`);
+      }
     }
   };
 
