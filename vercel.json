@@ -46,7 +46,7 @@
       "destination": "https://dequan-m.firebaseapp.com/__/auth/:path*"
     },
     {
-      "source": "/((?!assets/|images/|favicon.ico|_manus_).*|login|register|admin|checkout|privacy)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
