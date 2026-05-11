@@ -48,6 +48,10 @@ export default function Login() {
         setError(
           'Firebase 設定異常（常見：Vercel 缺少 VITE_FIREBASE_* 或金鑰為空）。請到 Vercel 專案 Environment Variables 檢查後重新部署。'
         );
+      } else if (code === 'auth/internal-error') {
+        setError(
+          'Google 登入失敗 (internal-error)。可能原因：\n1. Safari 瀏覽器開啟了「防止跨網站追蹤」（請至設定關閉或改用 Chrome）。\n2. 目前的網址尚未加入 Firebase 的「授權網域 (Authorized domains)」中。'
+        );
       } else {
         setError(err.message || 'Google 登入失敗，請稍後再試');
       }
