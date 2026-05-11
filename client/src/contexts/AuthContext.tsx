@@ -155,16 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isFbIgWebview = /FBAN|FBAV|Instagram/i.test(ua);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
 
-    // Google blocks OAuth from WebView (Error 403: disallowed_useragent).
-    if (isLineWebview) {
-      const currentUrl = new URL(window.location.href);
-      if (!currentUrl.searchParams.has('openExternalBrowser')) {
-        currentUrl.searchParams.set('openExternalBrowser', '1');
-        window.location.href = currentUrl.toString();
-        return new Promise<'redirect'>(() => {});
-      }
-    } else if (isFbIgWebview) {
-      alert("為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！");
+    // 移除自動重新載入邏輯，直接進入登入流程
+    if (isFbIgWebview) {
+      alert("為保護您的帳號安全，請點擊右上角選單，選擇「以系統預設瀏覽器開啟」後再試一次！");
       throw new Error("WebView not supported");
     }
     
