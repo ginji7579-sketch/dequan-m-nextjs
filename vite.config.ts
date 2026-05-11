@@ -7,6 +7,10 @@ import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 import { createEcpayCheckout } from "./server/payments/ecpay";
+import cookieParser from "cookie-parser";
+import { OAuth2Client } from "google-auth-library";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
@@ -197,12 +201,226 @@ function vitePluginPaymentApi(): Plugin {
   };
 }
 
+function vitePluginOAuthApi(): Plugin {
+  return {
+    name: "oauth-api",
+    configureServer(server: ViteDevServer) {
+      // Cookie parser for signed cookies
+      server.middlewares.use(
+        cookieParser(process.env.OAUTH_SESSION_SECRET || "dev-secret-change-me")
+      );
+
+      // GET /api/oauth/authorize - initiate OAuth
+      server.middlewares.use("/api/oauth/authorize", (req, res, next) => {
+        if (req.method !== "GET") return next();
+
+        const protocol = (req as any).protocol === "https" || (req as any).secure ? "https" : "http";
+        const host = (req as any).headers.host;
+        const redirectUri = `${protocol}://${host}/api/oauth/callback`;
+
+        const state = crypto.randomBytes(16).toString("hex");
+        const nonce = crypto.randomBytes(16).toString("hex");
+
+        // Set state and nonce in signed cookies
+        res.cookie("oauth_state", state, {
+          httpOnly: true,
+          secure: false, // dev only
+          sameSite: "lax" as const,
+          maxAge: 5 * 60 * 1000,
+          signed: true,
+        });
+        res.cookie("oauth_nonce", nonce, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "lax" as const,
+          maxAge: 5 * 60 * 1000,
+          signed: true,
+        });
+
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+        if (!clientId || !clientSecret) {
+          console.error("Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
+          res.status(500).send("Server misconfiguration: missing OAuth credentials");
+          return;
+        }
+
+        try {
+          const oauthClient = new OAuth2Client({
+            clientId,
+            clientSecret,
+            redirectUri,
+          });
+
+          const authUrl = oauthClient.generateAuthUrl({
+            scope: ["openid", "profile", "email"],
+            access_type: "offline",
+            state,
+            nonce,
+            prompt: "select_account",
+          });
+
+          res.redirect(authUrl);
+        } catch (err) {
+          console.error("OAuth authorize error:", err);
+          res.status(500).send("Failed to initiate OAuth");
+        }
+      });
+
+      // GET /api/oauth/callback - Google redirects here
+      server.middlewares.use("/api/oauth/callback", async (req, res, next) => {
+        if (req.method !== "GET") return next();
+
+        const query = (req as any).query as any;
+        const { code, state } = query;
+        if (!code || !state) {
+          return res.status(400).send("Missing code or state");
+        }
+
+        const signedCookies = (req as any).signedCookies as any;
+        const stateCookie = signedCookies?.oauth_state;
+        if (!stateCookie || stateCookie !== state) {
+          return res.status(400).send("Invalid state");
+        }
+
+        const protocol = (req as any).protocol === "https" || (req as any).secure ? "https" : "http";
+        const host = (req as any).headers.host;
+        const redirectUri = `${protocol}://${host}/api/oauth/callback`;
+
+        try {
+          const clientId = process.env.GOOGLE_CLIENT_ID;
+          const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+          if (!clientId || !clientSecret) {
+            throw new Error("Missing OAuth credentials");
+          }
+          const oauthClient = new OAuth2Client({
+            clientId,
+            clientSecret,
+            redirectUri,
+          });
+
+          const { tokens } = await oauthClient.getToken({
+            code,
+            redirectUri,
+          });
+
+          const idToken = tokens.id_token;
+          if (!idToken) throw new Error("No ID token returned");
+
+          const ticket = await oauthClient.verifyIdToken({
+            idToken,
+            audience: clientId,
+          });
+          const payload = ticket.getPayload();
+
+          if (!payload) throw new Error("Invalid ID token payload");
+
+          const nonceCookie = signedCookies?.oauth_nonce;
+          if (!nonceCookie || nonceCookie !== payload.nonce) {
+            return res.status(400).send("Invalid nonce");
+          }
+
+          // Create session JWT
+          const sessionToken = jwt.sign(
+            {
+              uid: payload.sub,
+              email: payload.email,
+              displayName: payload.name,
+              photoURL: payload.picture,
+            },
+            process.env.OAUTH_SESSION_SECRET || "dev-secret",
+            { expiresIn: "7d" }
+          );
+
+          // Clear OAuth cookies
+          res.clearCookie("oauth_state");
+          res.clearCookie("oauth_nonce");
+
+          // Set session cookie
+          res.cookie("session", sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax" as const,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+          });
+
+          // Success response
+          const html = `<!DOCTYPE html>
+<html><head><title>登入</title></head>
+<body>
+<p>登入處理中...</p>
+<script>
+  if (window.opener) {
+    window.opener.postMessage({ type: 'oauth-success' }, '*');
+    setTimeout(() => window.close(), 300);
+  } else {
+    window.location.href = '/?oauth=success';
+  }
+</script>
+</body></html>`;
+          res.type("html").send(html);
+        } catch (err) {
+          console.error("OAuth callback error:", err);
+          const html = `<!DOCTYPE html>
+<html><head><title>登入失敗</title></head>
+<body>
+<p>登入失敗，請關閉視窗後再試。</p>
+<script>
+  if (window.opener) {
+    window.opener.postMessage({ type: 'oauth-error', error: '${err}' }, '*');
+  }
+  setTimeout(() => window.close(), 2000);
+</script>
+</body></html>`;
+          res.type("html").send(html);
+        }
+      });
+
+      // GET /api/auth/me
+      server.middlewares.use("/api/auth/me", (req: any, res: any) => {
+        if (req.method !== "GET") {
+          res.status(405).send("Method Not Allowed");
+          return;
+        }
+
+        const token = req.cookies?.session;
+        if (!token) {
+          return res.status(401).json({ authenticated: false, user: null });
+        }
+
+        try {
+          const payload = jwt.verify(token, process.env.OAUTH_SESSION_SECRET || "dev-secret") as any;
+          const { uid, email, displayName, photoURL } = payload;
+          res.json({
+            authenticated: true,
+            user: { uid, email, displayName, photoURL },
+          });
+        } catch (err) {
+          res.clearCookie("session");
+          return res.status(401).json({ authenticated: false, user: null });
+        }
+      });
+
+      // POST /api/auth/logout
+      server.middlewares.use("/api/auth/logout", (req: any, res: any) => {
+        if (req.method !== "POST") {
+          res.status(405).send("Method Not Allowed");
+          return;
+        }
+        res.clearCookie("session");
+        res.json({ success: true });
+      });
+    },
+  };
+}
+
 const plugins = [
   react(),
   tailwindcss(),
   jsxLocPlugin(),
   vitePluginManusRuntime(),
   vitePluginPaymentApi(),
+  vitePluginOAuthApi(),
   vitePluginManusDebugCollector(),
 ];
 

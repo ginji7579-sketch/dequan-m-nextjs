@@ -1,14 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
   User,
+  getRedirectResult,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -16,7 +13,7 @@ interface AuthContextType {
   user: User | null;
   signup: (email: string, password: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
-  loginWithGoogle: (returnTo?: string) => Promise<void>;
+  loginWithGoogle: () => void;
   logout: () => Promise<void>;
   loading: boolean;
   isAuthenticated: boolean;
@@ -28,12 +25,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch user from server-side OAuth session
+  const fetchServerUser = useCallback(async () => {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const { user: serverUser } = await res.json();
+        setUser(serverUser as any); // cast to Firebase User shape
+      }
+      // If not authenticated via server, do nothing (keep Firebase user if any)
+    } catch (err) {
+      console.error('Failed to fetch server user:', err);
+    }
+  }, []);
+
+  // Initial check for server session on mount
+  useEffect(() => {
+    fetchServerUser();
+  }, [fetchServerUser]);
+
+  // Listen for OAuth success messages from popup
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      if (event.data?.type === 'oauth-success') {
+        fetchServerUser();
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [fetchServerUser]);
+
+  // Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
     });
 
+    // Handle any pending redirect result (legacy)
     const checkRedirect = async () => {
       try {
         const result = await getRedirectResult(auth);
@@ -52,34 +81,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
   const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
 
-   const loginWithGoogle = async (returnTo?: string) => {
-     const provider = new GoogleAuthProvider();
-     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-     const isMobile = /iPhone|iPad|iPod|Android|Line|FBAN|FBAV|Instagram/i.test(ua);
-     const isLine = /Line/i.test(ua);
+  const loginWithGoogle = () => {
+    // Open OAuth flow in a centered popup
+    const width = 500, height = 600;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+    const popup = window.open(
+      '/api/oauth/authorize',
+      'Google Login',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
 
-     if (isLine) {
-       alert("⚠️ 請點擊右上角「⋯」，選擇「以系統瀏覽器開啟」再進行登入，以確保 Google 驗證成功。");
-     }
+    // Fallback if popup blocked: full-page redirect
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      window.location.href = '/api/oauth/authorize';
+    }
+  };
 
-     try {
-       if (isMobile) {
-         await signInWithRedirect(auth, provider);
-       } else {
-         await signInWithPopup(auth, provider);
-       }
-       return isMobile ? 'redirect' : 'popup';
-     } catch (error: any) {
-       if (error.code === 'auth/popup-blocked') {
-         await signInWithRedirect(auth, provider);
-         return 'redirect';
-       } else {
-         throw error;
-       }
-     }
-   };
-
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    await signOut(auth);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    setUser(null);
+  };
 
   const value = {
     user,
