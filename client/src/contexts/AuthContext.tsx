@@ -215,10 +215,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
+          // 診斷 1: 成功抓到跳轉結果
+          alert(`✅ 抓到使用者了: ${result.user.email}`);
           consumeGoogleReturnIfSignedIn(result.user);
+        } else {
+          // 診斷 2: 沒抓到結果 (可能是沒執行跳轉，或資訊遺失)
+          console.log('No redirect result');
         }
-      } catch {
-        /* redirect 未完成或已處理過時可忽略 */
+      } catch (e: any) {
+        // 診斷 3: 發生具體錯誤
+        alert(`❌ 跳轉出錯 (${e.code}): ${e.message}`);
+        console.error('Redirect Result Error:', e);
       }
     })();
 
