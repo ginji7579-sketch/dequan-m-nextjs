@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -9,7 +9,19 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, user, redirectError } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setLocation('/admin');
+    }
+  }, [user, setLocation]);
+
+  useEffect(() => {
+    if (redirectError) {
+      setError(redirectError);
+    }
+  }, [redirectError]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

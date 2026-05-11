@@ -134,6 +134,7 @@ interface AuthContextType {
   loginWithGoogle: (returnTo?: string) => Promise<'popup' | 'redirect'>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
+  redirectError: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -141,6 +142,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   const signup = (email: string, password: string) => {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -157,7 +159,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isMetaWebview = /FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
 
-    // Google blocks OAuth from WebView (Error 403: disallowed_useragent).
     if (isLineWebview) {
       const currentUrl = new URL(window.location.href);
       if (!currentUrl.searchParams.has('openExternalBrowser')) {
@@ -171,7 +172,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // 在行動裝置上，如果不是 LINE/FB，先嘗試 popup，失敗則自動切換為 redirect
       await signInWithPopup(auth, provider);
       clearGoogleReturnMarkers();
       return 'popup' as const;
@@ -181,11 +181,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ? String((e as { code: string }).code)
           : "";
       
-      // 在行動裝置上，任何「不支援」或「內部錯誤」通常都暗示應該改用 Redirect
       if (
         code === "auth/popup-blocked" ||
         code === "auth/operation-not-supported-in-this-environment" ||
-        (isMobile && (code === "auth/internal-error" || code === "auth/network-request-failed"))
+        (isMobile && (code === "auth/internal-error" || code === "auth/network-request-failed" || code === "auth/web-storage-unsupported"))
       ) {
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
@@ -202,9 +201,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    // 必須先訂閱 onAuthStateChanged，不可先 await getRedirectResult：
-    // 在部分 Safari／WebView 上 getRedirectResult 可能長時間不 resolve，
-    // 會導致 loading 永遠 true、整站 children 不渲染（白畫面）。
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (cancelled) return;
       setUser(currentUser);
@@ -220,8 +216,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (result?.user) {
           consumeGoogleReturnIfSignedIn(result.user);
         }
-      } catch {
-        /* redirect 未完成或已處理過時可忽略 */
+      } catch (error: any) {
+        console.error('getRedirectResult failed:', error);
+        setRedirectError(error.message || 'Google 登入跳轉驗證失敗，請改用一般瀏覽器重試。');
       }
     })();
 
@@ -243,6 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithGoogle,
     logout,
     isAuthenticated: Boolean(user),
+    redirectError,
   };
 
   return (

@@ -7,7 +7,7 @@ export type ServiceItem = ServiceCatalogItem & {
   image?: string;
   isNew?: boolean;
 };
-
+export const services: ServiceItem[] = [
   {
     ...serviceCatalog[0], // 形象網站基本價
     icon: Monitor,
