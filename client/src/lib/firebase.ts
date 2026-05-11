@@ -34,8 +34,8 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 根據截圖中的專案 ID 更新
-  return "dequan-m.vercel.app";
+  // 還原為預設域名，確保電腦版能 100% 登入
+  return "iron-burner-491014-s3.firebaseapp.com";
 };
 
 const appConfig = {

@@ -165,16 +165,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         currentUrl.searchParams.set('openExternalBrowser', '1');
         window.location.href = currentUrl.toString();
         return new Promise<'redirect'>(() => {});
-      } else {
-        // 如果已經帶有參數但還是在 LINE，說明自動跳轉失敗，需要手動提示
-        const msg = "偵測到您正在 LINE 內使用。Google 不支援在 LINE 內登入，請點擊右上角「...」並選擇「以預設瀏覽器開啟」再試一次。";
-        alert(msg);
-        throw new Error(msg);
+        alert(`偵測到您正在 LINE 內使用。Google 不支援在 LINE 內登入，請點擊右上角「...」並選擇「以預設瀏覽器開啟」再試一次。`);
+        throw new Error("LINE webview detected");
       }
     } else if (isMetaWebview) {
-      const msg = "偵測到您正在 FB/Instagram 內使用。Google 不支援在應用程式內登入，請點擊下方（或右上方）圖示選擇「以預設瀏覽器開啟」再試一次。";
-      alert(msg);
-      throw new Error(msg);
+      alert("偵測到您正在 FB/Instagram 內使用。Google 不支援在應用程式內登入，請點擊下方（或右上方）圖示選擇「以預設瀏覽器開啟」再試一次。");
+      throw new Error("Meta webview detected");
     }
     
     try {
@@ -196,23 +192,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const message = popupErr?.message ?? "未知錯誤";
         console.warn('Popup failed, falling back to redirect:', code);
         
-        // 如果是常見的 Popup 被阻擋，嘗試 Redirect
+        // 只有在彈窗被阻擋或環境不支援時才跳轉
         if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
           persistGoogleReturnPath(returnTo);
           await signInWithRedirect(auth, provider);
           return "redirect" as const;
         }
-        
-        // 診斷用彈窗：幫助我們知道手機上到底發生了什麼錯誤
-        alert(`登入失敗 (${code}): ${message}\n如果您使用的是 Safari，請嘗試關閉「防止跨網站追蹤」或改用 Chrome。`);
         throw popupErr;
       }
     } catch (e: any) {
-      const code = e?.code ?? "";
       console.error('Google login total error:', e);
-      if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') {
-        alert(`系統異常 (${code}): ${e?.message ?? "請稍後再試"}`);
-      }
       throw e;
     }
   };
@@ -241,10 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error: any) {
         console.error('getRedirectResult failed:', error);
-        const msg = error?.message || 'Google 登入跳轉驗證失敗';
-        const code = error?.code || 'unknown';
-        alert(`初始化失敗 (${code}): ${msg}`);
-        setRedirectError(msg);
+        setRedirectError(error.message || 'Google 登入跳轉驗證失敗，請改用一般瀏覽器重試。');
       }
     })();
 
