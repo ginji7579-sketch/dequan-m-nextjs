@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -8,21 +8,8 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showOpenInBrowser, setShowOpenInBrowser] = useState(false);
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle, user, redirectError } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      setLocation('/admin');
-    }
-  }, [user, setLocation]);
-
-  useEffect(() => {
-    if (redirectError) {
-      setError(redirectError);
-    }
-  }, [redirectError]);
+  const { login, loginWithGoogle } = useAuth();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,40 +26,19 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setError('');
     try {
-      await loginWithGoogle();
-      setLocation('/admin');
+      const mode = await loginWithGoogle('/admin');
+      if (mode === 'popup') {
+        setLocation('/admin');
+      }
     } catch (err: any) {
       const code = err?.code ?? '';
-      const message = err?.message ?? 'Unknown error';
-      
-      console.error('❌ Google 登入失敗：', { code, message, hostname: window.location.hostname });
-      
-      if (code === 'auth/internal-error') {
-        setError('系統連線異常。請確認您的瀏覽器是否開啟了「防止跨網站追蹤」，或嘗試改用 Chrome 瀏覽器。');
-        setShowOpenInBrowser(true);
-      } else if (code === 'auth/unauthorized-domain') {
-        setError(`❌ Domain 未授權：${window.location.hostname}\n\n請要求管理員在 Firebase Console > Authentication > Authorized domains 加入此網域。\n\n詳細資訊：${message}`);
-      } else if (code === 'auth/popup-blocked') {
-        setError('登入視窗被瀏覽器阻擋。請檢查瀏覽器快顯設定，或點擊下方按鈕以預設瀏覽器開啟。');
-        setShowOpenInBrowser(true);
+      if (code === 'auth/argument-error') {
+        setError(
+          'Firebase 設定異常（常見：Vercel 缺少 VITE_FIREBASE_* 或金鑰為空）。請到 Vercel 專案 Environment Variables 檢查後重新部署。'
+        );
       } else {
-        setError(`登入失敗 (${code}):\n${message}\n\n若持續發生，請點擊下方按鈕以預設瀏覽器開啟。`);
-        setShowOpenInBrowser(true);
+        setError(err.message || 'Google 登入失敗，請稍後再試');
       }
-    }
-  };
-
-  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-  const isWebView = /Line|FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
-
-  const openInSystemBrowser = () => {
-    try {
-      const u = new URL(window.location.href);
-      u.searchParams.set('openExternalBrowser', '1');
-      window.location.href = u.toString();
-    } catch (e) {
-      // fallback
-      window.location.href = window.location.href + (window.location.href.includes('?') ? '&' : '?') + 'openExternalBrowser=1';
     }
   };
 
@@ -86,11 +52,9 @@ export default function Login() {
             <h1 className="text-2xl font-bold mb-2" style={{ color: '#2B8A8A' }}>會員登入</h1>
             <p className="text-[#2C3E50] text-sm">歡迎回到德全，請輸入您的帳號密碼</p>
             {error && (
-              <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-100">
-                <p className="text-sm text-red-600 whitespace-pre-wrap font-medium" role="alert">
-                  {error}
-                </p>
-              </div>
+              <p className="mt-4 text-sm text-red-600" role="alert">
+                {error}
+              </p>
             )}
           </div>
 
@@ -164,18 +128,6 @@ export default function Login() {
             </svg>
             使用 Google 登入
           </button>
-
-          {showOpenInBrowser && (
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={openInSystemBrowser}
-                className="w-full py-3 px-4 rounded-lg bg-[#F5A623] text-white font-medium transition-transform active:scale-[0.98]"
-              >
-                以系統瀏覽器開啟（推薦）
-              </button>
-            </div>
-          )}
 
           <div className="mt-8 text-center text-sm">
             <span className="text-gray-500">還沒有帳號嗎？</span>
