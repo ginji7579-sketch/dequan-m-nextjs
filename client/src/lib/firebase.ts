@@ -33,10 +33,8 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  if (!domain || domain.includes("vercel.app")) {
-    return projectId ? `${projectId}.firebaseapp.com` : "";
-  }
-  return domain;
+  // 終極解決方案：使用「同網域代理」。這讓 Safari 認為驗證是在 dequan-m.vercel.app 完成的
+  return "dequan-m.vercel.app";
 };
 
 const appConfig = {

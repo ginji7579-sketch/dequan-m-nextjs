@@ -172,28 +172,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      const isMobileDevice = isMobile || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0);
-      
-      // 在行動裝置上，如果是在 LINE 或 FB 內建瀏覽器，強制跳轉
+      // 如果是在 LINE 或 FB 內建瀏覽器，直接跳轉 (因為這些環境完全不支援彈窗)
       if (isLineWebview || isMetaWebview) {
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
         return "redirect" as const;
       }
 
-      // 對於其他行動裝置，直接使用跳轉是最穩定的，避免彈窗攔截
-      if (isMobileDevice) {
-        persistGoogleReturnPath(returnTo);
-        await signInWithRedirect(auth, provider);
-        return "redirect" as const;
+      // 其他環境（包括手機 Safari/Chrome），優先使用彈窗
+      // 配合同網域代理 (Auth Proxy)，這現在是非常穩定的
+      try {
+        await signInWithPopup(auth, provider);
+        clearGoogleReturnMarkers();
+        return 'popup' as const;
+      } catch (popupErr: any) {
+        const code = popupErr?.code ?? "";
+        console.warn('Popup failed, falling back to redirect:', code);
+        
+        // 只有在彈窗被阻擋或環境不支援時才跳轉
+        if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
+          persistGoogleReturnPath(returnTo);
+          await signInWithRedirect(auth, provider);
+          return "redirect" as const;
+        }
+        throw popupErr;
       }
-
-      // 電腦端使用彈窗
-      await signInWithPopup(auth, provider);
-      clearGoogleReturnMarkers();
-      return 'popup' as const;
     } catch (e: any) {
-      console.error('Google Login Error:', e);
+      console.error('Google Login Final Error:', e);
       throw e;
     }
   };
