@@ -18,7 +18,7 @@ export const serviceCatalog: ServiceCatalogItem[] = [
   },
   {
     id: 'logo-design',
-    title: 'logo設計',
+    title: 'Logo設計',
     titleEn: 'Logo Design',
     description: '$1000。',
     descriptionEn: '$1000.',
