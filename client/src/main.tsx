@@ -4,7 +4,7 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// 註冊 Service Worker 用於緩存和離線支持
+/* 註冊 Service Worker 用於緩存和離線支持
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((error) => {
@@ -12,6 +12,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
     });
   });
 }
+*/
 
 // 動態加載分析腳本
 const analyticsEndpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT;
