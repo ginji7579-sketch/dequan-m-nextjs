@@ -155,9 +155,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isFbIgWebview = /FBAN|FBAV|Instagram/i.test(ua);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
 
-    // 移除自動重新載入邏輯，直接進入登入流程
-    if (isFbIgWebview) {
-      alert("為保護您的帳號安全，請點擊右上角選單，選擇「以系統預設瀏覽器開啟」後再試一次！");
+    // Google 嚴格禁止在 LINE/FB 內建瀏覽器登入 (Error 403: disallowed_useragent)
+    if (isLineWebview) {
+      alert("⚠️ 請點擊右上角「⋯」，選擇「以系統預設瀏覽器開啟」再進行登入。\n\nGoogle 基於安全考量，不允許在 LINE 內建瀏覽器中登入。");
+      const currentUrl = new URL(window.location.href);
+      if (!currentUrl.searchParams.has('openExternalBrowser')) {
+        currentUrl.searchParams.set('openExternalBrowser', '1');
+        window.location.href = currentUrl.toString();
+        return new Promise<'redirect'>(() => {});
+      }
+    } else if (isFbIgWebview) {
       throw new Error("WebView not supported");
     }
     
