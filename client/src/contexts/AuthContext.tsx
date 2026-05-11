@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
@@ -12,9 +14,12 @@ import { auth } from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
+  signup: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<any>;
   loginWithGoogle: (returnTo?: string) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,13 +29,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 監聽登入狀態
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
     });
 
-    // 處理跳轉回來的結果
     const checkRedirect = async () => {
       try {
         const result = await getRedirectResult(auth);
@@ -46,6 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const signup = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
+  const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
+
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
@@ -58,10 +64,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       if (isMobile) {
-        // 手機版使用跳轉
         await signInWithRedirect(auth, provider);
       } else {
-        // 電腦版使用彈窗
         await signInWithPopup(auth, provider);
       }
     } catch (error: any) {
@@ -75,8 +79,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => signOut(auth);
 
+  const value = {
+    user,
+    signup,
+    login,
+    loginWithGoogle,
+    logout,
+    loading,
+    isAuthenticated: Boolean(user),
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loginWithGoogle, logout, loading }}>
+    <AuthContext.Provider value={value}>
       {!loading && children}
     </AuthContext.Provider>
   );
