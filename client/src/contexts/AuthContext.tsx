@@ -165,10 +165,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         currentUrl.searchParams.set('openExternalBrowser', '1');
         window.location.href = currentUrl.toString();
         return new Promise<'redirect'>(() => {});
+      } else {
+        // 如果已經帶有參數但還是在 LINE，說明自動跳轉失敗，需要手動提示
+        const msg = "偵測到您正在 LINE 內使用。Google 不支援在 LINE 內登入，請點擊右上角「...」並選擇「以預設瀏覽器開啟」再試一次。";
+        alert(msg);
+        throw new Error(msg);
       }
     } else if (isMetaWebview) {
-      alert(WEBVIEW_GOOGLE_LOGIN_MESSAGE);
-      throw new Error(WEBVIEW_GOOGLE_LOGIN_MESSAGE);
+      const msg = "偵測到您正在 FB/Instagram 內使用。Google 不支援在應用程式內登入，請點擊下方（或右上方）圖示選擇「以預設瀏覽器開啟」再試一次。";
+      alert(msg);
+      throw new Error(msg);
     }
     
     try {
