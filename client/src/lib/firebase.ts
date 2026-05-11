@@ -4,63 +4,24 @@ import {
   browserLocalPersistence, 
   browserPopupRedirectResolver, 
   indexedDBLocalPersistence,
-  GoogleAuthProvider, 
-  signInWithPopup 
+  GoogleAuthProvider,
+  signInWithPopup
 } from "firebase/auth";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
-/** 避免把 undefined 傳進 initializeApp（易在執行期觸發 auth/argument-error） */
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID as string | undefined,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID as string | undefined,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "dequan-m.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "dequan-m",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const required = {
-  apiKey: firebaseConfig.apiKey,
-  projectId: firebaseConfig.projectId,
-  appId: firebaseConfig.appId,
-} as const;
+// 這是最標準、相容性最高的初始化方式
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-for (const [k, v] of Object.entries(required)) {
-  if (v == null || String(v).trim() === "") {
-    const msg = `[Firebase] 缺少關鍵設定：${k}。請檢查 Vercel 的 Environment Variables 是否已設定並包含 VITE_ 前綴。`;
-    console.error(msg);
-  }
-}
-
-const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 在 Vercel 環境下，強迫使用當前網域作為 authDomain (解決手機版 Safari/LINE 的 internal-error)
-  const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
-  if (currentHost.includes('vercel.app')) {
-    return currentHost;
-  }
-
-  // 非 Vercel 環境，才使用環境變數或預設值
-  if (domain && domain.trim() !== '') return domain;
-  return projectId ? `${projectId}.firebaseapp.com` : "dequan-m.vercel.app";
-};
-
-const appConfig = {
-  apiKey: String(firebaseConfig.apiKey ?? ""),
-  authDomain: sanitizeAuthDomain(firebaseConfig.authDomain, firebaseConfig.projectId),
-  projectId: String(firebaseConfig.projectId ?? ""),
-  storageBucket: String(firebaseConfig.storageBucket ?? ""),
-  messagingSenderId: String(firebaseConfig.messagingSenderId ?? ""),
-  appId: String(firebaseConfig.appId ?? ""),
-};
-
-const app = getApps().length === 0 ? initializeApp(appConfig) : getApp();
-
-/** 
- * 手動初始化 Auth 以獲得最高相容性。
- * 使用 [indexedDBLocalPersistence, browserLocalPersistence] 的優先順序，
- * 這是解決 Safari ITP (Intelligent Tracking Prevention) 導致 internal-error 的業界標準做法。
- */
 export const auth = initializeAuth(app, {
   persistence: [indexedDBLocalPersistence, browserLocalPersistence],
   popupRedirectResolver: browserPopupRedirectResolver,
