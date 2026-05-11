@@ -23,7 +23,11 @@ const required = {
 
 for (const [k, v] of Object.entries(required)) {
   if (v == null || String(v).trim() === "") {
-    console.error(`[Firebase] 缺少或為空的設定：${k}，請檢查 Vercel／本機的 VITE_FIREBASE_* 環境變數。`);
+    const msg = `[Firebase] 缺少關鍵設定：${k}。請檢查 Vercel 的 Environment Variables 是否已設定並包含 VITE_ 前綴。`;
+    console.error(msg);
+    if (typeof window !== "undefined") {
+      alert(msg);
+    }
   }
 }
 

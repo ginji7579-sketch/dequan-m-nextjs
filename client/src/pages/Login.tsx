@@ -44,6 +44,12 @@ export default function Login() {
       }
     } catch (err: any) {
       const code = err?.code ?? '';
+      const message = err?.message ?? 'Unknown error';
+      // 行動端調試：直接彈出錯誤代碼
+      if (typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        alert(`登入偵錯資訊 - Code: ${code}\nMessage: ${message}`);
+      }
+
       if (code === 'auth/argument-error') {
         setError(
           'Firebase 設定異常（常見：Vercel 缺少 VITE_FIREBASE_* 或金鑰為空）。請到 Vercel 專案 Environment Variables 檢查後重新部署。'
