@@ -1,4 +1,4 @@
-import { Monitor, ShoppingCart, Store, PenTool, Layout, Settings, Newspaper, Mic2, Share2, Target, Heart, Star } from 'lucide-react';
+import { IdCard, Palette, Megaphone, Heart, Star, Newspaper, Mic2, Share2, Target } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { serviceCatalog, type ServiceCatalogItem } from '@shared/services';
 
@@ -7,64 +7,60 @@ export type ServiceItem = ServiceCatalogItem & {
   image?: string;
   isNew?: boolean;
 };
+
 export const services: ServiceItem[] = [
   {
-    ...serviceCatalog[0], // 形象網站基本價
-    icon: Monitor,
+    ...serviceCatalog[0], // 名片設計
+    icon: IdCard,
+    image: '/images/service-branding.png',
+  },
+  {
+    ...serviceCatalog[1], // logo設計
+    icon: Palette,
+    image: '/images/service-branding.png',
+  },
+  {
+    ...serviceCatalog[2], // 廣告文宣
+    icon: Megaphone,
+    image: '/images/service-marketing.png',
+  },
+  {
+    ...serviceCatalog[3], // 靜態網站架設
+    icon: Heart,
     image: '/images/service-webdev.png',
   },
   {
-    ...serviceCatalog[1], // 購物網站基本價
-    icon: ShoppingCart,
+    ...serviceCatalog[4], // 動態網站架設
+    icon: Star,
     image: '/images/service-webdev.png',
   },
   {
-    ...serviceCatalog[2], // 定版式購物網站方案
-    icon: Store,
-    image: '/images/service-webdev.png',
-  },
-  {
-    ...serviceCatalog[3], // 部落格網站基本價
-    icon: PenTool,
-    image: '/images/service-webdev.png',
-  },
-  {
-    ...serviceCatalog[4], // 一頁式網站基本價
-    icon: Layout,
-    image: '/images/service-webdev.png',
-  },
-  {
-    ...serviceCatalog[5], // 特殊功能網站基本價
-    icon: Settings,
-    image: '/images/service-webdev.png',
-  },
-  {
-    ...serviceCatalog[6], // 新聞稿撰寫
+    ...serviceCatalog[5], // 新聞稿撰寫
     icon: Newspaper,
     image: '/images/service-marketing.png',
   },
   {
-    ...serviceCatalog[7], // 人物專訪
+    ...serviceCatalog[6], // 人物專訪
     icon: Mic2,
     image: '/images/service-marketing.png',
   },
   {
-    ...serviceCatalog[8], // 公關媒體
+    ...serviceCatalog[7], // 公關媒體
     icon: Share2,
     image: '/images/service-marketing.png',
   },
   {
-    ...serviceCatalog[9], // 整合行銷
+    ...serviceCatalog[8], // 整合行銷
     icon: Target,
     image: '/images/service-marketing.png',
   },
   {
-    ...serviceCatalog[10], // 政府補助計畫
+    ...serviceCatalog[9], // 政府補助計畫
     icon: Heart,
     image: '/images/service-industrial.png',
   },
   {
-    ...serviceCatalog[11], // 塑橡膠外銷
+    ...serviceCatalog[10], // 塑橡膠外銷
     icon: Star,
     image: '/images/service-industrial.png',
   },
