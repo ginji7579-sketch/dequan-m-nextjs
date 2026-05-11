@@ -39,10 +39,8 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setError('');
     try {
-      const mode = await loginWithGoogle('/admin');
-      if (mode === 'popup') {
-        setLocation('/admin');
-      }
+      await loginWithGoogle();
+      setLocation('/admin');
     } catch (err: any) {
       const code = err?.code ?? '';
       const message = err?.message ?? 'Unknown error';
