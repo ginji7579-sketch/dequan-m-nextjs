@@ -34,16 +34,14 @@ for (const [k, v] of Object.entries(required)) {
 }
 
 const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
-  // 優先使用明確設定的 env variable
-  if (domain && domain.trim() !== '') return domain;
-
-  // 優先使用當前網域 (這能解決手機版 Safari/LINE 的 auth/internal-error)
+  // 在 Vercel 環境下，強迫使用當前網域作為 authDomain (解決手機版 Safari/LINE 的 internal-error)
   const currentHost = typeof window !== 'undefined' ? window.location.hostname : '';
   if (currentHost.includes('vercel.app')) {
     return currentHost;
   }
 
-  // 預設回退到 projectId 的 firebaseapp domain
+  // 非 Vercel 環境，才使用環境變數或預設值
+  if (domain && domain.trim() !== '') return domain;
   return projectId ? `${projectId}.firebaseapp.com` : "dequan-m.vercel.app";
 };
 
