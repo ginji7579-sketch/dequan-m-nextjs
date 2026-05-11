@@ -169,7 +169,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // 在行動裝置上，如果不是 LINE/FB，先嘗試 popup，失敗則自動切換為 redirect
+      // 在行動裝置上，強制使用 Redirect (重導向)，這是目前跨瀏覽器最穩定的做法
+      if (isMobile) {
+        persistGoogleReturnPath(returnTo);
+        await signInWithRedirect(auth, provider);
+        return 'redirect' as const;
+      }
+
+      // 電腦版維持使用彈窗
       await signInWithPopup(auth, provider);
       clearGoogleReturnMarkers();
       return 'popup' as const;
@@ -179,11 +186,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ? String((e as { code: string }).code)
           : "";
       
-      // 在行動裝置上，任何「不支援」或「內部錯誤」通常都暗示應該改用 Redirect
+      // 如果彈窗被阻擋，則備援切換為 Redirect
       if (
         code === "auth/popup-blocked" ||
-        code === "auth/operation-not-supported-in-this-environment" ||
-        (isMobile && (code === "auth/internal-error" || code === "auth/network-request-failed"))
+        code === "auth/operation-not-supported-in-this-environment"
       ) {
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
