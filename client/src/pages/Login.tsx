@@ -47,13 +47,18 @@ export default function Login() {
       const code = err?.code ?? '';
       const message = err?.message ?? 'Unknown error';
       
+      console.error('❌ Google 登入失敗：', { code, message, hostname: window.location.hostname });
+      
       if (code === 'auth/internal-error') {
         setError('系統連線異常。請確認您的瀏覽器是否開啟了「防止跨網站追蹤」，或嘗試改用 Chrome 瀏覽器。');
         setShowOpenInBrowser(true);
       } else if (code === 'auth/unauthorized-domain') {
-        setError('此網域尚未獲得授權，請聯絡管理員檢查 Firebase 設定。');
+        setError(`❌ Domain 未授權：${window.location.hostname}\n\n請要求管理員在 Firebase Console > Authentication > Authorized domains 加入此網域。\n\n詳細資訊：${message}`);
+      } else if (code === 'auth/popup-blocked') {
+        setError('登入視窗被瀏覽器阻擋。請檢查瀏覽器快顯設定，或點擊下方按鈕以預設瀏覽器開啟。');
+        setShowOpenInBrowser(true);
       } else {
-        setError(`登入失敗: ${code}。如果持續發生，請點擊右上角以預設瀏覽器開啟。`);
+        setError(`登入失敗 (${code}):\n${message}\n\n若持續發生，請點擊下方按鈕以預設瀏覽器開啟。`);
         setShowOpenInBrowser(true);
       }
     }

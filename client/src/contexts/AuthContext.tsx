@@ -12,6 +12,7 @@ import {
   User,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { isInWebView, hasOpenExternalBrowserFlag, forceOpenInSystemBrowserIfNeeded } from '../const';
 
 /**
  * Google OAuth 會經多個網域再回 dequan-m.vercel.app；僅用 sessionStorage 時，
@@ -153,58 +154,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const loginWithGoogle = async (returnTo: string = '/admin') => {
-    const provider = new GoogleAuthProvider();
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const isLineWebview = /Line/i.test(ua);
-    const isMetaWebview = /FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
+    // 第一步：檢測是否在內建瀏覽器，如果是且還沒標記就強制轉向
+    if (isInWebView() && !hasOpenExternalBrowserFlag()) {
+      console.info('[Auth] Detected webview, forcing system browser...');
+      forceOpenInSystemBrowserIfNeeded();
+      // 程式碼不會執行到這裡（因為上面會 redirect），但為了型別完整性保留
+      return new Promise<'redirect'>(() => {});
+    }
 
-    if (isLineWebview) {
-      const currentUrl = new URL(window.location.href);
-      if (!currentUrl.searchParams.has('openExternalBrowser')) {
-        currentUrl.searchParams.set('openExternalBrowser', '1');
-        window.location.href = currentUrl.toString();
-        return new Promise<'redirect'>(() => {});
-      } else {
-        // 如果已經帶有參數但還是在 LINE，手動提示
-        const msg = "偵測到您正在 LINE 內使用。Google 不支援在 LINE 內登入，請點擊右上角「...」並選擇「以預設瀏覽器開啟」再試一次。";
-        alert(msg);
-        throw new Error(msg);
-      }
-    } else if (isMetaWebview) {
-      const msg = "偵測到您正在 FB/Instagram 內使用。Google 不支援在應用程式內登入，請點擊下方（或右上方）圖示選擇「以預設瀏覽器開啟」再試一次。";
+    // 第二步：如果帶有 openExternalBrowser 標記但仍在 webview，提示用戶
+    if (isInWebView() && hasOpenExternalBrowserFlag()) {
+      const msg = '為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！';
       alert(msg);
       throw new Error(msg);
     }
+
+    const provider = new GoogleAuthProvider();
     
     try {
-      // 如果是在 LINE 或 FB 內建瀏覽器，直接跳轉 (因為這些環境完全不支援彈窗)
-      if (isLineWebview || isMetaWebview) {
-        persistGoogleReturnPath(returnTo);
-        await signInWithRedirect(auth, provider);
-        return "redirect" as const;
-      }
-
-      // 其他環境（包括手機 Safari/Chrome），優先使用彈窗
-      // 配合同網域代理 (Auth Proxy)，這現在是非常穩定的
+      // 第三步：在系統瀏覽器中，優先使用彈窗
+      // 配合同網域代理 (Auth Proxy)，彈窗是穩定且推薦的做法
       try {
         await signInWithPopup(auth, provider);
         clearGoogleReturnMarkers();
         return 'popup' as const;
       } catch (popupErr: any) {
-        const code = popupErr?.code ?? "";
-        const message = popupErr?.message ?? "未知錯誤";
-        console.warn('Popup failed, not falling back to redirect (popupErr):', code, message);
+        const code = popupErr?.code ?? '';
+        const message = popupErr?.message ?? '未知錯誤';
+        console.warn('[Auth] Popup login failed:', code, message);
 
-        // 不自動 fallback 到 redirect：改為提示使用者改用系統瀏覽器或 Chrome
-        const userMsg = `無法開啟登入視窗（${code}）。請使用系統瀏覽器或 Chrome 開啟此頁面後重試。`;
-        try { alert(userMsg); } catch (e) { /* ignore */ }
-        // 提供記錄以利 debug
-        console.info('[Auth] popup error, recommend user open system browser or use Chrome', { code, message });
-        throw popupErr;
+        // popup 失敗時的降級方案：使用 redirect 流程
+        // 這是更穩定的備方案，特別是在某些特殊瀏覽器環境
+        console.info('[Auth] Falling back to redirect method...');
+        try {
+          persistGoogleReturnPath(returnTo);
+          await signInWithRedirect(auth, provider);
+          return 'redirect' as const;
+        } catch (redirectErr: any) {
+          // 如果 redirect 也失敗，提示用戶檢查環境
+          const fallbackMsg = `登入失敗 (${code})。請確保：\n1. 你使用的是系統瀏覽器（Safari/Chrome）\n2. 瀏覽器允許快顯視窗\n3. 網際網路連線正常`;
+          console.error('[Auth] Both popup and redirect failed:', redirectErr);
+          throw new Error(fallbackMsg);
+        }
       }
     } catch (e: any) {
-      console.error('Google login total error:', e);
+      console.error('[Auth] Google login total error:', e);
       throw e;
     }
   };
@@ -233,6 +227,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!apiKey) {
         alert("⚠️ 關鍵錯誤：找不到 Firebase API Key！\n請檢查 Vercel 後台的環境變數是否設定為 VITE_FIREBASE_API_KEY (必須以 VITE_ 開頭)。");
       }
+
+      // 詳細診斷日誌
+      console.group('🔐 Firebase Auth Config');
+      console.log('API Key:', apiKey ? '✓ 已設定' : '✗ 未設定');
+      console.log('Auth Domain:', authDomain);
+      console.log('當前 Hostname:', window.location.hostname);
+      console.groupEnd();
 
       try {
         const result = await getRedirectResult(auth);
