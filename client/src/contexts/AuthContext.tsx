@@ -241,7 +241,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error: any) {
         console.error('getRedirectResult failed:', error);
-        setRedirectError(error.message || 'Google 登入跳轉驗證失敗，請改用一般瀏覽器重試。');
+        const msg = error?.message || 'Google 登入跳轉驗證失敗';
+        const code = error?.code || 'unknown';
+        alert(`初始化失敗 (${code}): ${msg}`);
+        setRedirectError(msg);
       }
     })();
 
