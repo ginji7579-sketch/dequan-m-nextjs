@@ -36,9 +36,18 @@ if (
   );
 }
 
+const sanitizeAuthDomain = (domain: string | undefined, projectId: string | undefined) => {
+  if (!domain) return projectId ? `${projectId}.firebaseapp.com` : "";
+  // 如果被誤設為 Vercel 網址，強制修正回 firebaseapp.com
+  if (domain.includes("vercel.app") && projectId) {
+    return `${projectId}.firebaseapp.com`;
+  }
+  return domain;
+};
+
 const appConfig = {
   apiKey: String(firebaseConfig.apiKey ?? ""),
-  authDomain: String(firebaseConfig.authDomain ?? ""),
+  authDomain: sanitizeAuthDomain(firebaseConfig.authDomain, firebaseConfig.projectId),
   projectId: String(firebaseConfig.projectId ?? ""),
   storageBucket: String(firebaseConfig.storageBucket ?? ""),
   messagingSenderId: String(firebaseConfig.messagingSenderId ?? ""),

@@ -172,6 +172,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
+      // 在行動裝置上，直接使用 Redirect 是最穩定的做法，避開彈窗攔截與 ITP 限制
+      if (isMobile) {
+        persistGoogleReturnPath(returnTo);
+        await signInWithRedirect(auth, provider);
+        return "redirect" as const;
+      }
+
       await signInWithPopup(auth, provider);
       clearGoogleReturnMarkers();
       return 'popup' as const;
@@ -181,11 +188,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ? String((e as { code: string }).code)
           : "";
       
+      console.error('Google Login Error Details:', e);
+
       if (
         code === "auth/popup-blocked" ||
         code === "auth/operation-not-supported-in-this-environment" ||
-        (isMobile && (code === "auth/internal-error" || code === "auth/network-request-failed" || code === "auth/web-storage-unsupported"))
+        code === "auth/internal-error" || 
+        code === "auth/network-request-failed" || 
+        code === "auth/web-storage-unsupported"
       ) {
+        // 如果 Popup 失敗，嘗試最後一次 Redirect
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
         return "redirect" as const;
