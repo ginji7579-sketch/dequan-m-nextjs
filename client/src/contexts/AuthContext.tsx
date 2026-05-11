@@ -20,8 +20,6 @@ import { auth } from '../lib/firebase';
 const GOOGLE_RETURN_KEY = 'dequan_google_auth_return';
 const COOKIE_NAME = 'dequan_oauth_ret';
 const RETURN_TTL_MS = 12 * 60 * 1000;
-const WEBVIEW_GOOGLE_LOGIN_MESSAGE =
-  '為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！';
 
 type ReturnPayload = { path: string; exp: number };
 
@@ -134,7 +132,6 @@ interface AuthContextType {
   loginWithGoogle: (returnTo?: string) => Promise<'popup' | 'redirect'>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
-  redirectError: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -142,7 +139,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [redirectError, setRedirectError] = useState<string | null>(null);
 
   const signup = (email: string, password: string) => {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -156,52 +152,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
     const isLineWebview = /Line/i.test(ua);
-    const isMetaWebview = /FBAN|FBAV|Instagram|Barcelona|Threads/i.test(ua);
+    const isFbIgWebview = /FBAN|FBAV|Instagram/i.test(ua);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(ua);
 
+    // Google blocks OAuth from WebView (Error 403: disallowed_useragent).
     if (isLineWebview) {
       const currentUrl = new URL(window.location.href);
       if (!currentUrl.searchParams.has('openExternalBrowser')) {
         currentUrl.searchParams.set('openExternalBrowser', '1');
         window.location.href = currentUrl.toString();
         return new Promise<'redirect'>(() => {});
-        alert(`偵測到您正在 LINE 內使用。Google 不支援在 LINE 內登入，請點擊右上角「...」並選擇「以預設瀏覽器開啟」再試一次。`);
-        throw new Error("LINE webview detected");
       }
-    } else if (isMetaWebview) {
-      alert("偵測到您正在 FB/Instagram 內使用。Google 不支援在應用程式內登入，請點擊下方（或右上方）圖示選擇「以預設瀏覽器開啟」再試一次。");
-      throw new Error("Meta webview detected");
+    } else if (isFbIgWebview) {
+      alert("為保護您的帳號安全，Google 不允許在應用程式內建的瀏覽器登入。\n\n請點擊右上角選單（⋯ 或 ⋮），選擇「以系統預設瀏覽器開啟」（例如 Safari 或 Chrome）後，再試一次登入！");
+      throw new Error("WebView not supported");
     }
     
     try {
-      // 如果是在 LINE 或 FB 內建瀏覽器，直接跳轉 (因為這些環境完全不支援彈窗)
-      if (isLineWebview || isMetaWebview) {
+      // 在行動裝置上，如果不是 LINE/FB，先嘗試 popup，失敗則自動切換為 redirect
+      await signInWithPopup(auth, provider);
+      clearGoogleReturnMarkers();
+      return 'popup' as const;
+    } catch (e: unknown) {
+      const code =
+        e && typeof e === "object" && "code" in e
+          ? String((e as { code: string }).code)
+          : "";
+      
+      // 在行動裝置上，任何「不支援」或「內部錯誤」通常都暗示應該改用 Redirect
+      if (
+        code === "auth/popup-blocked" ||
+        code === "auth/operation-not-supported-in-this-environment" ||
+        (isMobile && (code === "auth/internal-error" || code === "auth/network-request-failed"))
+      ) {
         persistGoogleReturnPath(returnTo);
         await signInWithRedirect(auth, provider);
         return "redirect" as const;
       }
-
-      // 其他環境（包括手機 Safari/Chrome），優先使用彈窗
-      // 配合同網域代理 (Auth Proxy)，這現在是非常穩定的
-      try {
-        await signInWithPopup(auth, provider);
-        clearGoogleReturnMarkers();
-        return 'popup' as const;
-      } catch (popupErr: any) {
-        const code = popupErr?.code ?? "";
-        const message = popupErr?.message ?? "未知錯誤";
-        console.warn('Popup failed, falling back to redirect:', code);
-        
-        // 只有在彈窗被阻擋或環境不支援時才跳轉
-        if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
-          persistGoogleReturnPath(returnTo);
-          await signInWithRedirect(auth, provider);
-          return "redirect" as const;
-        }
-        throw popupErr;
-      }
-    } catch (e: any) {
-      console.error('Google login total error:', e);
       throw e;
     }
   };
@@ -213,6 +200,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    // 必須先訂閱 onAuthStateChanged，不可先 await getRedirectResult：
+    // 在部分 Safari／WebView 上 getRedirectResult 可能長時間不 resolve，
+    // 會導致 loading 永遠 true、整站 children 不渲染（白畫面）。
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (cancelled) return;
       setUser(currentUser);
@@ -228,18 +218,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (result?.user) {
           consumeGoogleReturnIfSignedIn(result.user);
         }
-      } catch (error: any) {
-        console.error('getRedirectResult failed:', error);
-        setRedirectError(error.message || 'Google 登入跳轉驗證失敗，請改用一般瀏覽器重試。');
+      } catch {
+        /* redirect 未完成或已處理過時可忽略 */
       }
     })();
 
     const failSafe = window.setTimeout(() => {
-      if (!cancelled) {
-        console.warn('Auth initialization timed out, forcing loading to false');
-        setLoading(false);
-      }
-    }, 5000); // 縮短為 5 秒，避免用戶看到太久的白屏
+      if (!cancelled) setLoading(false);
+    }, 12_000);
 
     return () => {
       cancelled = true;
@@ -255,30 +241,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithGoogle,
     logout,
     isAuthenticated: Boolean(user),
-    redirectError,
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {loading ? (
-        <div className="min-h-screen flex items-center justify-center bg-[#F5F1E8] p-4 text-center">
-          <div className="flex flex-col items-center gap-6 max-w-sm">
-            <div className="w-12 h-12 border-4 border-[#2B8A8A] border-t-transparent rounded-full animate-spin"></div>
-            <div className="space-y-2">
-              <p className="text-[#2B8A8A] font-bold text-lg">正在準備登入環境...</p>
-              <p className="text-gray-500 text-sm">如果等候超過 5 秒，請點擊下方按鈕重整，或確保您使用的是系統瀏覽器（Safari/Chrome）。</p>
-            </div>
-            <button 
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 bg-[#2B8A8A] text-white rounded-full font-medium shadow-md hover:opacity-90 active:scale-95 transition-all"
-            >
-              重新整理頁面
-            </button>
-          </div>
-        </div>
-      ) : (
-        children
-      )}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
