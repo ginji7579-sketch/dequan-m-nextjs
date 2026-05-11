@@ -52,30 +52,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
   const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
 
-  const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const isMobile = /iPhone|iPad|iPod|Android|Line|FBAN|FBAV|Instagram/i.test(ua);
-    const isLine = /Line/i.test(ua);
+   const loginWithGoogle = async (returnTo?: string) => {
+     const provider = new GoogleAuthProvider();
+     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+     const isMobile = /iPhone|iPad|iPod|Android|Line|FBAN|FBAV|Instagram/i.test(ua);
+     const isLine = /Line/i.test(ua);
 
-    if (isLine) {
-      alert("⚠️ 請點擊右上角「⋯」，選擇「以系統瀏覽器開啟」再進行登入，以確保 Google 驗證成功。");
-    }
+     if (isLine) {
+       alert("⚠️ 請點擊右上角「⋯」，選擇「以系統瀏覽器開啟」再進行登入，以確保 Google 驗證成功。");
+     }
 
-    try {
-      if (isMobile) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        await signInWithPopup(auth, provider);
-      }
-    } catch (error: any) {
-      if (error.code === 'auth/popup-blocked') {
-        await signInWithRedirect(auth, provider);
-      } else {
-        throw error;
-      }
-    }
-  };
+     try {
+       if (isMobile) {
+         await signInWithRedirect(auth, provider);
+       } else {
+         await signInWithPopup(auth, provider);
+       }
+       return isMobile ? 'redirect' : 'popup';
+     } catch (error: any) {
+       if (error.code === 'auth/popup-blocked') {
+         await signInWithRedirect(auth, provider);
+         return 'redirect';
+       } else {
+         throw error;
+       }
+     }
+   };
 
   const logout = () => signOut(auth);
 
