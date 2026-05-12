@@ -27,3 +27,6 @@ pnpm-debug.log
 *.save
 client/src/**/*.d.ts
 client/src/hooks/*.js
+.env.local
+.env.production
+.env
