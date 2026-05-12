@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -16,19 +16,6 @@ export default function Login() {
   const inWebView = isInWebView();
   const hasExternalFlag = hasOpenExternalBrowserFlag();
 
-  useEffect(() => {
-    // Listen for OAuth success/error messages from popup
-    const handler = (event: MessageEvent) => {
-      if (event.data?.type === 'oauth-success') {
-        setLocation('/admin');
-      } else if (event.data?.type === 'oauth-error') {
-        setError('Google 登入失敗，請稍後再試');
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [setLocation]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
@@ -41,9 +28,14 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     setError('');
-    loginWithGoogle();
+    try {
+      await loginWithGoogle();
+      setLocation('/admin');
+    } catch (err: any) {
+      setError(err.message || 'Google 登入失敗，請稍後再試');
+    }
   };
 
   const handleLineLogin = () => {

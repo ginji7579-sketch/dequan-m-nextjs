@@ -1,11 +1,12 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   User,
-  getRedirectResult,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
@@ -13,7 +14,7 @@ interface AuthContextType {
   user: User | null;
   signup: (email: string, password: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
-  loginWithGoogle: () => void;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   isAuthenticated: boolean;
@@ -25,90 +26,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user from server-side OAuth session
-  const fetchServerUser = useCallback(async () => {
-    try {
-      const res = await fetch('/api/auth/me', { credentials: 'include' });
-      if (res.ok) {
-        const { user: serverUser } = await res.json();
-        setUser(serverUser as any); // cast to Firebase User shape
-      }
-      // If not authenticated via server, do nothing (keep Firebase user if any)
-    } catch (err) {
-      console.error('Failed to fetch server user:', err);
-    }
-  }, []);
-
-  // Initial check for server session on mount
-  useEffect(() => {
-    fetchServerUser();
-  }, [fetchServerUser]);
-
-  // Listen for OAuth success messages from popup
-  useEffect(() => {
-    const handler = (event: MessageEvent) => {
-      if (event.data?.type === 'oauth-success') {
-        fetchServerUser();
-      }
-    };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
-  }, [fetchServerUser]);
-
-  // Firebase auth state
+  // 監聽 Firebase 認證狀態
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
     });
-
-    // Handle any pending redirect result (legacy)
-    const checkRedirect = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
-          setUser(result.user);
-        }
-      } catch (error) {
-        console.error("Redirect Error:", error);
-      }
-    };
-    checkRedirect();
-
     return () => unsubscribe();
   }, []);
 
-  const signup = (email: string, password: string) => createUserWithEmailAndPassword(auth, email, password);
-  const login = (email: string, password: string) => signInWithEmailAndPassword(auth, email, password);
+  // Email/密碼註冊與登入
+  const signup = (email: string, password: string) =>
+    createUserWithEmailAndPassword(auth, email, password);
 
-  const loginWithGoogle = () => {
-    // Open OAuth flow in a centered popup
-    const width = 500, height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-    const popup = window.open(
-      '/api/oauth/authorize',
-      'Google Login',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+  const login = (email: string, password: string) =>
+    signInWithEmailAndPassword(auth, email, password);
 
-    // Fallback if popup blocked: full-page redirect
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      window.location.href = '/api/oauth/authorize';
+  // Google 登入 (純 Firebase 客戶端)
+  const loginWithGoogle = async (): Promise<void> => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (error: any) {
+      console.error('Google 登入錯誤:', error);
+      throw new Error(error.message || 'Google 登入失敗，請稍後再試');
     }
   };
 
-  const logout = async () => {
+  // 登出：只清除前端 Firebase 狀態
+  const logout = async (): Promise<void> => {
     await signOut(auth);
-    try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
     setUser(null);
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     signup,
     login,
@@ -127,6 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 };
