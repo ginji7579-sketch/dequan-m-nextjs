@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -11,10 +11,17 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, user, loading } = useAuth();
 
   const inWebView = isInWebView();
   const hasExternalFlag = hasOpenExternalBrowserFlag();
+
+  // 當使用者登入成功時自動導向 /admin（適用於手機重定向登入後）
+  useEffect(() => {
+    if (!loading && user) {
+      setLocation('/admin');
+    }
+  }, [user, loading, setLocation]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -32,7 +39,8 @@ export default function Login() {
     setError('');
     try {
       await loginWithGoogle();
-      setLocation('/admin');
+      // 注意：手機使用重定向，頁面會跳轉到 Google，登入成功後會回到此頁面，
+      // 然後 useEffect 監聽到 user 變化就會自動導向 /admin，所以這裡不需要呼叫 setLocation
     } catch (err: any) {
       setError(err.message || 'Google 登入失敗，請稍後再試');
     }
@@ -71,7 +79,6 @@ export default function Login() {
             )}
           </div>
 
-          {/* In-app browser / webview warning */}
           {inWebView && !hasExternalFlag && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-sm text-amber-800 font-medium mb-2">
@@ -135,7 +142,6 @@ export default function Login() {
           </div>
 
           <div className="space-y-3">
-            {/* Google Login */}
             <button
               type="button"
               onClick={handleGoogleLogin}
@@ -163,7 +169,6 @@ export default function Login() {
               <span>使用 Google 登入</span>
             </button>
 
-            {/* LINE Login */}
             <button
               type="button"
               onClick={handleLineLogin}
