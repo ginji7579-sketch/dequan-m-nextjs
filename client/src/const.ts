@@ -1,15 +1,6 @@
-export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import isWebview from 'is-webview';
 
-/**
- * 檢測用戶是否在內建瀏覽器或 webview 中
- * 包括：LINE、Facebook、Instagram、Threads、Barcelona（Meta apps）、以及其他內建 WebView
- */
-export const isInWebView = (): boolean => {
-  if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-  // LINE、Facebook、Instagram、Threads、Barcelona、TikTok 等內建瀏覽器或 webview
-  return /Line|FBAN|FBAV|Instagram|Barcelona|Threads|TikTok|WeChat|QQ|Alipay/i.test(ua);
-};
+export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 /**
  * 檢查是否已帶有 "openExternalBrowser" 標記
@@ -23,19 +14,30 @@ export const hasOpenExternalBrowserFlag = (): boolean => {
 };
 
 /**
+ * 檢測用戶是否在內建瀏覽器或 webview 中
+ * 使用專業庫 is-webview 進行準確檢測
+ */
+export const isInWebView = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+  // 如果已經透過 openExternalBrowser=1 強制跳轉，則視為外部瀏覽器
+  if (hasOpenExternalBrowserFlag()) return false;
+  // 使用專業庫檢測 WebView
+  return isWebview(navigator.userAgent);
+};
+
+/**
  * 如果在內建瀏覽器中且還沒有 openExternalBrowser 標記，
- * 就加上此標記並重新載入，觸發系統瀏覽器開啟
+ * 就加上此標記並重新載入，觸發系統瀏覽器開啟（主要用於 LINE）
  */
 export const forceOpenInSystemBrowserIfNeeded = (): void => {
-  if (!isInWebView()) return; // 不在 webview，無需強制
-  if (hasOpenExternalBrowserFlag()) return; // 已標記，無需重複
+  if (!isInWebView()) return;
+  if (hasOpenExternalBrowserFlag()) return;
 
   try {
     const u = new URL(window.location.href);
     u.searchParams.set('openExternalBrowser', '1');
     window.location.href = u.toString();
   } catch (e) {
-    // fallback
     const sep = window.location.href.includes('?') ? '&' : '?';
     window.location.href = window.location.href + sep + 'openExternalBrowser=1';
   }
@@ -45,10 +47,8 @@ export const forceOpenInSystemBrowserIfNeeded = (): void => {
 export const getLoginUrl = () => {
   const oauthPortalUrl = import.meta.env.VITE_OAUTH_PORTAL_URL;
   const appId = import.meta.env.VITE_APP_ID;
-  // 固定 callback path，避免把動態 query 當作 redirect_uri
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
-  // 開發用 log，可用來驗證 runtime 實際的 redirectUri
-  try { console.debug('[Auth] generated redirectUri:', redirectUri); } catch (e) {}
+  try { console.debug('[Auth] generated redirectUri:', redirectUri); } catch (e) { }
   const state = btoa(redirectUri);
 
   const url = new URL(`${oauthPortalUrl}/app-auth`);

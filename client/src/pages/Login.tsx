@@ -16,7 +16,7 @@ export default function Login() {
   const inWebView = isInWebView();
   const hasExternalFlag = hasOpenExternalBrowserFlag();
 
-  // 當使用者登入成功時自動導向 /admin（適用於手機重定向登入後）
+  // 當使用者登入成功時自動導向 /admin
   useEffect(() => {
     if (!loading && user) {
       setLocation('/admin');
@@ -37,10 +37,15 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     setError('');
+
+    // 🛡️ 阻止在 WebView 中登入（除非已有 openExternalBrowser 標記）
+    if (inWebView && !hasExternalFlag) {
+      setError('請使用系統瀏覽器登入。請點擊下方「使用系統瀏覽器開啟」或「複製連結」後，在 Chrome / Safari 中開啟。');
+      return;
+    }
+
     try {
       await loginWithGoogle();
-      // 注意：手機使用重定向，頁面會跳轉到 Google，登入成功後會回到此頁面，
-      // 然後 useEffect 監聽到 user 變化就會自動導向 /admin，所以這裡不需要呼叫 setLocation
     } catch (err: any) {
       setError(err.message || 'Google 登入失敗，請稍後再試');
     }
@@ -48,7 +53,13 @@ export default function Login() {
 
   const handleLineLogin = () => {
     setError('');
-    // LINE Login via OAuth redirect
+
+    // 🛡️ 同樣阻止 WebView 中的 LINE 登入
+    if (inWebView && !hasExternalFlag) {
+      setError('請使用系統瀏覽器登入。請點擊下方「使用系統瀏覽器開啟」或「複製連結」後，在 Chrome / Safari 中開啟。');
+      return;
+    }
+
     window.location.href = '/api/oauth/authorize?provider=line';
   };
 
@@ -60,6 +71,18 @@ export default function Login() {
     } catch {
       const sep = window.location.href.includes('?') ? '&' : '?';
       window.location.href = window.location.href + sep + 'openExternalBrowser=1';
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      // 複製當前網址（不含 openExternalBrowser 參數，避免複製後仍強制跳轉）
+      const cleanUrl = window.location.href.split('?')[0];
+      await navigator.clipboard.writeText(cleanUrl);
+      setError('✅ 連結已複製！請貼到手機的 Chrome / Safari 瀏覽器中開啟。');
+      setTimeout(() => setError(''), 3000);
+    } catch (err) {
+      setError('無法複製連結，請手動複製網址列。');
     }
   };
 
@@ -79,29 +102,35 @@ export default function Login() {
             )}
           </div>
 
+          {/* WebView 警告區域 */}
           {inWebView && !hasExternalFlag && (
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-sm text-amber-800 font-medium mb-2">
-                您正在使用應用程式內建瀏覽器
+                ⚠️ 您正在使用應用程式內建瀏覽器
               </p>
               <p className="text-xs text-amber-700 mb-3">
-                為確保登入功能正常運作，建議使用系統瀏覽器開啟此頁面。
+                Google 與 LINE 登入無法在此環境進行，請改用系統瀏覽器。
               </p>
               <button
                 type="button"
                 onClick={handleOpenInSystemBrowser}
-                className="w-full py-2 px-4 rounded-lg text-sm font-medium bg-amber-500 text-white hover:bg-amber-600 transition-colors"
+                className="w-full py-2 px-4 rounded-lg text-sm font-medium bg-amber-500 text-white hover:bg-amber-600 transition-colors mb-2"
               >
                 使用系統瀏覽器開啟
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="w-full py-2 px-4 rounded-lg text-sm font-medium border border-amber-300 text-amber-700 hover:bg-amber-100 transition-colors"
+              >
+                複製連結，手動到瀏覽器貼上
               </button>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-[#2C3E50] mb-2">
-                電子郵件
-              </label>
+              <label className="block text-sm font-medium text-[#2C3E50] mb-2">電子郵件</label>
               <input
                 type="email"
                 required
@@ -113,9 +142,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#2C3E50] mb-2">
-                密碼
-              </label>
+              <label className="block text-sm font-medium text-[#2C3E50] mb-2">密碼</label>
               <input
                 type="password"
                 required

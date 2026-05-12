@@ -12,16 +12,18 @@ client/src/lib/.env.local
 # IDE specific files
 .idea/
 
-# OS-specific files  
 .DS_Store
 Thumbs.db
 
 # Build output
 build/
-dist/
-.next/
 
 # Dependency directories
 npm-debug.log
 yarn-error.log
 pnpm-debug.log
+
+# Backup and generated files that should not be committed
+*.save
+client/src/**/*.d.ts
+client/src/hooks/*.js
