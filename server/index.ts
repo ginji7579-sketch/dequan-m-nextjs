@@ -48,18 +48,17 @@ async function startServer() {
    *  object-src 'none'
    */
   const CSP = [
-    "default-src 'self'",
+    "default-src 'none'",
     "script-src 'self'",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src 'self' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://d2xsxph8kpxj0f.cloudfront.net https://*.googleapis.com https://*.gstatic.com https://forge.butterfly-effect.dev",
     "font-src 'self' https://fonts.gstatic.com",
     "connect-src 'self' https://dequan-m.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://forge.butterfly-effect.dev https://*.ecpay.com.tw wss://localhost:3000",
     "frame-src 'self' https://dequan-m.firebaseapp.com",
+    "frame-ancestors 'self'",
     "manifest-src 'self'",
     "base-uri 'self'",
     "form-action 'self' https://*.ecpay.com.tw",
-    "object-src 'none'",
-    "frame-ancestors 'self'",
   ].join("; ");
 
   // Security headers (including CSP)
