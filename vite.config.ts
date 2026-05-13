@@ -7,7 +7,6 @@ import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 import { createEcpayCheckout } from "./server/payments/ecpay";
-import cookieParser from "cookie-parser";
 import { OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -201,57 +200,149 @@ function vitePluginPaymentApi(): Plugin {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Helpers for raw Node.js http.ServerResponse (Vite middleware doesn't use Express)
+// ---------------------------------------------------------------------------
+
+function parseCookies(cookieHeader: string | undefined): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!cookieHeader) return result;
+  for (const pair of cookieHeader.split(";")) {
+    const idx = pair.indexOf("=");
+    if (idx < 0) continue;
+    const key = pair.slice(0, idx).trim();
+    const val = decodeURIComponent(pair.slice(idx + 1).trim());
+    result[key] = val;
+  }
+  return result;
+}
+
+function unsignCookie(val: string, secret: string): string | false {
+  // cookie-parser signed format: "s:value.signature"
+  if (!val.startsWith("s:")) return false;
+  const data = val.slice(2);
+  const dotIdx = data.lastIndexOf(".");
+  if (dotIdx < 0) return false;
+  const payload = data.slice(0, dotIdx);
+  const sig = data.slice(dotIdx + 1);
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+  if (sig !== expected) return false;
+  return payload;
+}
+
+function setCookieHeader(
+  res: import("node:http").ServerResponse,
+  name: string,
+  value: string,
+  opts: { httpOnly?: boolean; secure?: boolean; sameSite?: string; maxAge?: number; signed?: boolean } = {},
+  secret = ""
+) {
+  let cookieVal = value;
+  if (opts.signed && secret) {
+    const sig = crypto
+      .createHmac("sha256", secret)
+      .update(value)
+      .digest("base64")
+      .replace(/=/g, "")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+    cookieVal = `s:${value}.${sig}`;
+  }
+  let str = `${name}=${encodeURIComponent(cookieVal)}`;
+  if (opts.httpOnly) str += "; HttpOnly";
+  if (opts.secure) str += "; Secure";
+  if (opts.sameSite) str += `; SameSite=${opts.sameSite}`;
+  if (opts.maxAge !== undefined) str += `; Max-Age=${Math.floor(opts.maxAge / 1000)}`;
+  str += "; Path=/";
+  const existing = res.getHeader("Set-Cookie");
+  if (Array.isArray(existing)) {
+    res.setHeader("Set-Cookie", [...existing, str]);
+  } else if (existing) {
+    res.setHeader("Set-Cookie", [existing as string, str]);
+  } else {
+    res.setHeader("Set-Cookie", str);
+  }
+}
+
+function clearCookieHeader(res: import("node:http").ServerResponse, name: string) {
+  const str = `${name}=; Max-Age=0; Path=/`;
+  const existing = res.getHeader("Set-Cookie");
+  if (Array.isArray(existing)) {
+    res.setHeader("Set-Cookie", [...existing, str]);
+  } else if (existing) {
+    res.setHeader("Set-Cookie", [existing as string, str]);
+  } else {
+    res.setHeader("Set-Cookie", str);
+  }
+}
+
+function sendJson(res: import("node:http").ServerResponse, statusCode: number, data: unknown) {
+  const body = JSON.stringify(data);
+  res.writeHead(statusCode, { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) });
+  res.end(body);
+}
+
+function sendText(res: import("node:http").ServerResponse, statusCode: number, text: string, contentType = "text/plain") {
+  const body = Buffer.from(text, "utf-8");
+  res.writeHead(statusCode, { "Content-Type": contentType, "Content-Length": body.length });
+  res.end(body);
+}
+
+function sendRedirect(res: import("node:http").ServerResponse, url: string) {
+  res.writeHead(302, { Location: url });
+  res.end();
+}
+
 function vitePluginOAuthApi(): Plugin {
+  const SESSION_SECRET = process.env.OAUTH_SESSION_SECRET || "dev-secret-change-me";
+
   return {
     name: "oauth-api",
     configureServer(server: ViteDevServer) {
-      // Cookie parser for signed cookies
-      server.middlewares.use(
-        cookieParser(process.env.OAUTH_SESSION_SECRET || "dev-secret-change-me")
-      );
+      // Middleware to parse cookies and signed cookies from the raw request
+      server.middlewares.use((req: any, _res: any, next: any) => {
+        const cookies = parseCookies(req.headers?.cookie);
+        req.cookies = cookies;
+        const signedCookies: Record<string, string> = {};
+        for (const [k, v] of Object.entries(cookies)) {
+          const unsigned = unsignCookie(v, SESSION_SECRET);
+          if (unsigned !== false) signedCookies[k] = unsigned;
+        }
+        req.signedCookies = signedCookies;
+        next();
+      });
 
       // GET /api/oauth/authorize - initiate OAuth
-      server.middlewares.use("/api/oauth/authorize", (req, res, next) => {
+      server.middlewares.use("/api/oauth/authorize", (req: any, res: any, next: any) => {
         if (req.method !== "GET") return next();
 
-        const protocol = (req as any).protocol === "https" || (req as any).secure ? "https" : "http";
-        const host = (req as any).headers.host;
+        const protocol = req.headers["x-forwarded-proto"] || "http";
+        const host = req.headers.host;
         const redirectUri = `${protocol}://${host}/api/oauth/callback`;
 
         const state = crypto.randomBytes(16).toString("hex");
         const nonce = crypto.randomBytes(16).toString("hex");
 
-        // Set state and nonce in signed cookies
-        res.cookie("oauth_state", state, {
-          httpOnly: true,
-          secure: false, // dev only
-          sameSite: "lax" as const,
-          maxAge: 5 * 60 * 1000,
-          signed: true,
-        });
-        res.cookie("oauth_nonce", nonce, {
-          httpOnly: true,
-          secure: false,
-          sameSite: "lax" as const,
-          maxAge: 5 * 60 * 1000,
-          signed: true,
-        });
+        const cookieOpts = { httpOnly: true, secure: false, sameSite: "Lax", maxAge: 5 * 60 * 1000, signed: true };
+        setCookieHeader(res, "oauth_state", state, cookieOpts, SESSION_SECRET);
+        setCookieHeader(res, "oauth_nonce", nonce, cookieOpts, SESSION_SECRET);
 
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
         if (!clientId || !clientSecret) {
           console.error("Missing GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET");
-          res.status(500).send("Server misconfiguration: missing OAuth credentials");
+          sendText(res, 500, "Server misconfiguration: missing OAuth credentials");
           return;
         }
 
         try {
-          const oauthClient = new OAuth2Client({
-            clientId,
-            clientSecret,
-            redirectUri,
-          });
-
+          const oauthClient = new OAuth2Client({ clientId, clientSecret, redirectUri });
           const authUrl = oauthClient.generateAuthUrl({
             scope: ["openid", "profile", "email"],
             access_type: "offline",
@@ -259,92 +350,73 @@ function vitePluginOAuthApi(): Plugin {
             nonce,
             prompt: "select_account",
           });
-
-          res.redirect(authUrl);
+          sendRedirect(res, authUrl);
         } catch (err) {
           console.error("OAuth authorize error:", err);
-          res.status(500).send("Failed to initiate OAuth");
+          sendText(res, 500, "Failed to initiate OAuth");
         }
       });
 
       // GET /api/oauth/callback - Google redirects here
-      server.middlewares.use("/api/oauth/callback", async (req, res, next) => {
+      server.middlewares.use("/api/oauth/callback", async (req: any, res: any, next: any) => {
         if (req.method !== "GET") return next();
 
-        const query = (req as any).query as any;
-        const { code, state } = query;
+        const rawUrl = req.url || "";
+        const queryStr = rawUrl.includes("?") ? rawUrl.slice(rawUrl.indexOf("?") + 1) : "";
+        const params = new URLSearchParams(queryStr);
+        const code = params.get("code");
+        const state = params.get("state");
+
         if (!code || !state) {
-          return res.status(400).send("Missing code or state");
+          sendText(res, 400, "Missing code or state");
+          return;
         }
 
-        const signedCookies = (req as any).signedCookies as any;
-        const stateCookie = signedCookies?.oauth_state;
+        const stateCookie = req.signedCookies?.oauth_state;
         if (!stateCookie || stateCookie !== state) {
-          return res.status(400).send("Invalid state");
+          sendText(res, 400, "Invalid state");
+          return;
         }
 
-        const protocol = (req as any).protocol === "https" || (req as any).secure ? "https" : "http";
-        const host = (req as any).headers.host;
+        const protocol = req.headers["x-forwarded-proto"] || "http";
+        const host = req.headers.host;
         const redirectUri = `${protocol}://${host}/api/oauth/callback`;
 
         try {
           const clientId = process.env.GOOGLE_CLIENT_ID;
           const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-          if (!clientId || !clientSecret) {
-            throw new Error("Missing OAuth credentials");
-          }
-          const oauthClient = new OAuth2Client({
-            clientId,
-            clientSecret,
-            redirectUri,
-          });
+          if (!clientId || !clientSecret) throw new Error("Missing OAuth credentials");
 
-          const { tokens } = await oauthClient.getToken({
-            code,
-            redirectUri,
-          });
+          const oauthClient = new OAuth2Client({ clientId, clientSecret, redirectUri });
+          const { tokens } = await oauthClient.getToken({ code, redirectUri });
 
           const idToken = tokens.id_token;
           if (!idToken) throw new Error("No ID token returned");
 
-          const ticket = await oauthClient.verifyIdToken({
-            idToken,
-            audience: clientId,
-          });
+          const ticket = await oauthClient.verifyIdToken({ idToken, audience: clientId });
           const payload = ticket.getPayload();
-
           if (!payload) throw new Error("Invalid ID token payload");
 
-          const nonceCookie = signedCookies?.oauth_nonce;
+          const nonceCookie = req.signedCookies?.oauth_nonce;
           if (!nonceCookie || nonceCookie !== payload.nonce) {
-            return res.status(400).send("Invalid nonce");
+            sendText(res, 400, "Invalid nonce");
+            return;
           }
 
           // Create session JWT
           const sessionToken = jwt.sign(
-            {
-              uid: payload.sub,
-              email: payload.email,
-              displayName: payload.name,
-              photoURL: payload.picture,
-            },
+            { uid: payload.sub, email: payload.email, displayName: payload.name, photoURL: payload.picture },
             process.env.OAUTH_SESSION_SECRET || "dev-secret",
             { expiresIn: "7d" }
           );
 
-          // Clear OAuth cookies
-          res.clearCookie("oauth_state");
-          res.clearCookie("oauth_nonce");
+          clearCookieHeader(res, "oauth_state");
+          clearCookieHeader(res, "oauth_nonce");
+          setCookieHeader(
+            res, "session", sessionToken,
+            { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "Lax", maxAge: 7 * 24 * 60 * 60 * 1000 }
+          );
 
-          // Set session cookie
-          res.cookie("session", sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax" as const,
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
-
-          // Success response
           const html = `<!DOCTYPE html>
 <html><head><title>登入</title></head>
 <body>
@@ -356,9 +428,9 @@ function vitePluginOAuthApi(): Plugin {
   } else {
     window.location.href = '/?oauth=success';
   }
-</script>
+<\/script>
 </body></html>`;
-          res.type("html").send(html);
+          sendText(res, 200, html, "text/html; charset=utf-8");
         } catch (err) {
           console.error("OAuth callback error:", err);
           const html = `<!DOCTYPE html>
@@ -367,48 +439,46 @@ function vitePluginOAuthApi(): Plugin {
 <p>登入失敗，請關閉視窗後再試。</p>
 <script>
   if (window.opener) {
-    window.opener.postMessage({ type: 'oauth-error', error: '${err}' }, '*');
+    window.opener.postMessage({ type: 'oauth-error', error: '${String(err)}' }, '*');
   }
   setTimeout(() => window.close(), 2000);
-</script>
+<\/script>
 </body></html>`;
-          res.type("html").send(html);
+          sendText(res, 200, html, "text/html; charset=utf-8");
         }
       });
 
       // GET /api/auth/me
-      server.middlewares.use("/api/auth/me", (req: any, res: any) => {
+      server.middlewares.use("/api/auth/me", (req: any, res: any, next: any) => {
         if (req.method !== "GET") {
-          res.status(405).send("Method Not Allowed");
+          sendText(res, 405, "Method Not Allowed");
           return;
         }
 
         const token = req.cookies?.session;
         if (!token) {
-          return res.status(401).json({ authenticated: false, user: null });
+          sendJson(res, 401, { authenticated: false, user: null });
+          return;
         }
 
         try {
           const payload = jwt.verify(token, process.env.OAUTH_SESSION_SECRET || "dev-secret") as any;
           const { uid, email, displayName, photoURL } = payload;
-          res.json({
-            authenticated: true,
-            user: { uid, email, displayName, photoURL },
-          });
-        } catch (err) {
-          res.clearCookie("session");
-          return res.status(401).json({ authenticated: false, user: null });
+          sendJson(res, 200, { authenticated: true, user: { uid, email, displayName, photoURL } });
+        } catch {
+          clearCookieHeader(res, "session");
+          sendJson(res, 401, { authenticated: false, user: null });
         }
       });
 
       // POST /api/auth/logout
-      server.middlewares.use("/api/auth/logout", (req: any, res: any) => {
+      server.middlewares.use("/api/auth/logout", (req: any, res: any, next: any) => {
         if (req.method !== "POST") {
-          res.status(405).send("Method Not Allowed");
+          sendText(res, 405, "Method Not Allowed");
           return;
         }
-        res.clearCookie("session");
-        res.json({ success: true });
+        clearCookieHeader(res, "session");
+        sendJson(res, 200, { success: true });
       });
     },
   };
