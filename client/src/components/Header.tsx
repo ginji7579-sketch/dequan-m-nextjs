@@ -18,6 +18,7 @@ const logoSrc = '/images/logo.jpg';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isWebsiteExpanded, setIsWebsiteExpanded] = useState(false);
   const { openCart, totalQuantity } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
   const { lang, toggleLanguage, t } = useLanguage();
@@ -30,8 +31,17 @@ export default function Header() {
     { label: t('nav.contact'), href: '#contact' },
   ];
 
+  const websiteSubCategories = [
+    { label: '形象網站',      href: '/website-pricing?tab=branding' },
+    { label: '購物網站',      href: '/website-pricing?tab=shopping' },
+    { label: '部落格網站',    href: '/website-pricing?tab=blog' },
+    { label: '一頁式網站',    href: '/website-pricing?tab=onepage' },
+    { label: '特殊功能網站',  href: '/website-pricing?tab=special' },
+    { label: '定版式購物網站', href: '/website-pricing?tab=fixedshop' },
+  ];
+
   const categories = [
-    { label: '網站架設報價', href: '#services' },
+    { label: '網站架設報價', href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: '行銷推廣', href: '#services' },
     { label: '網頁開發', href: '#services', hasSub: true },
     { label: '工業服務', href: '#services' },
@@ -186,14 +196,52 @@ export default function Header() {
                     <div className="py-2">
                       {categories.map((link) => (
                         <div key={link.label} className="border-b border-gray-50 last:border-none">
-                          <a
-                            href={link.href}
-                            className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
-                            onClick={() => setIsMenuOpen(false)}
-                          >
-                            {link.label}
-                            {link.hasSub && <ChevronDown className="w-4 h-4 text-gray-400" />}
-                          </a>
+                          {link.isWebsite ? (
+                            <>
+                              <Link href="/website-pricing">
+                                <a
+                                  className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                                  onClick={() => setIsMenuOpen(false)}
+                                >
+                                  <span>{link.label}</span>
+                                  <button
+                                    className="p-1 -mr-1 rounded"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsWebsiteExpanded(prev => !prev); }}
+                                  >
+                                    <ChevronDown
+                                      className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isWebsiteExpanded ? 'rotate-180' : ''}`}
+                                    />
+                                  </button>
+                                </a>
+                              </Link>
+                              <div
+                                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                  isWebsiteExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                }`}
+                              >
+                                {websiteSubCategories.map((sub) => (
+                                  <Link key={sub.label} href={sub.href}>
+                                    <a
+                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                      onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                      {sub.label}
+                                    </a>
+                                  </Link>
+                                ))}
+                              </div>
+                            </>
+                          ) : (
+                            <a
+                              href={link.href}
+                              className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                              onClick={() => setIsMenuOpen(false)}
+                            >
+                              {link.label}
+                              {link.hasSub && <ChevronDown className="w-4 h-4 text-gray-400" />}
+                            </a>
+                          )}
                         </div>
                       ))}
                     </div>

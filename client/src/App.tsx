@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import Admin from "./pages/Admin";
 import Checkout from "./pages/Checkout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import WebsitePricing from "./pages/WebsitePricing";
 
 /**
  * App Component - Main application router and theme provider
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/admin"} component={Admin} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/privacy"} component={PrivacyPolicy} />
+      <Route path={"/website-pricing"} component={WebsitePricing} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
