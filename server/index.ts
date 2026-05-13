@@ -49,7 +49,7 @@ async function startServer() {
    */
   const CSP = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-eval'",
+    "script-src 'self'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://d2xsxph8kpxj0f.cloudfront.net https://*.googleapis.com https://*.gstatic.com https://forge.butterfly-effect.dev",
     "font-src 'self' https://fonts.gstatic.com",
@@ -59,6 +59,7 @@ async function startServer() {
     "base-uri 'self'",
     "form-action 'self' https://*.ecpay.com.tw",
     "object-src 'none'",
+    "frame-ancestors 'self'",
   ].join("; ");
 
   // Security headers (including CSP)
