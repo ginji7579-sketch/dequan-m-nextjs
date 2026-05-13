@@ -10,18 +10,39 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [oauthLoading, setOauthLoading] = useState(false);
   const [, setLocation] = useLocation();
-  const { login, loginWithGoogle, user, loading } = useAuth();
+  const { login, loginWithGoogle, user, loading, sessionUser } = useAuth();
 
   const inWebView = isInWebView();
   const hasExternalFlag = hasOpenExternalBrowserFlag();
 
   // 當使用者登入成功時自動導向 /admin
+  const isLoggedIn = Boolean(user) || Boolean(sessionUser);
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && isLoggedIn) {
       setLocation('/admin');
     }
-  }, [user, loading, setLocation]);
+  }, [isLoggedIn, loading, setLocation, sessionUser, user]);
+
+  // 監聽 server-side OAuth popup 回傳的訊息
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'oauth-success') {
+        console.log('✅ OAuth popup 登入成功，重新檢查 session');
+        setOauthLoading(false);
+        // 刷新頁面以確保 cookie 被正確讀取
+        window.location.reload();
+      }
+      if (event.data?.type === 'oauth-error') {
+        console.error('❌ OAuth popup 登入失敗:', event.data.error);
+        setOauthLoading(false);
+        setError('Google 登入失敗，請稍後再試');
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,11 +65,31 @@ export default function Login() {
       return;
     }
 
-    try {
-      await loginWithGoogle();
-    } catch (err: any) {
-      setError(err.message || 'Google 登入失敗，請稍後再試');
+    // 🚀 使用 server-side OAuth popup 方式（避免 Firebase client-side redirect 的 iOS 問題）
+    setOauthLoading(true);
+    
+    // 開啟 popup 視窗到 server-side OAuth endpoint
+    const popup = window.open('/api/oauth/authorize', 'google-login', 'width=500,height=600');
+    
+    // 如果 popup 被阻擋，fallback 到 Firebase redirect
+    if (!popup || popup.closed) {
+      setOauthLoading(false);
+      console.log('ℹ️ Popup 被阻擋，改用 Firebase redirect 方式');
+      try {
+        await loginWithGoogle();
+      } catch (err: any) {
+        setError(err.message || 'Google 登入失敗，請稍後再試');
+      }
+      return;
     }
+
+    // 設定 timeout：若 popup 在 60 秒內沒回應，讓使用者可以重試
+    setTimeout(() => {
+      if (oauthLoading) {
+        setOauthLoading(false);
+        setError('登入逾時，請關閉彈出視窗後重新點擊 Google 登入');
+      }
+    }, 60000);
   };
 
   const handleLineLogin = () => {
