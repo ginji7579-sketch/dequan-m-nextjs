@@ -15,12 +15,61 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Security headers
+  /**
+   * Content Security Policy (CSP)
+   *
+   * Strict policy tuned for the app's actual external resources:
+   *
+   *  default-src 'self'                    – base fallback
+   *  script-src 'self' 'unsafe-inline'     – React DevTools, runtime chunks,
+   *                                          Analytics inline script
+   *  style-src 'self' 'unsafe-inline'      – Tailwind, shadcn/ui inline styles,
+   *                                          Google Fonts stylesheet
+   *  img-src 'self' data: blob:            – same-origin + inline images +
+   *    https://d2xsxph8kpxj0f.cloudfront.net  – CDN product images / hero
+   *    https://*.googleapis.com               – Google Maps marker icons
+   *    https://*.gstatic.com                  – Google-hosted static assets
+   *    https://forge.butterfly-effect.dev     – Maps proxy for tiles
+   *  font-src 'self' https://fonts.gstatic.com – Google Fonts WOFF2 files
+   *  connect-src 'self'                       – API calls (payments, auth)
+   *    https://dequan-m.firebaseapp.com       – Firebase Auth endpoints
+   *    https://identitytoolkit.googleapis.com  – Firebase Auth REST helpers
+   *    https://securetoken.googleapis.com      – Firebase token refresh
+   *    https://firestore.googleapis.com        – Firestore (if used later)
+   *    https://www.googleapis.com              – Google OAuth token exchange
+   *    https://forge.butterfly-effect.dev      – Maps proxy / tiles proxy
+   *    https://*.ecpay.com.tw                  – Ecpay payment callback
+   *    wss://localhost:3000                    – Vite HMR (dev only; harmless in prod)
+   *  frame-src 'self'                         – allow same-origin popups
+   *    https://dequan-m.firebaseapp.com       – Firebase Auth popup
+   *  manifest-src 'self'
+   *  base-uri 'self'
+   *  form-action 'self' https://*.ecpay.com.tw – Ecpay payment form POST
+   *  object-src 'none'
+   */
+  const CSP = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https://d2xsxph8kpxj0f.cloudfront.net https://*.googleapis.com https://*.gstatic.com https://forge.butterfly-effect.dev",
+    "font-src 'self' https://fonts.gstatic.com",
+    "connect-src 'self' https://dequan-m.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com https://forge.butterfly-effect.dev https://*.ecpay.com.tw wss://localhost:3000",
+    "frame-src 'self' https://dequan-m.firebaseapp.com",
+    "manifest-src 'self'",
+    "base-uri 'self'",
+    "form-action 'self' https://*.ecpay.com.tw",
+    "object-src 'none'",
+  ].join("; ");
+
+  // Security headers (including CSP)
   app.use((_req, res, next) => {
+    res.setHeader("Content-Security-Policy", CSP);
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     next();
   });
 
