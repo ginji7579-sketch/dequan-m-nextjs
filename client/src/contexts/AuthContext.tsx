@@ -6,7 +6,6 @@ import {
   onAuthStateChanged,
   User,
   GoogleAuthProvider,
-  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
 } from 'firebase/auth';
@@ -37,16 +36,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  // 處理 redirect fallback 的結果（popup 被擋時才會用到）
+  // 處理重定向登入結果（手機登入必備）
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
         const result = await getRedirectResult(auth);
         if (result?.user) {
-          console.log('Redirect login success:', result.user);
+          console.log('Google 重定向登入成功:', result.user);
         }
       } catch (error: any) {
-        console.error('Redirect login error:', error);
+        console.error('Google 重定向登入失敗:', error);
       }
     };
     handleRedirectResult();
@@ -58,31 +57,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = (email: string, password: string) =>
     signInWithEmailAndPassword(auth, email, password);
 
-  // Google 登入：優先 popup，被擋才 fallback 到 redirect
+  // Google 登入：完全使用重定向方式，解決手機 COOP 錯誤
   const loginWithGoogle = async (): Promise<void> => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
-
-    try {
-      // 所有裝置（包含手機）都先用 popup
-      await signInWithPopup(auth, provider);
-    } catch (error: any) {
-      if (
-        error.code === 'auth/popup-blocked' ||
-        error.code === 'auth/popup-closed-by-user'
-      ) {
-        // popup 被瀏覽器擋住才改用 redirect
-        try {
-          await signInWithRedirect(auth, provider);
-        } catch (redirectError: any) {
-          console.error('Redirect login error:', redirectError);
-          throw new Error(redirectError.message || 'Google 登入失敗，請稍後再試');
-        }
-      } else {
-        console.error('Google 登入錯誤:', error);
-        throw new Error(error.message || 'Google 登入失敗，請稍後再試');
-      }
-    }
+    await signInWithRedirect(auth, provider);
   };
 
   const logout = async (): Promise<void> => {

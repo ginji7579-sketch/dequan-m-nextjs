@@ -18,7 +18,7 @@ git push -u origin feature/oauth-popup-first-fix
 Title: feat(auth): popup-first flow, fixed callback path, open-in-system-browser guide
 
 Description:
-- 保持 `signInWithPopup` 為主要流程，不自動 fallback 至 redirect（避免 `redirect_uri_mismatch`）。
+- 保持 `signInWithRedirect` 為主要流程，不自動 fallback 至 redirect（避免 `redirect_uri_mismatch`）。
 - 固定 OAuth callback path 為 `/api/oauth/callback`（由 `client/src/const.ts` 產生），並在 runtime 印出 `redirectUri` 供 debug。
 - 優先使用 `VITE_FIREBASE_AUTH_DOMAIN`（若有設定），否則回退到現有的 host 偵測或 `<projectId>.firebaseapp.com`。
 - 在登入頁面加入「以系統瀏覽器開啟（推薦）」按鈕，當彈窗被阻擋或發生 internal-error 時顯示，引導用戶在系統瀏覽器重試。
