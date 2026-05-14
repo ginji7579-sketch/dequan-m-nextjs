@@ -49,7 +49,6 @@ export default function Header() {
     { label: '社群行銷投放',   href: '/media-marketing-pricing?tab=socialads' },
     { label: '媒體採購方案',   href: '/media-marketing-pricing?tab=mediabuy' },
     { label: '募資規劃操盤',   href: '/media-marketing-pricing?tab=crowdfunding' },
-    { label: '網站架設報價',   href: '/website-pricing' },
   ];
 
   const categories = [

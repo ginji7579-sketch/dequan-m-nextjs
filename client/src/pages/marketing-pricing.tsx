@@ -140,22 +140,6 @@ const plans: Record<string, {
     accentTo: '#F59E0B',
     glowColor: '#B45309',
   },
-  webquote: {
-    title: '網站架設報價',
-    price: '42,000',
-    priceNote: '起，詳見網站架設方案',
-    features: [
-      '形象網站 / 購物網站 / 一頁式',
-      '響應式設計（RWD）',
-      'SEO 基礎優化',
-      '金物流串接（購物網站）',
-      '後台管理系統',
-      '前往完整網站架設報價頁',
-    ],
-    accentFrom: '#0F766E',
-    accentTo: '#2DD4BF',
-    glowColor: '#0F766E',
-  },
 };
 
 // ─── 共用報價卡片（與網站架設頁面相同結構） ───────────────────────────
