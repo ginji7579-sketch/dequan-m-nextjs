@@ -61,7 +61,6 @@ export default function Header() {
       <div className="bg-[#F25C05] h-1 md:h-1.5 w-full"></div>
       <div className="container">
         <div className="flex items-center justify-between h-20">
-          {/* 修正：直接把 className 給 Link，不要包 <a> */}
           <Link href="/" className="flex items-center gap-2 md:gap-3 transition-opacity opacity-100 hover:opacity-80">
             <img
               src={logoSrc}
@@ -93,7 +92,6 @@ export default function Header() {
             </nav>
 
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Language Switcher */}
               <button 
                 className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95"
                 onClick={toggleLanguage}
@@ -157,7 +155,6 @@ export default function Header() {
                   </SheetHeader>
 
                   <div className="flex-1 overflow-y-auto">
-                    {/* Main Links */}
                     <div className="py-2">
                       {navLinks.map((link) => (
                         <div key={link.label} className="border-b border-gray-50 last:border-none">
@@ -190,7 +187,6 @@ export default function Header() {
                       ))}
                     </div>
 
-                    {/* Category Section */}
                     <div className="mt-4">
                       <div className="px-6 py-4">
                         <h3 className="text-2xl font-medium text-gray-400">分類</h3>
@@ -198,7 +194,6 @@ export default function Header() {
                       <div className="py-2">
                         {categories.map((link) => (
                           <div key={link.label} className="border-b border-gray-50 last:border-none">
-                            {/* 網站架設報價：可展開 */}
                             {link.isWebsite && (
                               <>
                                 <Link
@@ -236,7 +231,6 @@ export default function Header() {
                               </>
                             )}
 
-                            {/* 精準媒體行銷：可展開 */}
                             {link.isMedia && (
                               <>
                                 <Link
@@ -256,25 +250,49 @@ export default function Header() {
                                 </Link>
                                 <div
                                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                    isMediaExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                    isMediaExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
                                   }`}
                                 >
-                                  {mediaMarketingSubCategories.map((sub) => (
-                                    <Link
-                                      key={sub.label}
-                                      href={sub.href}
-                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
-                                      onClick={() => setIsMenuOpen(false)}
-                                    >
-                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                                      {sub.label}
-                                    </Link>
-                                  ))}
+                                  {/* 依照原本陣列順序渲染，但針對「媒體採購方案」額外顯示廣告版面子項 */}
+                                  {mediaMarketingSubCategories.map((sub) => {
+                                    if (sub.label === '媒體採購方案') {
+                                      return (
+                                        <div key={sub.label} className="border-t border-gray-50">
+                                          <Link
+                                            href={sub.href}
+                                            className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                          >
+                                            <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                            {sub.label}
+                                          </Link>
+                                          <Link
+                                            href="/media-marketing-pricing/ad-space"
+                                            className="flex items-center gap-2 pl-14 pr-6 py-3 text-[14px] text-gray-500 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                            onClick={() => setIsMenuOpen(false)}
+                                          >
+                                            <ChevronRight className="w-3 h-3 text-[#F25C05] flex-shrink-0" />
+                                            廣告版面
+                                          </Link>
+                                        </div>
+                                      );
+                                    }
+                                    return (
+                                      <Link
+                                        key={sub.label}
+                                        href={sub.href}
+                                        className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                        onClick={() => setIsMenuOpen(false)}
+                                      >
+                                        <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                        {sub.label}
+                                      </Link>
+                                    );
+                                  })}
                                 </div>
                               </>
                             )}
 
-                            {/* 其他一般連結 */}
                             {!link.isWebsite && !link.isMedia && (
                               <a
                                 href={link.href}
@@ -290,7 +308,6 @@ export default function Header() {
                       </div>
                     </div>
 
-                    {/* Account Section */}
                     <div className="mt-4 pb-10">
                       <div className="px-6 py-4">
                         <h3 className="text-2xl font-medium text-gray-400">帳戶</h3>

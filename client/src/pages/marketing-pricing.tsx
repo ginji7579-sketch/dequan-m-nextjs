@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import {
   Check, ChevronRight, ArrowLeft,
   Target, Rocket, Star, MessageCircle, Share2, Tv, HandCoins, Globe,
@@ -147,8 +147,6 @@ function PricingCard({ planId }: { planId: string }) {
   const plan = plans[planId];
   if (!plan) return null;
 
-  const isSpecial = planId === 'special'; // 保留給未來擴充
-
   return (
     <div className="animate-fade-in-up flex justify-center">
       <div
@@ -225,6 +223,7 @@ function PricingCard({ planId }: { planId: string }) {
 // ─── 頁面元件 ─────────────────────────────────────────────────────
 export default function MarketingPricing() {
   const [activeId, setActiveId] = useState('brandplan');
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -273,21 +272,39 @@ export default function MarketingPricing() {
                 {categories.map(({ id, label, icon: Icon }) => {
                   const isActive = activeId === id;
                   const plan = plans[id];
+                  const isMediaBuy = id === 'mediabuy';
+
                   return (
-                    <button
-                      key={id}
-                      onClick={() => setActiveId(id)}
-                      className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
-                        isActive
-                          ? 'text-white shadow-md scale-[1.02]'
-                          : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
-                      }`}
-                      style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      {label}
-                      {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
-                    </button>
+                    <div key={id} className="flex flex-col w-full">
+                      {/* 主按鈕 */}
+                      <button
+                        onClick={() => {
+                          setActiveId(id);
+                          setLocation(`/media-marketing-pricing?tab=${id}`);
+                        }}
+                        className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                          isActive
+                            ? 'text-white shadow-md scale-[1.02]'
+                            : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
+                        }`}
+                        style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
+                      >
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        {label}
+                        {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
+                      </button>
+
+                      {/* 如果是媒體採購方案，則在其下方渲染「廣告版面」子按鈕 */}
+                      {isMediaBuy && (
+                        <Link
+                          href="/media-marketing-pricing/ad-space"
+                          className="flex items-center gap-2.5 pl-10 pr-4 py-2 mt-1 ml-2 text-sm text-gray-600 bg-gray-50 hover:bg-orange-50 hover:text-[#F25C05] rounded-lg transition-colors border-l-2 border-gray-200"
+                        >
+                          <ChevronRight className="w-3 h-3 text-[#F25C05]" />
+                          <span>廣告版面</span>
+                        </Link>
+                      )}
+                    </div>
                   );
                 })}
               </nav>

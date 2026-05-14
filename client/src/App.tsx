@@ -14,6 +14,7 @@ import Checkout from "./pages/Checkout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WebsitePricing from "./pages/WebsitePricing";
 import MediaMarketingPricing from "./pages/marketing-pricing";
+import AdSpaceMainPage from "./pages/AdSpaceMainPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
@@ -26,17 +27,19 @@ function Router() {
   return (
     <Switch>
       {/* 更具體的路徑優先 */}
-      <Route path={"/login"} component={Login} />
-      <Route path={"/register"} component={Register} />
-      <Route path={"/admin"} component={Admin} />
-      <Route path={"/checkout"} component={Checkout} />
-      <Route path={"/privacy"} component={PrivacyPolicy} />
-      <Route path={"/website-pricing"} component={WebsitePricing} />
-      <Route path={"/media-marketing-pricing"} component={MediaMarketingPricing} />
-      <Route path={"/404"} component={NotFound} />
-      {/* 根路徑放在最後 */}
-      <Route path={"/"} component={Home} />
-      {/* 最終 fallback */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      <Route path="/admin" component={Admin} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/website-pricing" component={WebsitePricing} />
+      
+      {/* 媒體採購相關路由：廣告版面獨立頁面優先 */}
+      <Route path="/media-marketing-pricing/ad-space" component={AdSpaceMainPage} />
+      <Route path="/media-marketing-pricing" component={MediaMarketingPricing} />
+      
+      <Route path="/404" component={NotFound} />
+      <Route path="/" component={Home} />
       <Route component={NotFound} />
     </Switch>
   );
