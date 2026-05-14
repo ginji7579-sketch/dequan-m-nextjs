@@ -13,6 +13,8 @@ import Admin from "./pages/Admin";
 import Checkout from "./pages/Checkout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WebsitePricing from "./pages/WebsitePricing";
+import MediaMarketingPricing from "./pages/marketing-pricing";
+import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
  * App Component - Main application router and theme provider
@@ -23,21 +25,22 @@ import WebsitePricing from "./pages/WebsitePricing";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      {/* 更具體的路徑優先 */}
       <Route path={"/login"} component={Login} />
       <Route path={"/register"} component={Register} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/privacy"} component={PrivacyPolicy} />
       <Route path={"/website-pricing"} component={WebsitePricing} />
+      <Route path={"/media-marketing-pricing"} component={MediaMarketingPricing} />
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      {/* 根路徑放在最後 */}
+      <Route path={"/"} component={Home} />
+      {/* 最終 fallback */}
       <Route component={NotFound} />
     </Switch>
   );
 }
-
-import { LanguageProvider } from "./contexts/LanguageContext";
 
 function App() {
   return (
