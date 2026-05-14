@@ -54,8 +54,6 @@ export default function Header() {
   const categories = [
     { label: '網站架設報價', href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: '精準媒體行銷方案報價', href: '/media-marketing-pricing', hasSub: true, isMedia: true },
-    { label: '網頁開發', href: '#services', hasSub: true },
-    { label: '工業服務', href: '#services' },
   ];
 
   return (
