@@ -30,7 +30,8 @@ export type EcpayCheckoutResponse = {
 };
 
 function getEcpayConfig(): EcpayConfig {
-  const isProduction = process.env.ECPAY_STAGE === 'false';
+  // 使用 ECPAY_ENV 控制環境：設為 'stage' 強制測試環境，否則預設正式環境
+  const isProduction = process.env.ECPAY_ENV !== 'stage';
 
   return {
     merchantId: process.env.ECPAY_MERCHANT_ID || '',
