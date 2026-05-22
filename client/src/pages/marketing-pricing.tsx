@@ -268,21 +268,21 @@ export default function MarketingPricing() {
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
             <aside className="lg:w-64 flex-shrink-0">
               <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">服務項目</p>
-              <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+              <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
                 {categories.map(({ id, label, icon: Icon }) => {
                   const isActive = activeId === id;
                   const plan = plans[id];
                   const isMediaBuy = id === 'mediabuy';
 
                   return (
-                    <div key={id} className="flex flex-col w-full">
+                    <div key={id} className="contents lg:flex lg:flex-col lg:w-full">
                       {/* 主按鈕 */}
                       <button
                         onClick={() => {
                           setActiveId(id);
                           setLocation(`/media-marketing-pricing?tab=${id}`);
                         }}
-                        className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                        className={`flex shrink-0 lg:w-full items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                           isActive
                             ? 'text-white shadow-md scale-[1.02]'
                             : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
@@ -298,7 +298,7 @@ export default function MarketingPricing() {
                       {isMediaBuy && (
                         <Link
                           href="/media-marketing-pricing/ad-space"
-                          className="flex items-center gap-2.5 pl-10 pr-4 py-2 mt-1 ml-2 text-sm text-gray-600 bg-gray-50 hover:bg-orange-50 hover:text-[#F25C05] rounded-lg transition-colors border-l-2 border-gray-200"
+                          className="flex shrink-0 items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap text-gray-600 bg-white hover:bg-orange-50 hover:text-[#F25C05] transition-colors border border-gray-100 lg:mt-1 lg:ml-2 lg:pl-10 lg:pr-4 lg:py-2 lg:rounded-lg lg:bg-gray-50 lg:border-l-2 lg:border-y-0 lg:border-r-0 lg:border-gray-200"
                         >
                           <ChevronRight className="w-3 h-3 text-[#F25C05]" />
                           <span>廣告版面</span>

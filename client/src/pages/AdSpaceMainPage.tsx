@@ -104,12 +104,12 @@ export default function AdSpaceMainPage() {
           {/* 左側邊欄：三個廣告版面選項 */}
           <aside className="lg:w-64 flex-shrink-0">
             <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">廣告版面</p>
-            <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
+            <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
               {sidebarItems.map((item) => (
                 <button
                   key={item.key}
                   onClick={() => setActiveKey(item.key)}
-                  className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                  className={`flex shrink-0 lg:w-full items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                     activeKey === item.key
                       ? 'text-white shadow-md scale-[1.02]'
                       : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dequan-m.vercel.app/sitemap.xml
