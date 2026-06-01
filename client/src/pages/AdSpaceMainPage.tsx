@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
-import { Check, ArrowLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -9,15 +9,6 @@ const adSpaces = {
   homepage: {
     id: 'homepage',
     title: '首頁廣告版面',
-    price: '38,000',
-    priceNote: '/月',
-    description: '網站首頁黃金位置，最高流量區域，24 小時不間斷曝光。',
-    features: [
-      '每日 10 萬+ 瀏覽量',
-      '可指定刊登日期範圍',
-      '提供點擊數據報表',
-      '支援圖片/GIF/影音素材',
-    ],
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
@@ -25,15 +16,6 @@ const adSpaces = {
   menu: {
     id: 'menu',
     title: '網站選單廣告版面',
-    price: '25,000',
-    priceNote: '/月',
-    description: '所有頁面的選單列皆有曝光，導航即廣告，品牌識別強化首選。',
-    features: [
-      '跨頁面高頻曝光',
-      '適合品牌形象強化',
-      '支援圖片/GIF 素材',
-      '可搭配動態輪播',
-    ],
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
@@ -41,15 +23,6 @@ const adSpaces = {
   classified: {
     id: 'classified',
     title: '分類廣告版面',
-    price: '12,000',
-    priceNote: '/月',
-    description: '依產品屬性精準投放在對應分類頁，提升轉換率。',
-    features: [
-      '精準受眾觸及',
-      '可搭配促銷活動',
-      'A/B 測試支援',
-      '每週成效報表',
-    ],
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
@@ -149,48 +122,11 @@ export default function AdSpaceMainPage() {
                     style={{ background: `linear-gradient(to right, ${current.accentFrom}, ${current.accentTo})` }}
                   />
 
-                  <div className="flex justify-center mt-6">
-                    <span
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full tracking-wider border"
-                      style={{
-                        background: `${current.accentFrom}22`,
-                        borderColor: `${current.accentFrom}66`,
-                        color: current.accentTo,
-                      }}
-                    >
-                      月費方案
-                    </span>
-                  </div>
-
-                  <div className="text-center mt-5 px-8">
+                  <div className="text-center mt-8 px-8">
                     <h2 className="text-white text-2xl font-bold mb-1">{current.title}</h2>
-                    <div className="flex items-end justify-center gap-1 mt-3">
-                      <span className="text-lg font-semibold" style={{ color: current.accentTo }}>$</span>
-                      <span className="text-white text-5xl font-extrabold tracking-tight">{current.price}</span>
-                    </div>
-                    <p className="text-gray-400 text-sm mt-1">{current.priceNote}</p>
                   </div>
 
-                  <div className="mx-8 my-6 border-t border-white/10" />
-
-                  <ul className="px-8 pb-8 space-y-3">
-                    {current.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-3">
-                        <span
-                          className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center border"
-                          style={{
-                            background: `${current.accentFrom}30`,
-                            borderColor: current.accentFrom,
-                          }}
-                        >
-                          <Check className="w-3 h-3" style={{ color: current.accentTo }} />
-                        </span>
-                        <span className="text-gray-200 text-sm leading-snug">{feat}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="px-8 pb-8">
+                  <div className="px-8 pb-8 pt-6">
                     <a
                       href="/#contact"
                       className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
