@@ -3,6 +3,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { Link } from 'wouter';
 import { AlertTriangle, Edit3, Plus, Save, Search, Ticket, Trash2, UserPlus, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type TabId = 'products' | 'coupons' | 'orders' | 'admins';
 type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
@@ -43,11 +44,11 @@ type AdminUser = {
   addedAt: string;
 };
 
-const tabs: { id: TabId; label: string }[] = [
-  { id: 'products', label: '商品管理' },
-  { id: 'coupons', label: '折價券管理' },
-  { id: 'orders', label: '訂單管理' },
-  { id: 'admins', label: '管理員設定' },
+const tabs: { id: TabId; labelKey: string }[] = [
+  { id: 'products', labelKey: 'admin.products' },
+  { id: 'coupons', labelKey: 'admin.coupons' },
+  { id: 'orders', labelKey: 'admin.orders' },
+  { id: 'admins', labelKey: 'admin.settings' },
 ];
 
 const statusLabels: Record<OrderStatus, string> = {
@@ -129,6 +130,7 @@ const emptyCoupon: Coupon = { id: '', code: '', type: 'fixed', value: 0, minOrde
 
 export default function Admin() {
   const { user, sessionUser } = useAuth();
+  const { t } = useLanguage();
   const currentEmail = user?.email || sessionUser?.email || 'demo@miru-studio.com';
   const [activeTab, setActiveTab] = useState<TabId>('orders');
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -198,15 +200,15 @@ export default function Admin() {
       <main>
         <div className="container max-w-6xl px-4 py-8 md:py-12 animate-fade-in">
           <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Metric label="本月營收" value={`NT$ ${summary.revenue.toLocaleString()}`} />
-            <Metric label="待處理訂單" value={summary.pending.toString()} />
-            <Metric label="上架商品" value={summary.products.toString()} />
-            <Metric label="活動折價券" value={summary.coupons.toString()} />
+            <Metric label={t('admin.revenue')} value={`NT$ ${summary.revenue.toLocaleString()}`} />
+            <Metric label={t('admin.pendingOrders')} value={summary.pending.toString()} />
+            <Metric label={t('admin.activeProducts')} value={summary.products.toString()} />
+            <Metric label={t('admin.activeCoupons')} value={summary.coupons.toString()} />
           </div>
 
           <div className="mb-8 flex flex-col gap-4 border-b border-black/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="mb-2 font-serif text-2xl font-normal tracking-normal md:text-3xl">後台管理中心</h2>
+              <h2 className="mb-2 font-serif text-2xl font-normal tracking-normal md:text-3xl">{t('admin.center')}</h2>
               <div className="mt-4 flex max-w-full gap-6 overflow-x-auto pb-1">
                 {tabs.map((tab) => (
                   <button
@@ -217,25 +219,25 @@ export default function Admin() {
                       activeTab === tab.id ? 'border-black font-bold opacity-100' : 'border-transparent opacity-40 hover:opacity-100'
                     }`}
                   >
-                    {tab.label}
+                    {t(tab.labelKey)}
                   </button>
                 ))}
               </div>
             </div>
             <div className="flex gap-4">
               <Link href="/">
-                <a className="border border-black/30 px-6 py-3 text-xs font-semibold tracking-widest transition hover:bg-black hover:text-white">返回前台</a>
+                <a className="border border-black/30 px-6 py-3 text-xs font-semibold tracking-widest transition hover:bg-black hover:text-white">{t('admin.backToFront')}</a>
               </Link>
               {activeTab === 'products' && (
                 <button type="button" onClick={() => openProductModal()} className="inline-flex items-center gap-2 bg-black px-6 py-3 text-xs font-semibold tracking-widest text-white transition hover:bg-black/80">
                   <Plus size={16} />
-                  新增商品
+                  {t('admin.addProduct')}
                 </button>
               )}
               {activeTab === 'coupons' && (
                 <button type="button" onClick={openCouponModal} className="inline-flex items-center gap-2 bg-black px-6 py-3 text-xs font-semibold tracking-widest text-white transition hover:bg-black/80">
                   <Plus size={16} />
-                  新增折價券
+                  {t('admin.addCoupon')}
                 </button>
               )}
             </div>
@@ -267,6 +269,7 @@ export default function Admin() {
 }
 
 function AdminNav() {
+  const { t } = useLanguage();
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-white/40 bg-[#fcfaf7]/80 px-6 py-4 backdrop-blur-xl md:px-12 md:py-8">
       <div className="flex items-center gap-4 md:gap-16">
@@ -275,13 +278,13 @@ function AdminNav() {
         </Link>
         <div className="hidden gap-6 text-[11px] font-medium uppercase tracking-widest opacity-60 lg:flex xl:gap-10 xl:text-[13px]">
           <Link href="/">
-            <a className="transition-opacity hover:opacity-100">商店總覽</a>
+            <a className="transition-opacity hover:opacity-100">{t('admin.storeOverview')}</a>
           </Link>
-          <a className="transition-opacity hover:opacity-100" href="#coupons">領券中心</a>
+          <a className="transition-opacity hover:opacity-100" href="#coupons">{t('admin.couponCenter')}</a>
           <Link href="/admin">
-            <a className="text-[#9c6f3a] transition-opacity hover:opacity-100">後台體驗 (DEMO)</a>
+            <a className="text-[#9c6f3a] transition-opacity hover:opacity-100">{t('admin.experience')}</a>
           </Link>
-          <a className="transition-opacity hover:opacity-100" href="#about">關於卡洛特</a>
+          <a className="transition-opacity hover:opacity-100" href="#about">{t('admin.aboutMiru')}</a>
         </div>
       </div>
       <div className="flex items-center gap-4 md:gap-6">
@@ -289,7 +292,7 @@ function AdminNav() {
           <Search size={18} />
         </button>
         <button type="button" className="flex items-center gap-2 opacity-60 transition-opacity hover:opacity-100">
-          <span className="text-[13px] font-medium uppercase tracking-widest">購物車</span>
+          <span className="text-[13px] font-medium uppercase tracking-widest">{t('admin.cart')}</span>
           <span className="flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white">0</span>
         </button>
       </div>
@@ -307,15 +310,16 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 function ProductsTable({ products, onEdit, onDelete }: { products: Product[]; onEdit: (product: Product) => void; onDelete: (id: string) => void }) {
+  const { t } = useLanguage();
   return (
     <TableShell minWidth="min-w-[680px]">
       <thead className="bg-[#f2ece4] text-[10px] uppercase tracking-widest opacity-60">
         <tr>
-          <th className="px-6 py-4">圖片</th>
-          <th className="px-6 py-4">名稱</th>
-          <th className="px-6 py-4">分類</th>
-          <th className="px-6 py-4">價格</th>
-          <th className="px-6 py-4 text-right">操作</th>
+          <th className="px-6 py-4">{t('admin.image')}</th>
+          <th className="px-6 py-4">{t('admin.name')}</th>
+          <th className="px-6 py-4">{t('admin.category')}</th>
+          <th className="px-6 py-4">{t('admin.price')}</th>
+          <th className="px-6 py-4 text-right">{t('admin.action')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-black/5">
@@ -331,8 +335,8 @@ function ProductsTable({ products, onEdit, onDelete }: { products: Product[]; on
             <td className="px-6 py-4 text-xs">NT$ {product.price.toLocaleString()}</td>
             <td className="px-6 py-4 text-right">
               <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => onEdit(product)} className="p-2 transition hover:bg-black/5" aria-label="編輯商品"><Edit3 size={14} /></button>
-                <button type="button" onClick={() => onDelete(product.id)} className="p-2 text-red-500 transition hover:bg-red-50" aria-label="刪除商品"><Trash2 size={14} /></button>
+                <button type="button" onClick={() => onEdit(product)} className="p-2 transition hover:bg-black/5" aria-label={t('admin.editProduct')}><Edit3 size={14} /></button>
+                <button type="button" onClick={() => onDelete(product.id)} className="p-2 text-red-500 transition hover:bg-red-50" aria-label={t('admin.deleteProduct')}><Trash2 size={14} /></button>
               </div>
             </td>
           </tr>
@@ -343,26 +347,27 @@ function ProductsTable({ products, onEdit, onDelete }: { products: Product[]; on
 }
 
 function CouponsTable({ coupons, onDelete }: { coupons: Coupon[]; onDelete: (id: string) => void }) {
+  const { t } = useLanguage();
   return (
     <TableShell minWidth="min-w-[640px]">
       <thead className="bg-[#f2ece4] text-[10px] uppercase tracking-widest opacity-60">
         <tr>
-          <th className="px-6 py-4">代碼</th>
-          <th className="px-6 py-4">類型</th>
-          <th className="px-6 py-4">折扣值</th>
-          <th className="px-6 py-4">最低門檻</th>
-          <th className="px-6 py-4 text-right">操作</th>
+          <th className="px-6 py-4">{t('admin.code')}</th>
+          <th className="px-6 py-4">{t('admin.type')}</th>
+          <th className="px-6 py-4">{t('admin.value')}</th>
+          <th className="px-6 py-4">{t('admin.minThreshold')}</th>
+          <th className="px-6 py-4 text-right">{t('admin.action')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-black/5">
         {coupons.map((coupon) => (
           <tr key={coupon.id} className="transition-colors hover:bg-black/[0.01]">
             <td className="px-6 py-4 text-sm font-bold uppercase tracking-widest">{coupon.code}</td>
-            <td className="px-6 py-4 text-[10px] opacity-60">{couponTypeLabel(coupon.type)}</td>
-            <td className="px-6 py-4 text-xs">{coupon.type === 'percent' ? `${coupon.value}%` : coupon.type === 'shipping' ? '免運費' : `NT$ ${coupon.value.toLocaleString()}`}</td>
+            <td className="px-6 py-4 text-[10px] opacity-60">{couponTypeLabel(coupon.type, t)}</td>
+            <td className="px-6 py-4 text-xs">{coupon.type === 'percent' ? `${coupon.value}%` : coupon.type === 'shipping' ? t('admin.coupon.shipping') : `NT$ ${coupon.value.toLocaleString()}`}</td>
             <td className="px-6 py-4 text-xs">NT$ {coupon.minOrder.toLocaleString()}</td>
             <td className="px-6 py-4 text-right">
-              <button type="button" onClick={() => onDelete(coupon.id)} className="p-2 text-red-500 opacity-60 transition hover:bg-red-50 hover:opacity-100" aria-label="刪除折價券"><Trash2 size={14} /></button>
+              <button type="button" onClick={() => onDelete(coupon.id)} className="p-2 text-red-500 opacity-60 transition hover:bg-red-50 hover:opacity-100" aria-label={t('admin.deleteProduct')}><Trash2 size={14} /></button>
             </td>
           </tr>
         ))}
@@ -372,16 +377,17 @@ function CouponsTable({ coupons, onDelete }: { coupons: Coupon[]; onDelete: (id:
 }
 
 function OrdersTable({ orders, onStatusUpdate }: { orders: Order[]; onStatusUpdate: (id: string, status: OrderStatus) => void }) {
+  const { t } = useLanguage();
   return (
     <TableShell minWidth="min-w-[820px]">
       <thead className="bg-[#f2ece4] text-[10px] uppercase tracking-widest opacity-60">
         <tr>
-          <th className="px-6 py-4">訂單編號</th>
-          <th className="px-6 py-4">時間</th>
-          <th className="px-6 py-4">收件人</th>
-          <th className="px-6 py-4">明細</th>
-          <th className="px-6 py-4">總金額</th>
-          <th className="px-6 py-4 text-right">狀態管理</th>
+          <th className="px-6 py-4">{t('admin.orderId')}</th>
+          <th className="px-6 py-4">{t('admin.time')}</th>
+          <th className="px-6 py-4">{t('admin.recipient')}</th>
+          <th className="px-6 py-4">{t('admin.detail')}</th>
+          <th className="px-6 py-4">{t('admin.total')}</th>
+          <th className="px-6 py-4 text-right">{t('admin.statusManage')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-black/5">
@@ -390,12 +396,12 @@ function OrdersTable({ orders, onStatusUpdate }: { orders: Order[]; onStatusUpda
             <td className="px-6 py-4 font-mono text-xs uppercase opacity-80">#{order.id.slice(-8)}</td>
             <td className="px-6 py-4 text-[10px] opacity-60">{order.createdAt}</td>
             <td className="px-6 py-4 text-xs">{order.shippingInfo.name}<br /><span className="text-[10px] opacity-50">{order.shippingInfo.phone}</span></td>
-            <td className="px-6 py-4 text-xs opacity-80">{order.items} 項商品{order.couponCode && <span className="mt-1 block text-[10px] text-[#9c6f3a]">券: {order.couponCode}</span>}</td>
+            <td className="px-6 py-4 text-xs opacity-80">{order.items} {t('admin.items')}{order.couponCode && <span className="mt-1 block text-[10px] text-[#9c6f3a]">{t('admin.coupon')}: {order.couponCode}</span>}</td>
             <td className="px-6 py-4 font-serif text-sm font-bold">NT$ {order.total.toLocaleString()}</td>
             <td className="px-6 py-4">
               <div className="flex justify-end">
                 <select value={order.status} onChange={(event) => onStatusUpdate(order.id, event.target.value as OrderStatus)} className={`border px-3 py-1.5 text-xs outline-none ${statusClass(order.status)}`}>
-                  {Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  {Object.keys(statusLabels).map((value) => <option key={value} value={value}>{t(`admin.status.${value as OrderStatus}`)}</option>)}
                 </select>
               </div>
             </td>
@@ -421,44 +427,45 @@ function AdminsPanel({
   onAddAdmin: (event: FormEvent<HTMLFormElement>) => void;
   onRemoveAdmin: (email: string) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="space-y-6">
       <div className="border border-amber-200 bg-amber-50 p-4 md:p-6">
         <div className="flex items-start gap-3">
           <AlertTriangle size={20} className="mt-0.5 shrink-0 text-amber-600" />
           <div>
-            <h4 className="mb-1 text-sm font-bold">管理員權限說明</h4>
-            <p className="text-xs leading-relaxed text-amber-800">管理員可以操作後台所有功能，包含商品管理、折價券管理、訂單狀態管理。新增管理員後，該帳號登入即可直接使用後台功能。</p>
+            <h4 className="mb-1 text-sm font-bold">{t('admin.permissionDescTitle')}</h4>
+            <p className="text-xs leading-relaxed text-amber-800">{t('admin.permissionDesc')}</p>
           </div>
         </div>
       </div>
 
       <form onSubmit={onAddAdmin} className="flex flex-col gap-4 sm:flex-row sm:items-end">
         <div className="flex-1">
-          <label className="mb-2 block text-[11px] uppercase tracking-widest opacity-60">新增管理員 Email</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest opacity-60">{t('admin.addAdminEmail')}</label>
           <input type="email" required placeholder="admin@example.com" value={newAdminEmail} onChange={(event) => setNewAdminEmail(event.target.value)} className="w-full border border-black/10 bg-white/80 px-4 py-2.5 text-sm outline-none" />
         </div>
-        <button type="submit" className="inline-flex items-center justify-center gap-2 bg-black px-6 py-2.5 text-xs font-semibold tracking-widest text-white"><UserPlus size={14} />新增管理員</button>
+        <button type="submit" className="inline-flex items-center justify-center gap-2 bg-black px-6 py-2.5 text-xs font-semibold tracking-widest text-white"><UserPlus size={14} />{t('admin.addAdminBtn')}</button>
       </form>
 
       <TableShell>
         <thead className="bg-[#f2ece4] text-[10px] uppercase tracking-widest opacity-60">
           <tr>
             <th className="px-6 py-4">Email</th>
-            <th className="px-6 py-4">新增時間</th>
-            <th className="px-6 py-4 text-right">操作</th>
+            <th className="px-6 py-4">{t('admin.addedTime')}</th>
+            <th className="px-6 py-4 text-right">{t('admin.action')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-black/5">
           {admins.map((admin) => (
             <tr key={admin.id} className="transition-colors hover:bg-black/[0.01]">
-              <td className="px-6 py-4 text-sm font-medium">{admin.email}{admin.email === currentEmail && <span className="ml-2 rounded-full bg-black px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">你</span>}</td>
+              <td className="px-6 py-4 text-sm font-medium">{admin.email}{admin.email === currentEmail && <span className="ml-2 rounded-full bg-black px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">{t('admin.you')}</span>}</td>
               <td className="px-6 py-4 text-[10px] opacity-60">{admin.addedAt}</td>
               <td className="px-6 py-4 text-right">
                 {admin.email !== currentEmail ? (
                   <button type="button" onClick={() => onRemoveAdmin(admin.email)} className="p-2 text-red-500 opacity-60 transition hover:bg-red-50 hover:opacity-100" aria-label="移除管理員"><Trash2 size={14} /></button>
                 ) : (
-                  <span className="text-[10px] opacity-30">不可移除</span>
+                  <span className="text-[10px] opacity-30">{t('admin.notRemovable')}</span>
                 )}
               </td>
             </tr>
@@ -482,20 +489,21 @@ function ProductModal({
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const { t } = useLanguage();
   return (
-    <ModalFrame title={editingProductId ? '編輯商品' : '新增商品'} onClose={onClose}>
+    <ModalFrame title={editingProductId ? t('admin.editProduct') : t('admin.addProduct')} onClose={onClose}>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-6">
-          <Field label="商品名稱"><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.name} onChange={(event) => setProductForm({ ...productForm, name: event.target.value })} /></Field>
-          <Field label="價格"><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.price || ''} onChange={(event) => setProductForm({ ...productForm, price: Number(event.target.value) })} /></Field>
-          <Field label="分類"><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 uppercase outline-none" value={productForm.category} onChange={(event) => setProductForm({ ...productForm, category: event.target.value })} /></Field>
-          <Field label="圖片 URL"><input required type="url" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.image} onChange={(event) => setProductForm({ ...productForm, image: event.target.value })} /></Field>
+          <Field label={t('admin.name')}><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.name} onChange={(event) => setProductForm({ ...productForm, name: event.target.value })} /></Field>
+          <Field label={t('admin.price')}><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.price || ''} onChange={(event) => setProductForm({ ...productForm, price: Number(event.target.value) })} /></Field>
+          <Field label={t('admin.category')}><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 uppercase outline-none" value={productForm.category} onChange={(event) => setProductForm({ ...productForm, category: event.target.value })} /></Field>
+          <Field label={`${t('admin.image')} URL`}><input required type="url" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={productForm.image} onChange={(event) => setProductForm({ ...productForm, image: event.target.value })} /></Field>
           <div className="col-span-2">
-            <label className="mb-2 block text-[11px] uppercase tracking-widest opacity-60">商品描述</label>
+            <label className="mb-2 block text-[11px] uppercase tracking-widest opacity-60">{t('admin.description')}</label>
             <textarea required rows={3} className="w-full border border-black/20 bg-transparent p-3 text-sm outline-none" value={productForm.desc} onChange={(event) => setProductForm({ ...productForm, desc: event.target.value })} />
           </div>
         </div>
-        <button type="submit" className="mt-4 flex w-full items-center justify-center gap-2 bg-black py-4 text-sm font-semibold tracking-widest text-white"><Save size={16} />儲存商品</button>
+        <button type="submit" className="mt-4 flex w-full items-center justify-center gap-2 bg-black py-4 text-sm font-semibold tracking-widest text-white"><Save size={16} />{t('admin.saveProduct')}</button>
       </form>
     </ModalFrame>
   );
@@ -512,18 +520,25 @@ function CouponModal({
   onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const { t } = useLanguage();
   return (
-    <ModalFrame title="新增活動折價券" onClose={onClose}>
+    <ModalFrame title={t('admin.newCoupon')} onClose={onClose}>
       <form onSubmit={onSubmit} className="flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-6">
-          <Field label="折價券代碼 (如: DOUBLE11)"><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 uppercase outline-none" value={couponForm.code} onChange={(event) => setCouponForm({ ...couponForm, code: event.target.value })} /></Field>
-          <Field label="折扣類型"><select className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.type} onChange={(event) => setCouponForm({ ...couponForm, type: event.target.value as CouponType })}><option value="fixed">固定金額 (NT$)</option><option value="percent">百分比 (%)</option><option value="shipping">免運費</option></select></Field>
-          <Field label="折扣數值"><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.value || ''} onChange={(event) => setCouponForm({ ...couponForm, value: Number(event.target.value) })} /></Field>
-          <Field label="最低使用門檻 (NT$)"><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.minOrder || ''} onChange={(event) => setCouponForm({ ...couponForm, minOrder: Number(event.target.value) })} /></Field>
-          <Field label="活動描述"><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.description} onChange={(event) => setCouponForm({ ...couponForm, description: event.target.value })} /></Field>
-          <Field label="失效日期"><input type="date" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.expiryDate} onChange={(event) => setCouponForm({ ...couponForm, expiryDate: event.target.value })} /></Field>
+          <Field label={t('admin.code')}><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 uppercase outline-none" value={couponForm.code} onChange={(event) => setCouponForm({ ...couponForm, code: event.target.value })} /></Field>
+          <Field label={t('admin.type')}>
+            <select className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.type} onChange={(event) => setCouponForm({ ...couponForm, type: event.target.value as CouponType })}>
+              <option value="fixed">{t('admin.coupon.fixed')}</option>
+              <option value="percent">{t('admin.coupon.percent')}</option>
+              <option value="shipping">{t('admin.coupon.shipping')}</option>
+            </select>
+          </Field>
+          <Field label={t('admin.value')}><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.value || ''} onChange={(event) => setCouponForm({ ...couponForm, value: Number(event.target.value) })} /></Field>
+          <Field label={t('admin.minThreshold')}><input required type="number" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.minOrder || ''} onChange={(event) => setCouponForm({ ...couponForm, minOrder: Number(event.target.value) })} /></Field>
+          <Field label={t('admin.description')}><input required type="text" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.description} onChange={(event) => setCouponForm({ ...couponForm, description: event.target.value })} /></Field>
+          <Field label={t('admin.expiryDate')}><input type="date" className="w-full border-b border-black/20 bg-transparent py-2 outline-none" value={couponForm.expiryDate} onChange={(event) => setCouponForm({ ...couponForm, expiryDate: event.target.value })} /></Field>
         </div>
-        <button type="submit" className="mt-4 flex w-full items-center justify-center gap-2 bg-black py-4 text-sm font-semibold tracking-widest text-white"><Ticket size={16} />建立折價券</button>
+        <button type="submit" className="mt-4 flex w-full items-center justify-center gap-2 bg-black py-4 text-sm font-semibold tracking-widest text-white"><Ticket size={16} />{t('admin.createCoupon')}</button>
       </form>
     </ModalFrame>
   );
@@ -554,26 +569,50 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function AdminFooter() {
+  const { t } = useLanguage();
   return (
     <footer className="mt-20 border-t border-black/5 bg-[#fcfaf7] pb-12 pt-16">
       <div className="container mx-auto px-6 md:px-12">
         <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-4">
           <div className="md:col-span-2">
             <h2 className="mb-6 font-serif text-2xl font-bold tracking-[0.4em]">M I R U .</h2>
-            <p className="max-w-sm text-sm font-light leading-relaxed text-black/50">探索日常物件中的美學價值。我們精選具有商業美感與生活溫度的器物，讓您的空間與生活更加精緻。</p>
+            <p className="max-w-sm text-sm font-light leading-relaxed text-black/50">{t('admin.desc')}</p>
           </div>
           <div>
-            <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.3em] opacity-40">快速連結</h3>
-            <ul className="flex flex-col gap-4 text-xs font-medium uppercase tracking-widest"><li>商店總覽</li><li>關於我們</li><li>管理後台</li></ul>
+            <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.3em] opacity-40">{t('footer.links')}</h3>
+            <ul className="flex flex-col gap-4 text-xs font-medium uppercase tracking-widest">
+              <li>
+                <Link href="/">
+                  <a>{t('admin.storeOverview')}</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/about">
+                  <a>{t('nav.about')}</a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin">
+                  <a>{t('nav.admin')}</a>
+                </Link>
+              </li>
+            </ul>
           </div>
           <div>
-            <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.3em] opacity-40">聯絡資訊</h3>
+            <h3 className="mb-6 text-xs font-bold uppercase tracking-[0.3em] opacity-40">{t('footer.contact')}</h3>
             <ul className="flex flex-col gap-4 text-xs font-light tracking-widest text-black/50"><li>E. hello@miru-studio.com</li><li>T. +886 2 2345 6789</li><li>A. 台北市信義區美學路 101 號</li></ul>
           </div>
         </div>
         <div className="flex flex-col items-center justify-between gap-6 border-t border-black/5 pt-8 md:flex-row">
-          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-black/50">© 2026 Carrot Studio. 版權所有</div>
-          <div className="flex gap-8 text-[10px] font-medium uppercase tracking-[0.2em] text-black/50"><span>隱私政策</span><span>服務條款</span></div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.2em] text-black/50">{t('admin.copyright')}</div>
+          <div className="flex gap-8 text-[10px] font-medium uppercase tracking-[0.2em] text-black/50">
+            <Link href="/privacy">
+              <a>{t('footer.privacy')}</a>
+            </Link>
+            <Link href="/privacy">
+              <a>{t('footer.terms')}</a>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
@@ -588,10 +627,10 @@ function TableShell({ children, minWidth = 'min-w-[600px]' }: { children: ReactN
   );
 }
 
-function couponTypeLabel(type: CouponType) {
-  if (type === 'fixed') return '固定金額';
-  if (type === 'percent') return '百分比';
-  return '免運費';
+function couponTypeLabel(type: CouponType, t: any) {
+  if (type === 'fixed') return t('admin.coupon.fixed');
+  if (type === 'percent') return t('admin.coupon.percent');
+  return t('admin.coupon.shipping');
 }
 
 function statusClass(status: OrderStatus) {

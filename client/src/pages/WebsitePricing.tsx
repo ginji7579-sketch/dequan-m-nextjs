@@ -6,53 +6,54 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Category Config ──────────────────────────────────────────────────────────
 
 const categories = [
-  { id: 'branding',  label: '形象網站',       icon: Globe },
-  { id: 'shopping',  label: '購物網站',       icon: ShoppingCart },
-  { id: 'blog',      label: '部落格網站',     icon: BookOpen },
-  { id: 'onepage',   label: '一頁式網站',     icon: Layout },
-  { id: 'special',   label: '特殊功能網站',   icon: Zap },
-  { id: 'fixedshop', label: '定版式購物網站', icon: Store },
+  { id: 'branding',  labelKey: 'website.branding',   icon: Globe },
+  { id: 'shopping',  labelKey: 'website.shopping',   icon: ShoppingCart },
+  { id: 'blog',      labelKey: 'website.blog',       icon: BookOpen },
+  { id: 'onepage',   labelKey: 'website.onepage',    icon: Layout },
+  { id: 'special',   labelKey: 'website.special',    icon: Zap },
+  { id: 'fixedshop', labelKey: 'website.fixedshop',  icon: Store },
 ];
 
 // ─── Feature Data ─────────────────────────────────────────────────────────────
 
-const plans: Record<string, { title: string; accentFrom: string; accentTo: string; glowColor: string }> = {
+const plans: Record<string, { titleKey: string; accentFrom: string; accentTo: string; glowColor: string }> = {
   branding: {
-    title: '形象網站',
+    titleKey: 'website.branding',
     accentFrom: '#F25C05',
     accentTo: '#F5A623',
     glowColor: '#2B8A8A',
   },
   shopping: {
-    title: '購物網站',
+    titleKey: 'website.shopping',
     accentFrom: '#1a6b3a',
     accentTo: '#2B8A8A',
     glowColor: '#1a6b3a',
   },
   blog: {
-    title: '部落格網站',
+    titleKey: 'website.blog',
     accentFrom: '#6B21A8',
     accentTo: '#A855F7',
     glowColor: '#6B21A8',
   },
   onepage: {
-    title: '一頁式網站',
+    titleKey: 'website.onepage',
     accentFrom: '#0369A1',
     accentTo: '#38BDF8',
     glowColor: '#0369A1',
   },
   special: {
-    title: '特殊功能網站',
+    titleKey: 'website.special',
     accentFrom: '#B45309',
     accentTo: '#F59E0B',
     glowColor: '#B45309',
   },
   fixedshop: {
-    title: '定版式購物網站',
+    titleKey: 'website.fixedshop',
     accentFrom: '#0F766E',
     accentTo: '#2DD4BF',
     glowColor: '#0F766E',
@@ -62,6 +63,7 @@ const plans: Record<string, { title: string; accentFrom: string; accentTo: strin
 // ─── Shared Pricing Card ──────────────────────────────────────────────────────
 
 function PricingCard({ planId }: { planId: string }) {
+  const { t } = useLanguage();
   const plan = plans[planId];
   if (!plan) return null;
 
@@ -79,7 +81,7 @@ function PricingCard({ planId }: { planId: string }) {
 
         {/* Title */}
         <div className="text-center px-8 mt-8">
-          <h2 className="text-white text-2xl font-bold mb-1">{plan.title}</h2>
+          <h2 className="text-white text-2xl font-bold mb-1">{t(plan.titleKey)}</h2>
         </div>
 
         {/* CTA */}
@@ -89,7 +91,7 @@ function PricingCard({ planId }: { planId: string }) {
             className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
             style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
           >
-            立即諮詢
+            {t('pricing.inquireNow')}
           </a>
         </div>
 
@@ -106,6 +108,7 @@ function PricingCard({ planId }: { planId: string }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WebsitePricing() {
+  const { t } = useLanguage();
   const [activeId, setActiveId] = useState('branding');
 
   useEffect(() => {
@@ -133,15 +136,15 @@ export default function WebsitePricing() {
             <Link href="/">
               <a className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-6 transition-colors">
                 <ArrowLeft className="w-4 h-4" />
-                返回首頁
+                {t('pricing.backToHome')}
               </a>
             </Link>
             <div className="h-1 w-12 rounded-full bg-[#F25C05] mb-4" />
             <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              網站架設報價
+              {t('pricing.websiteTitle')}
             </h1>
             <p className="text-gray-300 text-base md:text-lg max-w-xl">
-              依您的需求選擇最適合的網站方案，透明報價、專業開發、快速交件。
+              {t('pricing.websiteDesc')}
             </p>
           </div>
         </section>
@@ -152,9 +155,9 @@ export default function WebsitePricing() {
 
             {/* Sidebar */}
             <aside className="lg:w-56 flex-shrink-0">
-              <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">服務項目</p>
+              <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">{t('pricing.services')}</p>
               <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
-                {categories.map(({ id, label, icon: Icon }) => {
+                {categories.map(({ id, labelKey, icon: Icon }) => {
                   const isActive = activeId === id;
                   const plan = plans[id];
                   return (
@@ -170,7 +173,7 @@ export default function WebsitePricing() {
                       style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
                     >
                       <Icon className="w-4 h-4 flex-shrink-0" />
-                      {label}
+                      {t(labelKey)}
                       {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
                     </button>
                   );

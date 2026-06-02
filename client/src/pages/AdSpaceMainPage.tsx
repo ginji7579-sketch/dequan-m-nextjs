@@ -3,26 +3,27 @@ import { Link } from 'wouter';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // 三個廣告版面的詳細資料（與報價頁面卡片格式一致）
 const adSpaces = {
   homepage: {
     id: 'homepage',
-    title: '首頁廣告版面',
+    titleKey: 'adspace.homepage',
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
   },
   menu: {
     id: 'menu',
-    title: '網站選單廣告版面',
+    titleKey: 'adspace.menu',
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
   },
   classified: {
     id: 'classified',
-    title: '分類廣告版面',
+    titleKey: 'adspace.classified',
     accentFrom: '#0891B2',
     accentTo: '#22D3EE',
     glowColor: '#0891B2',
@@ -33,12 +34,13 @@ type AdSpaceKey = keyof typeof adSpaces;
 
 // 左側邊欄選項列表
 const sidebarItems = [
-  { key: 'homepage' as AdSpaceKey, label: '首頁廣告版面' },
-  { key: 'menu' as AdSpaceKey, label: '網站選單廣告版面' },
-  { key: 'classified' as AdSpaceKey, label: '分類廣告版面' },
+  { key: 'homepage' as AdSpaceKey, labelKey: 'adspace.homepage' },
+  { key: 'menu' as AdSpaceKey, labelKey: 'adspace.menu' },
+  { key: 'classified' as AdSpaceKey, labelKey: 'adspace.classified' },
 ];
 
 export default function AdSpaceMainPage() {
+  const { t } = useLanguage();
   const [activeKey, setActiveKey] = useState<AdSpaceKey>('homepage');
   const current = adSpaces[activeKey];
 
@@ -58,15 +60,15 @@ export default function AdSpaceMainPage() {
           <Link href="/">
             <a className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-6 transition-colors">
               <ArrowLeft className="w-4 h-4" />
-              返回首頁
+              {t('pricing.backToHome')}
             </a>
           </Link>
           <div className="h-1 w-12 rounded-full bg-[#7C3AED] mb-4" />
           <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-            廣告版面方案
+            {t('adspace.title')}
           </h1>
           <p className="text-gray-300 text-base md:text-lg max-w-xl">
-            選擇最適合您的廣告位置，讓品牌曝光最大化
+            {t('adspace.desc')}
           </p>
         </div>
       </section>
@@ -76,7 +78,7 @@ export default function AdSpaceMainPage() {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* 左側邊欄：三個廣告版面選項 */}
           <aside className="lg:w-64 flex-shrink-0">
-            <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">廣告版面</p>
+            <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">{t('media.adspace')}</p>
             <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
               {sidebarItems.map((item) => (
                 <button
@@ -94,7 +96,7 @@ export default function AdSpaceMainPage() {
                   }
                 >
                   <ChevronRight className="w-4 h-4 flex-shrink-0" />
-                  {item.label}
+                  {t(item.labelKey)}
                   {activeKey === item.key && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
                 </button>
               ))}
@@ -108,7 +110,7 @@ export default function AdSpaceMainPage() {
               <Link href="/media-marketing-pricing">
                 <a className="inline-flex items-center gap-1.5 text-gray-500 hover:text-gray-700 mb-6 transition-colors">
                   <ArrowLeft className="w-4 h-4" />
-                  返回媒體採購方案總覽
+                  {t('adspace.backToMarketing')}
                 </a>
               </Link>
 
@@ -123,7 +125,7 @@ export default function AdSpaceMainPage() {
                   />
 
                   <div className="text-center mt-8 px-8">
-                    <h2 className="text-white text-2xl font-bold mb-1">{current.title}</h2>
+                    <h2 className="text-white text-2xl font-bold mb-1">{t(current.titleKey)}</h2>
                   </div>
 
                   <div className="px-8 pb-8 pt-6">
@@ -132,7 +134,7 @@ export default function AdSpaceMainPage() {
                       className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
                       style={{ background: `linear-gradient(135deg, ${current.accentFrom} 0%, ${current.accentTo} 100%)` }}
                     >
-                      立即諮詢
+                      {t('pricing.inquireNow')}
                     </a>
                   </div>
 

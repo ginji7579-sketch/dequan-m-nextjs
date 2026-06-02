@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -20,6 +21,19 @@ import ServicesPage from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContactPage from "./pages/ContactPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
+
+/**
+ * ScrollToTop Component - Scroll to top of window on route changes
+ */
+function ScrollToTop() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  return null;
+}
 
 /**
  * App Component - Main application router and theme provider
@@ -63,6 +77,7 @@ function App() {
             <CartProvider>
               <TooltipProvider>
                 <Toaster />
+                <ScrollToTop />
                 <Router />
               </TooltipProvider>
             </CartProvider>
