@@ -52,8 +52,8 @@ export default function Header() {
   ];
 
   const categories = [
-    { label: '網站架設報價', href: '/website-pricing', hasSub: true, isWebsite: true },
-    { label: '精準媒體行銷方案報價', href: '/media-marketing-pricing', hasSub: true, isMedia: true },
+    { label: '網站架設', href: '/website-pricing', hasSub: true, isWebsite: true },
+    { label: '精準媒體行銷方案', href: '/media-marketing-pricing', hasSub: true, isMedia: true },
   ];
 
   return (
@@ -188,9 +188,6 @@ export default function Header() {
                     </div>
 
                     <div className="mt-4">
-                      <div className="px-6 py-4">
-                        <h3 className="text-2xl font-medium text-gray-400">分類</h3>
-                      </div>
                       <div className="py-2">
                         {categories.map((link) => (
                           <div key={link.label} className="border-b border-gray-50 last:border-none">
