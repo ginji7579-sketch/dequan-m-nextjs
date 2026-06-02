@@ -15,6 +15,10 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import WebsitePricing from "./pages/WebsitePricing";
 import MediaMarketingPricing from "./pages/marketing-pricing";
 import AdSpaceMainPage from "./pages/AdSpaceMainPage";
+import AboutPage from "./pages/AboutPage";
+import ServicesPage from "./pages/ServicesPage";
+import PortfolioPage from "./pages/PortfolioPage";
+import ContactPage from "./pages/ContactPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
@@ -37,6 +41,11 @@ function Router() {
       {/* 媒體採購相關路由：廣告版面獨立頁面優先 */}
       <Route path="/media-marketing-pricing/ad-space" component={AdSpaceMainPage} />
       <Route path="/media-marketing-pricing" component={MediaMarketingPricing} />
+      
+      <Route path="/about" component={AboutPage} />
+      <Route path="/services" component={ServicesPage} />
+      <Route path="/portfolio" component={PortfolioPage} />
+      <Route path="/contact" component={ContactPage} />
       
       <Route path="/404" component={NotFound} />
       <Route path="/" component={Home} />

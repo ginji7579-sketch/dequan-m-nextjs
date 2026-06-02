@@ -26,10 +26,10 @@ export default function Header() {
 
   const navLinks = [
     { label: t('nav.home'), href: '/' },
-    { label: t('nav.about'), href: '#about' },
-    { label: t('nav.services'), href: '#services', hasSub: true },
-    { label: t('nav.portfolio'), href: '#portfolio', hasSub: true },
-    { label: t('nav.contact'), href: '#contact' },
+    { label: t('nav.about'), href: '/about' },
+    { label: t('nav.services'), href: '/services', hasSub: true },
+    { label: t('nav.portfolio'), href: '/portfolio', hasSub: true },
+    { label: t('nav.contact'), href: '/contact' },
   ];
 
   const websiteSubCategories = [
@@ -78,16 +78,16 @@ export default function Header() {
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             <nav className="hidden lg:flex items-center gap-8 mr-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.href}
                   href={link.href}
                   className="font-medium transition-colors duration-300"
                   style={{ color: '#2C3E50' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#2B8A8A'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#2C3E50'}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#2B8A8A')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#2C3E50')}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </nav>
 
