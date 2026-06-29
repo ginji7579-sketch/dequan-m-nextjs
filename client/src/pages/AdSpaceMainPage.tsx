@@ -130,7 +130,7 @@ export default function AdSpaceMainPage() {
 
                   <div className="px-8 pb-8 pt-6">
                     <a
-                      href="/#contact"
+                      href="/contact"
                       className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
                       style={{ background: `linear-gradient(135deg, ${current.accentFrom} 0%, ${current.accentTo} 100%)` }}
                     >
