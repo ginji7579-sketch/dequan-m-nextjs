@@ -50,4 +50,14 @@ export const portfolioItems: PortfolioItem[] = [
     tags: ['E-commerce', 'Management'],
     link: 'https://pick-up-jade.vercel.app/',
   },
+  {
+    id: 'daily-mate',
+    title: 'Daily Mate - 日常生活管理平台',
+    titleEn: 'Daily Mate - Daily Life Management Platform',
+    description: '一個聚焦日常生活管理與使用體驗優化的網站作品，強調清楚的資訊呈現與流暢的互動流程。',
+    descriptionEn: 'A website project focused on daily life management and user experience, emphasizing clear information presentation and smooth interaction flow.',
+    image: '/images/daily_mate_jimi.svg',
+    tags: ['Web App', 'UX Design'],
+    link: 'https://daily-mate-flax.vercel.app/',
+  },
 ];
