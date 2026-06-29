@@ -24,44 +24,4 @@ export const services: ServiceItem[] = [
     icon: Megaphone,
     image: '/images/service_cloud_library.png',
   },
-  {
-    ...serviceCatalog[3], // 靜態網站架設
-    icon: Heart,
-    image: '/images/service_writing_room.png',
-  },
-  {
-    ...serviceCatalog[4], // 動態網站架設
-    icon: Star,
-    image: '/images/service_cloud_library.png',
-  },
-  {
-    ...serviceCatalog[5], // 新聞稿撰寫
-    icon: Newspaper,
-    image: '/images/service_bloom_sky.png',
-  },
-  {
-    ...serviceCatalog[6], // 人物專訪
-    icon: Mic2,
-    image: '/images/service_cloud_library.png',
-  },
-  {
-    ...serviceCatalog[7], // 公關媒體
-    icon: Share2,
-    image: '/images/service_bloom_sky.png',
-  },
-  {
-    ...serviceCatalog[8], // 整合行銷
-    icon: Target,
-    image: '/images/service_writing_room.png',
-  },
-  {
-    ...serviceCatalog[9], // 政府補助計畫
-    icon: Heart,
-    image: '/images/service_bloom_sky.png',
-  },
-  {
-    ...serviceCatalog[10], // 塑橡膠外銷
-    icon: Star,
-    image: '/images/service_writing_room.png',
-  },
 ];

@@ -20,16 +20,22 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWebsiteExpanded, setIsWebsiteExpanded] = useState(false);
   const [isMediaExpanded, setIsMediaExpanded] = useState(false);
+  const [isGraphicExpanded, setIsGraphicExpanded] = useState(false);
   const { openCart, totalQuantity } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
   const { lang, toggleLanguage, t } = useLanguage();
 
-  const navLinks = [
+  const navLinks: { label: string; href: string; hasSub?: boolean }[] = [
     { label: t('nav.home'), href: '/' },
     { label: t('nav.about'), href: '/about' },
-    { label: t('nav.services'), href: '/services' },
     { label: t('nav.portfolio'), href: '/portfolio' },
     { label: t('nav.contact'), href: '/contact' },
+  ];
+
+  const graphicDesignSubCategories = [
+    { label: t('graphic.businesscard'), href: '/services?tab=business-card' },
+    { label: t('graphic.logodesign'),   href: '/services?tab=logo-design' },
+    { label: t('graphic.adcopy'),       href: '/services?tab=ad-copy' },
   ];
 
   const websiteSubCategories = [
@@ -49,9 +55,15 @@ export default function Header() {
     { label: t('media.socialads'),   href: '/media-marketing-pricing?tab=socialads' },
     { label: t('media.mediabuy'),    href: '/media-marketing-pricing?tab=mediabuy' },
     { label: t('media.crowdfunding'), href: '/media-marketing-pricing?tab=crowdfunding' },
+    { label: t('media.pressrelease'), href: '/media-marketing-pricing?tab=pressrelease' },
+    { label: t('media.interview'),   href: '/media-marketing-pricing?tab=interview' },
+    { label: t('media.publicrelations'), href: '/media-marketing-pricing?tab=publicrelations' },
+    { label: t('media.integratedmarketing'), href: '/media-marketing-pricing?tab=integratedmarketing' },
+    { label: t('media.grantplan'),   href: '/media-marketing-pricing?tab=grantplan' },
   ];
 
   const categories = [
+    { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
   ];
@@ -59,8 +71,8 @@ export default function Header() {
   const desktopNavItems = [
     { label: t('nav.home'), href: '/' },
     { label: t('nav.about'), href: '/about' },
-    { label: t('nav.services'), href: '/services' },
     { label: t('nav.portfolio'), href: '/portfolio' },
+    { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
     { label: t('nav.websitepricing'), href: '/website-pricing', isWebsite: true, subItems: websiteSubCategories },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.contact'), href: '/contact' },
@@ -88,7 +100,7 @@ export default function Header() {
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             <nav className="hidden lg:flex items-center gap-5 xl:gap-8 mr-4 xl:mr-8">
               {desktopNavItems.map((item) => {
-                const hasSub = item.isWebsite || item.isMedia;
+                const hasSub = item.isWebsite || item.isMedia || item.isGraphic;
                 return (
                   <div key={item.label} className="relative group py-2">
                     <Link
@@ -115,6 +127,17 @@ export default function Header() {
                     {hasSub && (
                       <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div className="w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
+                          {item.isGraphic && item.subItems?.map((sub) => (
+                            <Link
+                              key={sub.label}
+                              href={sub.href}
+                              className="flex items-center gap-2 px-4 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
+                            >
+                              <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                              {sub.label}
+                            </Link>
+                          ))}
+
                           {item.isWebsite && item.subItems?.map((sub) => (
                             <Link
                               key={sub.label}
@@ -246,6 +269,43 @@ export default function Header() {
                         ))}
                         {categories.map((link) => (
                           <div key={link.label} className="border-b border-gray-50 last:border-none">
+                            {link.isGraphic && (
+                              <>
+                                <Link
+                                  href={link.href}
+                                  className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                                  onClick={() => setIsMenuOpen(false)}
+                                >
+                                  <span>{link.label}</span>
+                                  <button
+                                    className="p-1 -mr-1 rounded"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsGraphicExpanded(prev => !prev); }}
+                                  >
+                                    <ChevronDown
+                                      className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isGraphicExpanded ? 'rotate-180' : ''}`}
+                                    />
+                                  </button>
+                                </Link>
+                                <div
+                                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                                    isGraphicExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                                  }`}
+                                >
+                                  {graphicDesignSubCategories.map((sub) => (
+                                    <Link
+                                      key={sub.label}
+                                      href={sub.href}
+                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                      onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                      {sub.label}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+
                             {link.isWebsite && (
                               <>
                                 <Link

@@ -9,30 +9,16 @@ export const serviceCatalog: ServiceCatalogItem[] = [
   {
     id: 'business-card',
     title: '名片設計',
-    description: '單面300雙面500。',
-    price: 300,
+    description: '依照客人需求報價',
   },
   {
     id: 'logo-design',
     title: 'logo設計',
-    description: '$1000。',
-    price: 1000,
+    description: '依照客人需求報價',
   },
   {
     id: 'ad-copy',
     title: '廣告文宣',
-    description: '$500/頁',
-    price: 500,
-  },
-  {
-    id: 'static-website',
-    title: '靜態網站架設',
-    description: '1-3萬',
-    price: 10000,
-  },
-  {
-    id: 'dynamic-website',
-    title: '動態網站架設',
     description: '依照客人需求報價',
   },
   {
@@ -61,10 +47,5 @@ export const serviceCatalog: ServiceCatalogItem[] = [
     id: 'grant-plan',
     title: '政府補助計畫',
     description: '依據客人需求報價',
-  },
-  {
-    id: 'rubber-export',
-    title: '塑橡膠外銷',
-    description: '依照客人需求報價',
   },
 ];

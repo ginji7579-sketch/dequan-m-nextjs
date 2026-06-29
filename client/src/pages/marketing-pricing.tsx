@@ -3,6 +3,7 @@ import { Link, useLocation } from 'wouter';
 import {
   ChevronRight, ArrowLeft,
   Target, Rocket, Star, MessageCircle, Share2, Tv, HandCoins, Globe,
+  Newspaper, Mic2, Heart, TrendingUp,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -17,6 +18,11 @@ const categories = [
   { id: 'socialads',   labelKey: 'media.socialads',   icon: Share2 },
   { id: 'mediabuy',    labelKey: 'media.mediabuy',    icon: Tv },
   { id: 'crowdfunding',labelKey: 'media.crowdfunding',icon: HandCoins },
+  { id: 'pressrelease',labelKey: 'media.pressrelease',icon: Newspaper },
+  { id: 'interview',   labelKey: 'media.interview',   icon: Mic2 },
+  { id: 'publicrelations', labelKey: 'media.publicrelations', icon: Globe },
+  { id: 'integratedmarketing', labelKey: 'media.integratedmarketing', icon: TrendingUp },
+  { id: 'grantplan',   labelKey: 'media.grantplan',   icon: Heart },
 ];
 
 // ─── 各方案詳細內容 ────────────────────────────────────────────────
@@ -67,6 +73,36 @@ const plans: Record<string, {
     accentFrom: '#B45309',
     accentTo: '#F59E0B',
     glowColor: '#B45309',
+  },
+  pressrelease: {
+    titleKey: 'media.pressrelease',
+    accentFrom: '#0EA5E9',
+    accentTo: '#38BDF8',
+    glowColor: '#0EA5E9',
+  },
+  interview: {
+    titleKey: 'media.interview',
+    accentFrom: '#8B5CF6',
+    accentTo: '#A78BFA',
+    glowColor: '#8B5CF6',
+  },
+  publicrelations: {
+    titleKey: 'media.publicrelations',
+    accentFrom: '#F43F5E',
+    accentTo: '#FB7185',
+    glowColor: '#F43F5E',
+  },
+  integratedmarketing: {
+    titleKey: 'media.integratedmarketing',
+    accentFrom: '#10B981',
+    accentTo: '#34D399',
+    glowColor: '#10B981',
+  },
+  grantplan: {
+    titleKey: 'media.grantplan',
+    accentFrom: '#EC4899',
+    accentTo: '#F472B6',
+    glowColor: '#EC4899',
   },
 };
 
