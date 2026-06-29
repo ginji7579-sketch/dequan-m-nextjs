@@ -405,7 +405,7 @@ export default function Header() {
                               </>
                             )}
 
-                            {!link.isWebsite && !link.isMedia && (
+                            {!link.isWebsite && !link.isMedia && !link.isGraphic && (
                               <a
                                 href={link.href}
                                 className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
