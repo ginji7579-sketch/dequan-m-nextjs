@@ -54,10 +54,6 @@ export default function ServicesSection() {
                   <h3 className="text-sm md:text-base font-normal text-center mb-1 text-gray-800 leading-snug px-2 line-clamp-2 min-h-[2.5rem] flex items-center">
                     {lang === 'en' && service.titleEn ? service.titleEn : service.title}
                   </h3>
-                  
-                  <p className="text-base md:text-lg font-bold text-center mb-4 text-black">
-                    NT${service.price?.toLocaleString() || '---'}
-                  </p>
 
                   <button
                     type="button"
