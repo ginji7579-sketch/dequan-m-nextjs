@@ -35,18 +35,18 @@ export default function ServicesSection() {
                 className="group relative flex flex-col transition-all duration-300"
               >
                 {/* Image/Icon Container */}
-                <div className="relative w-full pt-[125%] mb-4 bg-gray-50 overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {service.image ? (
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
+                <div className="relative w-full pt-[75%] mb-4 bg-gray-50 overflow-hidden">
+                  {service.image ? (
+                    <img
+                      src={service.image}
+                      alt={service.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
                       <Icon className="w-16 h-16 text-brand-primary opacity-40" />
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}

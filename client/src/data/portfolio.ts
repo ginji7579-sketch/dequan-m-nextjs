@@ -56,7 +56,7 @@ export const portfolioItems: PortfolioItem[] = [
     titleEn: 'Daily Mate - Daily Life Management Platform',
     description: '一個聚焦日常生活管理與使用體驗優化的網站作品，強調清楚的資訊呈現與流暢的互動流程。',
     descriptionEn: 'A website project focused on daily life management and user experience, emphasizing clear information presentation and smooth interaction flow.',
-    image: '/images/daily_mate_jimi.svg',
+    image: '/images/daily_mate_jimi.png',
     tags: ['Web App', 'UX Design'],
     link: 'https://daily-mate-flax.vercel.app/',
   },
