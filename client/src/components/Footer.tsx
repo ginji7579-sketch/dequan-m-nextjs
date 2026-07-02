@@ -9,36 +9,10 @@ export default function Footer() {
   return (
     <footer style={{ backgroundColor: '#2C3E50', color: 'white' }}>
       <div className="container section-spacing">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           <div>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>德全有限公司</h3>
             <p className="text-sm" style={{ color: '#9CA3AF' }}>DEQUAN-M CO.LTD</p>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>{t('footer.links')}</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  {t('nav.home')}
-                </a>
-              </li>
-              <li>
-                <a href="#about" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  {t('nav.about')}
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  {t('nav.services')}
-                </a>
-              </li>
-              <li>
-                <a href="#contact" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  {t('nav.contact')}
-                </a>
-              </li>
-            </ul>
           </div>
 
           <div>
