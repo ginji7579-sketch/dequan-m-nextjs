@@ -35,8 +35,10 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-start gap-3">
-                <WeChatIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                <span style={{ color: '#D1D5DB' }}>ginji7579</span>
+                <a href="weixin://dl/chat?ginji7579" className="flex items-start gap-2 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
+                  <WeChatIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
+                  <span>ginji7579</span>
+                </a>
               </div>
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />

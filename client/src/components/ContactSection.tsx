@@ -92,7 +92,7 @@ export default function ContactSection() {
       icon: WeChatIcon,
       label: 'wechat',
       value: 'ginji7579',
-      href: '#',
+      href: 'weixin://dl/chat?ginji7579',
     },
     {
       icon: MapPin,
