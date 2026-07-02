@@ -193,24 +193,24 @@ export default function Header() {
 
             <div className="flex items-center gap-2 sm:gap-4">
               <button 
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95"
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95 flex-shrink-0"
                 onClick={toggleLanguage}
               >
                 <span className="text-[10px] md:text-xs font-bold tracking-wider">{t('lang.label')}</span>
-                <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <Globe className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               </button>
 
-              <button className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-                <Search className="w-5.5 h-5.5" />
+              <button className="hidden sm:block p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+                <Search className="w-5 h-5" />
               </button>
 
               {isAuthenticated ? (
-                <Link href="/admin" className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-                  <UserIcon className="w-5.5 h-5.5" />
+                <Link href="/admin" className="hidden sm:flex p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+                  <UserIcon className="w-5 h-5" />
                 </Link>
               ) : (
-                <Link href="/login" className="p-2 text-gray-700 hover:text-brand-primary transition-colors">
-                  <UserIcon className="w-5.5 h-5.5" />
+                <Link href="/login" className="hidden sm:flex p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+                  <UserIcon className="w-5 h-5" />
                 </Link>
               )}
 
