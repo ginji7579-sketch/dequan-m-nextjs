@@ -29,8 +29,10 @@ export default function Footer() {
                 </a>
               </div>
               <div className="flex items-start gap-3">
-                <LineIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                <span style={{ color: '#D1D5DB' }}>ginji7579</span>
+                <a href="https://line.me/ti/p/zz8b4pkw8C" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
+                  <LineIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
+                  <span>ginji7579</span>
+                </a>
               </div>
               <div className="flex items-start gap-3">
                 <WeChatIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />

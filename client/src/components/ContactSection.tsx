@@ -86,7 +86,7 @@ export default function ContactSection() {
       icon: LineIcon,
       label: 'line',
       value: 'ginji7579',
-      href: '#',
+      href: 'https://line.me/ti/p/zz8b4pkw8C',
     },
     {
       icon: WeChatIcon,
