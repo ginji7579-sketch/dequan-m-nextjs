@@ -68,7 +68,7 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.terms': '服務條款',
     // Categories and Custom Pricing Pages
     'nav.websitepricing': '網站架設',
-    'nav.mediamarketing': '精準媒體行銷',
+    'nav.mediamarketing': '媒體行銷',
     'nav.admin': '管理後台',
     'website.branding': '形象網站',
     'website.shopping': '購物網站',
@@ -96,7 +96,7 @@ const translations: Record<Language, Record<string, string>> = {
     'pricing.backToHome': '返回首頁',
     'pricing.websiteTitle': '網站架設',
     'pricing.websiteDesc': '依您的需求選擇最適合的網站方案，透明報價、專業開發、快速交件。',
-    'pricing.marketingTitle': '精準媒體行銷方案',
+    'pricing.marketingTitle': '媒體行銷方案',
     'pricing.marketingDesc': '品牌曝光、口碑操作、社群投放…全方位行銷服務，透明報價，彈性組合。',
     'pricing.services': '服務項目',
     'pricing.inquireNow': '立即諮詢',

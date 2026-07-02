@@ -48,7 +48,7 @@ export default function AdSpaceMainPage() {
     <div className="min-h-screen flex flex-col bg-[#F5F1E8]">
       <Header />
 
-      {/* Hero 區塊（與精準媒體行銷方案報價頁面相同） */}
+      {/* Hero 區塊（與媒體行銷方案報價頁面相同） */}
       <section
         className="relative py-16 md:py-20 overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' }}
