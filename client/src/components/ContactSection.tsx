@@ -122,7 +122,16 @@ export default function ContactSection() {
             {contactInfo.map((info, index) => {
               const Icon = info.icon;
               return (
-                <div key={index} className="flex gap-4">
+                <a
+                  key={index}
+                  href={info.href}
+                  target={info.href.startsWith('http') ? "_blank" : undefined}
+                  rel={info.href.startsWith('http') ? "noopener noreferrer" : undefined}
+                  className="flex gap-4 transition-colors block"
+                  style={{ color: 'rgba(44, 62, 80, 0.7)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#2B8A8A'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(44, 62, 80, 0.7)'}
+                >
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-center w-12 h-12 rounded-lg" style={{ backgroundColor: 'rgba(43, 138, 138, 0.1)' }}>
                       <Icon className="w-6 h-6" style={{ color: '#2B8A8A' }} />
@@ -130,19 +139,9 @@ export default function ContactSection() {
                   </div>
                   <div>
                     <p className="font-semibold mb-1" style={{ color: '#2C3E50' }}>{info.label}</p>
-                    <a
-                      href={info.href}
-                      target={info.href.startsWith('http') ? "_blank" : undefined}
-                      rel={info.href.startsWith('http') ? "noopener noreferrer" : undefined}
-                      className="transition-colors"
-                      style={{ color: 'rgba(44, 62, 80, 0.7)' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#2B8A8A'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(44, 62, 80, 0.7)'}
-                    >
-                      {info.value}
-                    </a>
+                    <span>{info.value}</span>
                   </div>
-                </div>
+                </a>
               );
             })}
 

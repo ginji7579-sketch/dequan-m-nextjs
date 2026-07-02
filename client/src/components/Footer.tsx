@@ -18,34 +18,26 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-semibold mb-4" style={{ color: '#F5A623' }}>{t('footer.contact')}</h3>
             <div className="space-y-3">
-              <div className="flex items-start gap-3">
+              <a href="tel:0930137329" className="flex items-start gap-3 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
                 <Phone className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                <span style={{ color: '#D1D5DB' }}>0930137329</span>
-              </div>
-              <div className="flex items-start gap-3">
+                <span>0930137329</span>
+              </a>
+              <a href="mailto:ginji7579@gmail.com" className="flex items-start gap-3 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
                 <Mail className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                <a href="mailto:ginji7579@gmail.com" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  ginji7579@gmail.com
-                </a>
-              </div>
-              <div className="flex items-start gap-3">
-                <a href="https://line.me/ti/p/zz8b4pkw8C" target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  <LineIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                  <span>ginji7579</span>
-                </a>
-              </div>
-              <div className="flex items-start gap-3">
-                <a href="weixin://dl/chat?ginji7579" className="flex items-start gap-2 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  <WeChatIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                  <span>ginji7579</span>
-                </a>
-              </div>
-              <div className="flex items-start gap-3">
+                <span>ginji7579@gmail.com</span>
+              </a>
+              <a href="https://line.me/ti/p/zz8b4pkw8C" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
+                <LineIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
+                <span>ginji7579</span>
+              </a>
+              <a href="weixin://dl/chat?ginji7579" className="flex items-start gap-3 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
+                <WeChatIcon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
+                <span>ginji7579</span>
+              </a>
+              <a href="https://maps.google.com/?q=台北市信義區松德路65號11樓之2" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
                 <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#F5A623' }} />
-                <a href="https://maps.google.com/?q=台北市信義區松德路65號11樓之2" target="_blank" rel="noopener noreferrer" className="transition-colors" style={{ color: '#D1D5DB' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F5A623'} onMouseLeave={(e) => e.currentTarget.style.color = '#D1D5DB'}>
-                  台北市信義區松德路65號11樓之2
-                </a>
-              </div>
+                <span>台北市信義區松德路65號11樓之2</span>
+              </a>
             </div>
           </div>
         </div>
