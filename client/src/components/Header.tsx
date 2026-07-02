@@ -63,18 +63,20 @@ export default function Header() {
   ];
 
   const categories = [
-    { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
+    { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
+    { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
   ];
 
   const desktopNavItems = [
     { label: t('nav.home'), href: '/' },
     { label: t('nav.about'), href: '/about' },
     { label: t('nav.portfolio'), href: '/portfolio' },
-    { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
     { label: t('nav.websitepricing'), href: '/website-pricing', isWebsite: true, subItems: websiteSubCategories },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
+    { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
+    { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
     { label: t('nav.contact'), href: '/contact' },
   ];
 

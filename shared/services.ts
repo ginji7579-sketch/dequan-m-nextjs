@@ -9,6 +9,13 @@ export type ServiceCatalogItem = {
 
 export const serviceCatalog: ServiceCatalogItem[] = [
   {
+    id: 'video-production',
+    title: '影音製作',
+    titleEn: 'Video Production',
+    description: '依照客人需求報價',
+    descriptionEn: 'Quote based on customer needs.',
+  },
+  {
     id: 'business-card',
     title: '名片設計',
     titleEn: 'Business Card',

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { 
   ChevronRight, ShoppingCart, 
-  IdCard, Palette, Megaphone 
+  IdCard, Palette, Megaphone, Video 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { services } from '@/data/services';
@@ -10,6 +10,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const categories = [
+  { id: 'video-production', labelKey: 'video.production', icon: Video },
   { id: 'business-card', labelKey: 'graphic.businesscard', icon: IdCard },
   { id: 'logo-design',   labelKey: 'graphic.logodesign',   icon: Palette },
   { id: 'ad-copy',       labelKey: 'graphic.adcopy',       icon: Megaphone },
@@ -20,6 +21,11 @@ const planStyles: Record<string, {
   accentTo: string;
   glowColor: string;
 }> = {
+  'video-production': {
+    accentFrom: '#F59E0B',
+    accentTo: '#FCD34D',
+    glowColor: '#F59E0B',
+  },
   'business-card': {
     accentFrom: '#7C3AED',
     accentTo: '#A78BFA',
