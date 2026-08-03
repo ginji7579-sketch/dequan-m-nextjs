@@ -31,6 +31,16 @@ export const portfolioItems: PortfolioItem[] = [
     link: 'https://wafer.carrot-atelier.online/',
   },
   {
+    id: 'carrot-games',
+    title: 'Carrot Games - 遊戲平台作品',
+    titleEn: 'Carrot Games - Game Platform',
+    description: '一個充滿創意與互動的遊戲平台，展示多款趣味遊戲與流暢的使用體驗。',
+    descriptionEn: 'A creative and interactive game platform showcasing fun games with smooth user experience.',
+    image: '/images/carrot_games_cover.png',
+    tags: ['Game', 'Web Game'],
+    link: 'https://darkschneider1024.github.io/carrot-games/',
+  },
+  {
     id: 'fastorder',
     title: 'FastOrder - 智能點餐系統',
     titleEn: 'FastOrder - Smart Ordering System',
