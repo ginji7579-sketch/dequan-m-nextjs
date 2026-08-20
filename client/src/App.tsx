@@ -20,6 +20,9 @@ import AboutPage from "./pages/AboutPage";
 import ServicesPage from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContactPage from "./pages/ContactPage";
+import GroupBuyPage from "./pages/GroupBuyPage";
+import MooncakePage from "./pages/MooncakePage";
+import FanPage from "./pages/FanPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
