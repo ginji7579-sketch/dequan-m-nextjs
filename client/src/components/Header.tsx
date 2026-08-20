@@ -100,96 +100,6 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <nav className="hidden lg:flex items-center gap-5 xl:gap-8 mr-4 xl:mr-8">
-              {desktopNavItems.map((item) => {
-                const hasSub = item.isWebsite || item.isMedia || item.isGraphic;
-                return (
-                  <div key={item.label} className="relative group py-2">
-                    <Link
-                      href={item.href}
-                      className="flex items-center gap-1 font-medium transition-colors duration-300 py-1 text-sm xl:text-base whitespace-nowrap"
-                      style={{ color: '#2C3E50' }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#2B8A8A';
-                        const icon = e.currentTarget.querySelector('.chevron-icon');
-                        if (icon) (icon as HTMLElement).style.color = '#2B8A8A';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = '#2C3E50';
-                        const icon = e.currentTarget.querySelector('.chevron-icon');
-                        if (icon) (icon as HTMLElement).style.color = '#9CA3AF';
-                      }}
-                    >
-                      <span>{item.label}</span>
-                      {hasSub && (
-                        <ChevronDown className="chevron-icon w-4 h-4 text-gray-400 transition-transform duration-300 group-hover:rotate-180" />
-                      )}
-                    </Link>
-
-                    {hasSub && (
-                      <div className="absolute left-1/2 -translate-x-1/2 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                        <div className="w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
-                          {item.isGraphic && item.subItems?.map((sub) => (
-                            <Link
-                              key={sub.label}
-                              href={sub.href}
-                              className="flex items-center gap-2 px-4 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
-                            >
-                              <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                              {sub.label}
-                            </Link>
-                          ))}
-
-                          {item.isWebsite && item.subItems?.map((sub) => (
-                            <Link
-                              key={sub.label}
-                              href={sub.href}
-                              className="flex items-center gap-2 px-4 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
-                            >
-                              <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                              {sub.label}
-                            </Link>
-                          ))}
-
-                          {item.isMedia && item.subItems?.map((sub) => {
-                            if (sub.href.includes('tab=mediabuy')) {
-                              return (
-                                <div key={sub.label}>
-                                  <Link
-                                    href={sub.href}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
-                                  >
-                                    <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                                    {sub.label}
-                                  </Link>
-                                  <Link
-                                    href="/media-marketing-pricing/ad-space"
-                                    className="flex items-center gap-2 pl-8 pr-4 py-2 text-[13px] text-gray-500 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
-                                  >
-                                    <ChevronRight className="w-3 h-3 text-[#F25C05] flex-shrink-0" />
-                                    {t('media.adspace')}
-                                  </Link>
-                                </div>
-                              );
-                            }
-                            return (
-                              <Link
-                                key={sub.label}
-                                href={sub.href}
-                                className="flex items-center gap-2 px-4 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
-                              >
-                                <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                                {sub.label}
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
 
             <div className="flex items-center gap-2 sm:gap-4">
               <button 
@@ -421,6 +331,7 @@ export default function Header() {
                         ))}
                       </div>
                     </div>
+
 
                     <div className="border-b border-gray-50">
                       <Link
