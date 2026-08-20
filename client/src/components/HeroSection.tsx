@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const BlobLogoScene = lazy(() => import('./BlobLogo'));
+const RotatingCard3DScene = lazy(() => import('./RotatingCard3D'));
 
 export default function HeroSection() {
   const { t } = useLanguage();
@@ -70,15 +71,11 @@ export default function HeroSection() {
             {/* Ambient gold glow behind the card */}
             <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/10 to-amber-500/15 rounded-full blur-3xl opacity-60 animate-pulse pointer-events-none"></div>
 
-            {/* Polaroid style glassmorphic illustration card */}
-            <div className="w-full max-w-[310px] bg-white/5 backdrop-blur-md border border-white/15 p-3 rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.6)] hover:shadow-[0_30px_60px_-10px_rgba(43,138,138,0.3)] transition-all duration-500 hover:-translate-y-2 animate-float relative z-20 group">
-              <div className="relative overflow-hidden rounded-2xl bg-[#090e17] border border-white/10">
-                <img
-                  src="/images/home_bg.png"
-                  alt="Cozy Starry Bear"
-                  className="w-full h-auto object-cover transform duration-700 group-hover:scale-105"
-                />
-              </div>
+            {/* 3D Rotating Card scene */}
+            <div className="relative z-20 w-full max-w-[300px] h-[360px] md:max-w-[320px] md:h-[400px]">
+              <Suspense fallback={<div className="w-full h-full flex items-center justify-center text-white/50">載入中...</div>}>
+                <RotatingCard3DScene className="w-full h-full" />
+              </Suspense>
             </div>
 
             {/* Smaller floating interactive 3D companion scene */}

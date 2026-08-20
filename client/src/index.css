@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=ZCOOL+KuaiLe&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -84,7 +85,7 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Noto Sans TC', 'Noto Sans', sans-serif;
+    font-family: 'Mochiy Pop One', 'ZCOOL KuaiLe', 'Noto Sans TC', 'Noto Sans', sans-serif;
   }
 
   img {
