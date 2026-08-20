@@ -107,6 +107,28 @@ export default function Header() {
             </div>
           </Link>
 
+          {/* Desktop navigation (visible md+) */}
+          <nav className="hidden md:flex items-center gap-4 ml-6">
+            {desktopNavItems.map((item) => (
+              <div key={item.label} className="relative">
+                {item.isGroupBuy ? (
+                  <Link href={item.href} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-primary">
+                    <span>{item.label}</span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </Link>
+                ) : item.isWebsite || item.isMedia || item.isGraphic ? (
+                  <Link href={item.href} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-primary">
+                    <span>{item.label}</span>
+                  </Link>
+                ) : (
+                  <Link href={item.href} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-primary">
+                    <span>{item.label}</span>
+                  </Link>
+                )}
+              </div>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-4 mt-4 md:mt-0">
 
             <div className="flex items-center gap-2 sm:gap-4">
