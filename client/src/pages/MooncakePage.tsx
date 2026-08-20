@@ -18,9 +18,15 @@ export default function MooncakePage() {
           <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-10 blur-3xl" style={{ background: '#2B8A8A', transform: 'translate(-30%,30%)' }} />
 
           <div className="container relative z-10">
+            <Link href="/group-buy">
+              <a className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-6 transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                返回團購
+              </a>
+            </Link>
             <div className="h-1 w-12 rounded-full bg-[#F25C05] mb-4" />
             <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              月餅
+              月餅團購
             </h1>
             <p className="text-gray-300 text-base md:text-lg max-w-xl">
               精選優質月餅，團購價格優惠
