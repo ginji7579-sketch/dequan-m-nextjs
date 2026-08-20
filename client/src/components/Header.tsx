@@ -187,7 +187,7 @@ export default function Header() {
                             </Link>
                           </div>
                         ))}
-                        {categories.map((link) => (
+                        {categories.filter(link => !link.isGroupBuy).map((link) => (
                           <div key={link.label} className="border-b border-gray-50 last:border-none">
                             {link.isGraphic && (
                               <>
