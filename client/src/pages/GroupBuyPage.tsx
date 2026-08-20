@@ -10,10 +10,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Category Config ──────────────────────────────────────────────────────────
 
-// Left sidebar categories removed per request. Keep arrays empty so no sidebar item is rendered.
-const categories: { id: string; labelKey: string; icon?: any }[] = [];
+const categories = [
+  { id: 'groupbuy',  labelKey: '團購',   icon: Cake },
+];
 
-const subItems: Record<string, any[]> = {};
+const subItems = {
+  groupbuy: [
+    { id: 'mooncake', label: '月餅', href: '/group-buy/mooncake' },
+    { id: 'fan', label: '風扇', href: '/group-buy/fan' },
+  ],
+};
 
 // ─── Feature Data ─────────────────────────────────────────────────────────────
 
