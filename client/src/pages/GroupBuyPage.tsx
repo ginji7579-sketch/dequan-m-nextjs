@@ -10,10 +10,12 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 // ─── Category Config ──────────────────────────────────────────────────────────
 
-// Left sidebar categories: keep empty to avoid duplicate '團購' in sidebar
-const categories: { id: string; labelKey: string; icon?: any }[] = [];
+import { groupBuyCategory, groupBuySubCategories } from '@/data/groupBuy';
 
-const subItems: Record<string, any[]> = {};
+const categories = [groupBuyCategory];
+const subItems = {
+  groupbuy: groupBuySubCategories,
+};
 
 // ─── Feature Data ─────────────────────────────────────────────────────────────
 

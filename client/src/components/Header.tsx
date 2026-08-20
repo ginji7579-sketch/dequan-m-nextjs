@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/sheet';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { groupBuyCategory, groupBuySubCategories } from '@/data/groupBuy';
 
 const logoSrc = '/images/logo.jpg';
 
@@ -63,17 +64,12 @@ export default function Header() {
     { label: t('media.grantplan'),   href: '/media-marketing-pricing?tab=grantplan' },
   ];
 
-  const groupBuySubCategories = [
-    { label: '月餅', href: '/group-buy/mooncake' },
-    { label: '風扇', href: '/group-buy/fan' },
-  ];
-
   const categories = [
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
-    { label: '團購', href: '/group-buy', hasSub: true, isGroupBuy: true },
+    groupBuyCategory,
   ];
 
   const desktopNavItems = [
@@ -84,7 +80,7 @@ export default function Header() {
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
-    { label: '團購', href: '/group-buy', isGroupBuy: true, subItems: groupBuySubCategories },
+    groupBuyCategory,
     { label: t('nav.contact'), href: '/contact' },
   ];
 
