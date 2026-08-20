@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/sheet';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { groupBuyCategory, groupBuySubCategories } from '@/data/groupBuy';
 
 const logoSrc = '/images/logo.jpg';
 
@@ -69,7 +68,6 @@ export default function Header() {
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
-    groupBuyCategory,
   ];
 
   const desktopNavItems = [
@@ -80,7 +78,6 @@ export default function Header() {
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
-    groupBuyCategory,
     { label: t('nav.contact'), href: '/contact' },
   ];
 
@@ -341,17 +338,6 @@ export default function Header() {
                                 <div
                                   className={`overflow-hidden transition-all duration-300 ease-in-out ${isGroupBuyExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
-                                  {groupBuySubCategories.map((sub) => (
-                                    <Link
-                                      key={sub.label}
-                                      href={sub.href}
-                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
-                                      onClick={() => setIsMenuOpen(false)}
-                                    >
-                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
-                                      {sub.label}
-                                    </Link>
-                                  ))}
                                 </div>
                               </>
                             )}
