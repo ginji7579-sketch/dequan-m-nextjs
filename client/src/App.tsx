@@ -63,6 +63,9 @@ function Router() {
       <Route path="/services" component={ServicesPage} />
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/contact" component={ContactPage} />
+      <Route path="/group-buy" component={GroupBuyPage} />
+      <Route path="/group-buy/mooncake" component={MooncakePage} />
+      <Route path="/group-buy/fan" component={FanPage} />
       
       <Route path="/404" component={NotFound} />
       <Route path="/" component={Home} />

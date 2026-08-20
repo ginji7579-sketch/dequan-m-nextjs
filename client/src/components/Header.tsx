@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'wouter';
 import { Menu, ShoppingCart, X, User as UserIcon, LogOut, ChevronDown, ChevronRight, Search, Globe } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +17,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const logoSrc = '/images/logo.jpg';
 
 export default function Header() {
+  const [location] = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWebsiteExpanded, setIsWebsiteExpanded] = useState(false);
   const [isMediaExpanded, setIsMediaExpanded] = useState(false);
@@ -25,6 +27,30 @@ export default function Header() {
   const { openCart, totalQuantity } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
   const { lang, toggleLanguage, t } = useLanguage();
+
+  useEffect(() => {
+    if (location !== '/') {
+      setIsScrolled(false);
+      return;
+    }
+    
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [location]);
+
+  const isHomepage = location === '/';
+  const iconColorClass = isHomepage && !isScrolled
+    ? 'text-white/80 hover:text-white transition-colors'
+    : 'text-gray-700 hover:text-brand-primary transition-colors';
 
   const navLinks: { label: string; href: string; hasSub?: boolean }[] = [
     { label: t('nav.home'), href: '/' },
@@ -63,14 +89,40 @@ export default function Header() {
     { label: t('media.grantplan'),   href: '/media-marketing-pricing?tab=grantplan' },
   ];
 
-  const categories = [
+  interface CategoryItem {
+    label: string;
+    href: string;
+    hasSub?: boolean;
+    isWebsite?: boolean;
+    isMedia?: boolean;
+    isGraphic?: boolean;
+    isGroupBuy?: boolean;
+  }
+
+  const groupBuySubCategories = [
+    { label: t('groupbuy.mooncake'), href: '/group-buy/mooncake' },
+    { label: t('groupbuy.fan'),      href: '/group-buy/fan' },
+  ];
+
+  const categories: CategoryItem[] = [
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
+    { label: t('nav.groupbuy'), href: '/group-buy', hasSub: true, isGroupBuy: true },
   ];
 
-  const desktopNavItems = [
+  interface DesktopNavItem {
+    label: string;
+    href: string;
+    isWebsite?: boolean;
+    isMedia?: boolean;
+    isGraphic?: boolean;
+    isGroupBuy?: boolean;
+    subItems?: { label: string; href: string }[];
+  }
+
+  const desktopNavItems: DesktopNavItem[] = [
     { label: t('nav.home'), href: '/' },
     { label: t('nav.about'), href: '/about' },
     { label: t('nav.portfolio'), href: '/portfolio' },
@@ -78,12 +130,23 @@ export default function Header() {
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
+    { label: t('nav.groupbuy'), href: '/group-buy', isGroupBuy: true, subItems: groupBuySubCategories },
     { label: t('nav.contact'), href: '/contact' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted">
-      <div className="bg-[#F25C05] h-1 md:h-1.5 w-full"></div>
+    <header className={
+      isHomepage
+        ? `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+            isScrolled 
+              ? 'bg-[#090e17]/90 backdrop-blur-md border-b border-white/10 shadow-lg' 
+              : 'bg-transparent border-transparent'
+          }`
+        : 'sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted'
+    }>
+      <div className={`bg-[#F25C05] h-1 md:h-1.5 w-full transition-all duration-500 ${
+        isHomepage && !isScrolled ? 'opacity-0 h-0' : 'opacity-100'
+      }`} />
       <div className="container">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-2 md:gap-3 transition-opacity opacity-100 hover:opacity-80">
@@ -92,11 +155,17 @@ export default function Header() {
               alt="德全有限公司 Logo"
               loading="eager"
               decoding="async"
-              className="h-10 md:h-12 w-auto object-contain"
+              className={`h-10 md:h-12 w-auto object-contain rounded-lg transition-all duration-500 ${
+                isHomepage && !isScrolled ? 'bg-white p-0.5' : ''
+              }`}
             />
             <div className="flex flex-col">
-              <span className="font-bold text-base md:text-xl text-brand-primary leading-tight">德全有限公司</span>
-              <span className="text-[9px] md:text-[11px] text-brand-dark leading-tight tracking-widest uppercase">DEQUAN-M CO.LTD</span>
+              <span className={`font-bold text-base md:text-xl leading-tight transition-colors duration-500 ${
+                isHomepage && !isScrolled ? 'text-white font-semibold' : 'text-brand-primary'
+              }`}>德全有限公司</span>
+              <span className={`text-[9px] md:text-[11px] leading-tight tracking-widest uppercase transition-colors duration-500 ${
+                isHomepage && !isScrolled ? 'text-slate-300' : 'text-brand-dark'
+              }`}>DEQUAN-M CO.LTD</span>
             </div>
           </Link>
 
@@ -104,29 +173,33 @@ export default function Header() {
 
             <div className="flex items-center gap-2 sm:gap-4">
               <button 
-                className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#1A1A1A] text-white rounded-full transition-transform hover:scale-105 active:scale-95 flex-shrink-0"
+                className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0 ${
+                  isHomepage && !isScrolled 
+                    ? 'bg-white/10 hover:bg-white/20 border border-white/20 text-white' 
+                    : 'bg-[#1A1A1A] text-white'
+                }`}
                 onClick={toggleLanguage}
               >
                 <span className="text-[10px] md:text-xs font-bold tracking-wider">{t('lang.label')}</span>
                 <Globe className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
               </button>
 
-              <button className="hidden sm:block p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+              <button className={`hidden sm:block p-2 transition-colors flex-shrink-0 ${iconColorClass}`}>
                 <Search className="w-5 h-5" />
               </button>
 
               {isAuthenticated ? (
-                <Link href="/admin" className="hidden sm:flex p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+                <Link href="/admin" className={`hidden sm:flex p-2 transition-colors flex-shrink-0 ${iconColorClass}`}>
                   <UserIcon className="w-5 h-5" />
                 </Link>
               ) : (
-                <Link href="/login" className="hidden sm:flex p-2 text-gray-700 hover:text-brand-primary transition-colors flex-shrink-0">
+                <Link href="/login" className={`hidden sm:flex p-2 transition-colors flex-shrink-0 ${iconColorClass}`}>
                   <UserIcon className="w-5 h-5" />
                 </Link>
               )}
 
               <button
-                className="relative p-2 text-gray-700 hover:text-brand-primary transition-colors"
+                className={`relative p-2 transition-colors ${iconColorClass}`}
                 onClick={openCart}
                 aria-label="開啟購物車"
               >
@@ -141,7 +214,7 @@ export default function Header() {
               <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
                 <SheetTrigger asChild>
                   <button
-                    className="p-2 text-gray-700 hover:text-brand-primary transition-colors"
+                    className={`p-2 transition-colors ${iconColorClass}`}
                     aria-label="開啟選單"
                   >
                     <Menu className="w-6 h-6" />
@@ -338,11 +411,22 @@ export default function Header() {
                                 <div
                                   className={`overflow-hidden transition-all duration-300 ease-in-out ${isGroupBuyExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
                                 >
+                                  {groupBuySubCategories.map((sub) => (
+                                    <Link
+                                      key={sub.label}
+                                      href={sub.href}
+                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                      onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                      {sub.label}
+                                    </Link>
+                                  ))}
                                 </div>
                               </>
                             )}
 
-                            {!link.isWebsite && !link.isMedia && !link.isGraphic && (
+                            {!link.isWebsite && !link.isMedia && !link.isGraphic && !link.isGroupBuy && (
                               <a
                                 href={link.href}
                                 className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"

@@ -12,7 +12,7 @@ import CartDrawer from '@/components/CartDrawer';
  */
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#090e17]">
       <Header />
       <main className="flex-grow">
         <HeroSection />

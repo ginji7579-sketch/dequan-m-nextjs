@@ -2,12 +2,21 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { LineIcon } from './LineIcon';
 import { WeChatIcon } from './WeChatIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useLocation } from 'wouter';
 
 export default function Footer() {
   const { t } = useLanguage();
+  const [location] = useLocation();
+  const isHomepage = location === '/';
 
   return (
-    <footer style={{ backgroundColor: '#2C3E50', color: 'white' }}>
+    <footer 
+      style={
+        isHomepage 
+          ? { backgroundColor: 'transparent', color: 'white', borderTop: '1px solid rgba(255, 255, 255, 0.05)' } 
+          : { backgroundColor: '#2C3E50', color: 'white' }
+      }
+    >
       <div className="container section-spacing">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           <div>

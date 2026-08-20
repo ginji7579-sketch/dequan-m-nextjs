@@ -41,9 +41,9 @@ const BlobLogo = () => {
   )
 }
 
-export default function BlobLogoScene() {
+export default function BlobLogoScene({ className = "w-[300px] h-[300px] md:w-[500px] md:h-[500px]" }: { className?: string }) {
   return (
-    <div className="w-[300px] h-[300px] md:w-[500px] md:h-[500px]">
+    <div className={className}>
       <Canvas shadows dpr={[1, 2]}>
         <PerspectiveCamera makeDefault position={[0, 0, 5]} />
         <ambientLight intensity={0.5} />

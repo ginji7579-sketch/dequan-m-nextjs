@@ -73,4 +73,20 @@ export const serviceCatalog: ServiceCatalogItem[] = [
     description: '依據客人需求報價',
     descriptionEn: 'Quote based on customer needs.',
   },
+  {
+    id: 'groupbuy-mooncake',
+    title: '特級中秋月餅禮盒',
+    titleEn: 'Premium Mid-Autumn Mooncake Gift Box',
+    description: '$880',
+    descriptionEn: '$880',
+    price: 880,
+  },
+  {
+    id: 'groupbuy-fan',
+    title: '智能靜音循環風扇',
+    titleEn: 'Smart Silent Air Circulation Fan',
+    description: '$1980',
+    descriptionEn: '$1980',
+    price: 1980,
+  },
 ];
