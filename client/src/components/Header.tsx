@@ -21,6 +21,7 @@ export default function Header() {
   const [isWebsiteExpanded, setIsWebsiteExpanded] = useState(false);
   const [isMediaExpanded, setIsMediaExpanded] = useState(false);
   const [isGraphicExpanded, setIsGraphicExpanded] = useState(false);
+  const [isGroupBuyExpanded, setIsGroupBuyExpanded] = useState(false);
   const { openCart, totalQuantity } = useCart();
   const { user, logout, isAuthenticated } = useAuth();
   const { lang, toggleLanguage, t } = useLanguage();
@@ -62,11 +63,17 @@ export default function Header() {
     { label: t('media.grantplan'),   href: '/media-marketing-pricing?tab=grantplan' },
   ];
 
+  const groupBuySubCategories = [
+    { label: '月餅', href: '/group-buy/mooncake' },
+    { label: '風扇', href: '/group-buy/fan' },
+  ];
+
   const categories = [
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
+    { label: '團購', href: '/group-buy', hasSub: true, isGroupBuy: true },
   ];
 
   const desktopNavItems = [
@@ -77,6 +84,7 @@ export default function Header() {
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.videoproduction'), href: '/services?tab=video-production' },
     { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },
+    { label: '團購', href: '/group-buy', isGroupBuy: true, subItems: groupBuySubCategories },
     { label: t('nav.contact'), href: '/contact' },
   ];
 
@@ -313,6 +321,41 @@ export default function Header() {
                                       </Link>
                                     );
                                   })}
+                                </div>
+                              </>
+                            )}
+
+                            {link.isGroupBuy && (
+                              <>
+                                <Link
+                                  href={link.href}
+                                  className="flex items-center justify-between px-6 py-4 text-[16px] font-medium text-gray-800 hover:bg-gray-50 transition-colors"
+                                  onClick={() => setIsMenuOpen(false)}
+                                >
+                                  <span>{link.label}</span>
+                                  <button
+                                    className="p-1 -mr-1 rounded"
+                                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); setIsGroupBuyExpanded(prev => !prev); }}
+                                  >
+                                    <ChevronDown
+                                      className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isGroupBuyExpanded ? 'rotate-180' : ''}`}
+                                    />
+                                  </button>
+                                </Link>
+                                <div
+                                  className={`overflow-hidden transition-all duration-300 ease-in-out ${isGroupBuyExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                                >
+                                  {groupBuySubCategories.map((sub) => (
+                                    <Link
+                                      key={sub.label}
+                                      href={sub.href}
+                                      className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors border-t border-gray-50"
+                                      onClick={() => setIsMenuOpen(false)}
+                                    >
+                                      <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                      {sub.label}
+                                    </Link>
+                                  ))}
                                 </div>
                               </>
                             )}
