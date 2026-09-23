@@ -17,8 +17,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 const logoSrc = '/images/logo.jpg';
 
 export default function Header() {
-  const [location] = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isWebsiteExpanded, setIsWebsiteExpanded] = useState(false);
   const [isMediaExpanded, setIsMediaExpanded] = useState(false);
@@ -28,29 +26,7 @@ export default function Header() {
   const { user, logout, isAuthenticated } = useAuth();
   const { lang, toggleLanguage, t } = useLanguage();
 
-  useEffect(() => {
-    if (location !== '/') {
-      setIsScrolled(false);
-      return;
-    }
-    
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    
-    handleScroll();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [location]);
-
-  const isHomepage = location === '/';
-  const iconColorClass = isHomepage && !isScrolled
-    ? 'text-white/80 hover:text-white transition-colors'
-    : 'text-gray-700 hover:text-brand-primary transition-colors';
+  const iconColorClass = 'text-gray-700 hover:text-brand-primary transition-colors';
 
   const navLinks: { label: string; href: string; hasSub?: boolean }[] = [
     { label: t('nav.home'), href: '/' },
@@ -135,18 +111,8 @@ export default function Header() {
   ];
 
   return (
-    <header className={
-      isHomepage
-        ? `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-            isScrolled 
-              ? 'bg-[#090e17]/90 backdrop-blur-md border-b border-white/10 shadow-lg' 
-              : 'bg-transparent border-transparent'
-          }`
-        : 'sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted'
-    }>
-      <div className={`bg-[#F25C05] h-1 md:h-1.5 w-full transition-all duration-500 ${
-        isHomepage && !isScrolled ? 'opacity-0 h-0' : 'opacity-100'
-      }`} />
+    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-brand-muted">
+      <div className="bg-[#F25C05] h-1 md:h-1.5 w-full" />
       <div className="container">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center gap-2 md:gap-3 transition-opacity opacity-100 hover:opacity-80">
@@ -155,17 +121,11 @@ export default function Header() {
               alt="德全有限公司 Logo"
               loading="eager"
               decoding="async"
-              className={`h-10 md:h-12 w-auto object-contain rounded-lg transition-all duration-500 ${
-                isHomepage && !isScrolled ? 'bg-white p-0.5' : ''
-              }`}
+              className="h-10 md:h-12 w-auto object-contain rounded-lg"
             />
             <div className="flex flex-col">
-              <span className={`font-bold text-base md:text-xl leading-tight transition-colors duration-500 ${
-                isHomepage && !isScrolled ? 'text-white font-semibold' : 'text-brand-primary'
-              }`}>德全有限公司</span>
-              <span className={`text-[9px] md:text-[11px] leading-tight tracking-widest uppercase transition-colors duration-500 ${
-                isHomepage && !isScrolled ? 'text-slate-300' : 'text-brand-dark'
-              }`}>DEQUAN-M CO.LTD</span>
+              <span className="font-bold text-base md:text-xl leading-tight text-brand-primary">德全有限公司</span>
+              <span className="text-[9px] md:text-[11px] leading-tight tracking-widest uppercase text-brand-dark">DEQUAN-M CO.LTD</span>
             </div>
           </Link>
 
@@ -173,11 +133,7 @@ export default function Header() {
 
             <div className="flex items-center gap-2 sm:gap-4">
               <button 
-                className={`flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0 ${
-                  isHomepage && !isScrolled 
-                    ? 'bg-white/10 hover:bg-white/20 border border-white/20 text-white' 
-                    : 'bg-[#1A1A1A] text-white'
-                }`}
+                className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0 bg-[#1A1A1A] text-white"
                 onClick={toggleLanguage}
               >
                 <span className="text-[10px] md:text-xs font-bold tracking-wider">{t('lang.label')}</span>

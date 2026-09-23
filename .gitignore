@@ -31,3 +31,6 @@ client/src/hooks/*.js
 .env.local
 .env.production
 .env
+
+# Vite internal timestamp files
+vite.config.ts.timestamp-*.mjs
