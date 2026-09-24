@@ -50,6 +50,11 @@ export default function Header() {
     { label: t('website.fixedshop'),     href: '/website-pricing?tab=fixedshop' },
   ];
 
+  const pressReleaseSubCategories = [
+    { label: t('media.pressrelease'), href: '/media-marketing-pricing?tab=pressrelease' },
+    { label: t('media.pressreleaseMedia'), href: '/media-marketing-pricing?tab=pressrelease-media' },
+  ];
+
   const mediaMarketingSubCategories = [
     { label: t('media.websiteSocialGeo'), href: '/media-marketing-pricing?tab=website-social-geo' },
     { label: t('media.brandplan'),   href: '/media-marketing-pricing?tab=brandplan' },
@@ -59,7 +64,7 @@ export default function Header() {
     { label: t('media.socialads'),   href: '/media-marketing-pricing?tab=socialads' },
     { label: t('media.mediabuy'),    href: '/media-marketing-pricing?tab=mediabuy' },
     { label: t('media.crowdfunding'), href: '/media-marketing-pricing?tab=crowdfunding' },
-    { label: t('media.pressrelease'), href: '/media-marketing-pricing?tab=pressrelease' },
+    { label: t('media.pressreleaseGroup'), href: '/media-marketing-pricing?tab=pressrelease' },
     { label: t('media.interview'),   href: '/media-marketing-pricing?tab=interview' },
     { label: t('media.publicrelations'), href: '/media-marketing-pricing?tab=publicrelations' },
     { label: t('media.integratedmarketing'), href: '/media-marketing-pricing?tab=integratedmarketing' },
@@ -305,11 +310,38 @@ export default function Header() {
                                 </Link>
                                 <div
                                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                    isMediaExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+                                    isMediaExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                                   }`}
                                 >
                                   {/* 依照原本陣列順序渲染，但針對「媒體採購方案」額外顯示廣告版面子項 */}
                                   {mediaMarketingSubCategories.map((sub) => {
+                                    if (sub.href.includes('tab=pressrelease')) {
+                                      return (
+                                        <div key={sub.label} className="border-t border-gray-50">
+                                          <Link
+                                            href={sub.href}
+                                            className="flex items-center gap-2 pl-10 pr-6 py-3 text-[15px] font-semibold text-gray-700 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                          >
+                                            <ChevronRight className="w-3.5 h-3.5 text-[#F25C05] flex-shrink-0" />
+                                            {sub.label}
+                                          </Link>
+                                          <div className="border-t border-gray-50 bg-gray-50/60">
+                                            {pressReleaseSubCategories.map((child) => (
+                                              <Link
+                                                key={child.label}
+                                                href={child.href}
+                                                className="flex items-center gap-2 pl-14 pr-6 py-2.5 text-[14px] text-gray-600 hover:bg-orange-50 hover:text-[#F25C05] transition-colors"
+                                                onClick={() => setIsMenuOpen(false)}
+                                              >
+                                                <ChevronRight className="w-3 h-3 text-[#F25C05] flex-shrink-0" />
+                                                {child.label}
+                                              </Link>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      );
+                                    }
                                     if (sub.href.includes('tab=mediabuy')) {
                                       return (
                                         <div key={sub.label} className="border-t border-gray-50">

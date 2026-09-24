@@ -3,17 +3,28 @@ import { Link, useLocation } from 'wouter';
 import {
   ChevronRight, ArrowLeft,
   Target, Rocket, Star, MessageCircle, Share2, Tv, HandCoins, Globe,
-  Newspaper, Mic2, Heart, TrendingUp,
+  Newspaper, FileText, Mic2, Heart, TrendingUp, ShoppingCart,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CartDrawer from '@/components/CartDrawer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
+import { services } from '@/data/services';
+import { toast } from 'sonner';
 import {
+  pressReleaseMediaTable,
   websiteSocialGeoTables,
   type ComparisonTable,
+  type MediaListingTable,
 } from '@/data/mediaMarketingPricing';
 
 // ─── 行銷方案分類設定 ──────────────────────────────────────────────
+const pressReleaseCategories = [
+  { id: 'pressrelease', labelKey: 'media.pressrelease', icon: Newspaper },
+  { id: 'pressrelease-media', labelKey: 'media.pressreleaseMedia', icon: FileText },
+];
+
 const categories = [
   { id: 'website-social-geo', labelKey: 'media.websiteSocialGeo', icon: Globe },
   { id: 'brandplan',   labelKey: 'media.brandplan',   icon: Target },
@@ -23,12 +34,18 @@ const categories = [
   { id: 'socialads',   labelKey: 'media.socialads',   icon: Share2 },
   { id: 'mediabuy',    labelKey: 'media.mediabuy',    icon: Tv },
   { id: 'crowdfunding',labelKey: 'media.crowdfunding',icon: HandCoins },
-  { id: 'pressrelease',labelKey: 'media.pressrelease',icon: Newspaper },
+  { id: 'pressrelease-group', labelKey: 'media.pressreleaseGroup', icon: Newspaper },
   { id: 'interview',   labelKey: 'media.interview',   icon: Mic2 },
   { id: 'publicrelations', labelKey: 'media.publicrelations', icon: Globe },
   { id: 'integratedmarketing', labelKey: 'media.integratedmarketing', icon: TrendingUp },
   { id: 'grantplan',   labelKey: 'media.grantplan',   icon: Heart },
 ];
+
+const pressReleaseCategoryIds = new Set(pressReleaseCategories.map((category) => category.id));
+const validCategoryIds = new Set([
+  ...categories.map((category) => category.id),
+  ...Array.from(pressReleaseCategoryIds),
+]);
 
 // ─── 各方案詳細內容 ────────────────────────────────────────────────
 const plans: Record<string, {
@@ -85,11 +102,23 @@ const plans: Record<string, {
     accentTo: '#F59E0B',
     glowColor: '#B45309',
   },
+  'pressrelease-group': {
+    titleKey: 'media.pressreleaseGroup',
+    accentFrom: '#0EA5E9',
+    accentTo: '#38BDF8',
+    glowColor: '#0EA5E9',
+  },
   pressrelease: {
     titleKey: 'media.pressrelease',
     accentFrom: '#0EA5E9',
     accentTo: '#38BDF8',
     glowColor: '#0EA5E9',
+  },
+  'pressrelease-media': {
+    titleKey: 'media.pressreleaseMedia',
+    accentFrom: '#F97316',
+    accentTo: '#FBBF24',
+    glowColor: '#F97316',
   },
   interview: {
     titleKey: 'media.interview',
@@ -120,8 +149,18 @@ const plans: Record<string, {
 // ─── 共用報價卡片（與網站架設頁面相同結構） ───────────────────────────
 function PricingCard({ planId }: { planId: string }) {
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const plan = plans[planId];
   if (!plan) return null;
+
+  const isPressReleaseWriting = planId === 'pressrelease';
+  const pressReleaseService = services.find((service) => service.id === 'press-release');
+
+  const handleAddPressReleaseToCart = () => {
+    if (!pressReleaseService) return;
+    addItem(pressReleaseService);
+    toast.success(`${pressReleaseService.title} 已加入購物車`);
+  };
 
   return (
     <div className="animate-fade-in-up flex justify-center">
@@ -136,16 +175,33 @@ function PricingCard({ planId }: { planId: string }) {
 
         <div className="text-center mt-8 px-8">
           <h2 className="text-white text-2xl font-bold mb-1">{t(plan.titleKey)}</h2>
+          {isPressReleaseWriting && (
+            <p className="text-3xl font-extrabold text-white">
+              NT$<span className="text-sky-300">3,000</span>
+            </p>
+          )}
         </div>
 
         <div className="px-8 pb-8 pt-6">
-          <a
-            href="/contact"
-            className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
-            style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
-          >
-            {t('pricing.inquireNow')}
-          </a>
+          {isPressReleaseWriting ? (
+            <button
+              type="button"
+              onClick={handleAddPressReleaseToCart}
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {t('pricing.addToCart')}
+            </button>
+          ) : (
+            <a
+              href="/contact"
+              className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
+            >
+              {t('pricing.inquireNow')}
+            </a>
+          )}
         </div>
 
         <div
@@ -300,17 +356,181 @@ function WebsiteSocialGeoDetails({
   );
 }
 
+function MediaListingTable({
+  table,
+  accentFrom,
+}: {
+  table: MediaListingTable;
+  accentFrom: string;
+}) {
+  const { t } = useLanguage();
+  const { addItem } = useCart();
+
+  const handleAddToCart = (serviceId: string, title: string, expectedPrice: number) => {
+    const service = services.find((item) => item.id === serviceId);
+    if (!service || service.price !== expectedPrice) {
+      toast.error('媒體價格資料尚未同步，請稍後再試');
+      return;
+    }
+    addItem(service);
+    toast.success(`${title} 已加入購物車`);
+  };
+
+  return (
+    <section
+      className="overflow-hidden rounded-2xl border border-[#D8E1E5] bg-white shadow-sm"
+      style={{ borderTop: `4px solid ${accentFrom}` }}
+    >
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[920px] border-collapse text-left">
+          <thead>
+            <tr className="bg-[#F97316]">
+              {table.headers.map((header, index) => (
+                <th
+                  key={header}
+                  scope="col"
+                  className={`px-4 py-3 text-base font-bold text-white ${
+                    index === 0
+                      ? 'w-[26%]'
+                      : index === 1
+                        ? 'w-[16%]'
+                        : index === 2
+                          ? 'w-[38%]'
+                          : 'w-[20%]'
+                  }`}
+                >
+                  <span className="block text-center">{header}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row, index) => (
+              <tr
+                key={row.serviceId}
+                className="border-b border-[#D8E1E5] transition-colors last:border-0 hover:bg-[#F8FAFC]"
+              >
+                <th
+                  scope="row"
+                  className="bg-[#C5CDD3] px-4 py-4 text-center text-sm font-bold leading-6 text-[#2C3E50]"
+                >
+                  {row.media}
+                </th>
+                <td
+                  className={`px-4 py-4 text-center ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-[#F8FAFC]'
+                  }`}
+                >
+                  <span
+                    className="inline-flex rounded-lg border border-current/15 bg-white px-3 py-1.5 text-base font-extrabold shadow-sm"
+                    style={{ color: accentFrom }}
+                  >
+                    {row.price}
+                  </span>
+                </td>
+                <td
+                  className={`px-4 py-4 text-center text-sm font-medium leading-6 text-gray-700 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-[#F8FAFC]'
+                  }`}
+                >
+                  {row.note}
+                </td>
+                <td
+                  className={`px-3 py-4 text-center ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-[#F8FAFC]'
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart(row.serviceId, `${row.media}新聞稿刊登`, row.priceValue)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#F97316] px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2"
+                    aria-label={`將 ${row.media} 新聞稿刊登加入購物車`}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    {t('pricing.addToCart')}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {table.footerNotes && table.footerNotes.length > 0 && (
+        <div className="space-y-1 border-t border-[#D8E1E5] bg-[#FFF7ED] px-5 py-4 text-sm leading-6 text-gray-700 sm:px-6">
+          {table.footerNotes.map((note) => (
+            <p key={note}>{note}</p>
+          ))}
+        </div>
+      )}
+
+    </section>
+  );
+}
+
+function PressReleaseMediaDetails({
+  accentFrom,
+  accentTo,
+}: {
+  accentFrom: string;
+  accentTo: string;
+}) {
+  const { t } = useLanguage();
+
+  return (
+    <div className="space-y-8">
+      <div
+        className="rounded-2xl p-6 text-white shadow-lg sm:p-8"
+        style={{ background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})` }}
+      >
+        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/80">
+          Media Marketing
+        </p>
+        <h2 className="text-2xl font-extrabold sm:text-3xl">
+          {t('media.pressreleaseMedia')}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/90 sm:text-base">
+          依媒體與刊登條件整理費用，實際刊登以媒體審稿與檔期確認為準。
+        </p>
+      </div>
+
+      <MediaListingTable
+        table={pressReleaseMediaTable}
+        accentFrom={accentFrom}
+      />
+
+      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-[#D8E1E5] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:p-6">
+        <div>
+          <h3 className="text-lg font-bold text-[#2C3E50]">想確認適合的媒體刊登方案？</h3>
+          <p className="mt-1 text-sm leading-6 text-gray-600">
+            告知新聞稿主題與產業需求，由專人協助確認媒體及刊登條件。
+          </p>
+        </div>
+        <a
+          href="/contact"
+          className="inline-flex shrink-0 items-center justify-center rounded-xl px-5 py-3 font-bold text-white transition-opacity hover:opacity-90"
+          style={{ background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})` }}
+        >
+          {t('pricing.inquireNow')}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─── 頁面元件 ─────────────────────────────────────────────────────
 export default function MarketingPricing() {
   const { t } = useLanguage();
   const [activeId, setActiveId] = useState('brandplan');
-  const [location, setLocation] = useLocation();
+  const [isPressReleaseExpanded, setIsPressReleaseExpanded] = useState(false);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    if (tab && categories.some((c) => c.id === tab)) {
+    if (tab && validCategoryIds.has(tab)) {
       setActiveId(tab);
+      setIsPressReleaseExpanded(pressReleaseCategoryIds.has(tab));
     }
   }, []);
 
@@ -351,15 +571,23 @@ export default function MarketingPricing() {
               <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">{t('pricing.services')}</p>
               <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
                 {categories.map(({ id, labelKey, icon: Icon }) => {
-                  const isActive = activeId === id;
+                  const isPressReleaseGroup = id === 'pressrelease-group';
+                  const isActive = isPressReleaseGroup
+                    ? pressReleaseCategoryIds.has(activeId)
+                    : activeId === id;
                   const plan = plans[id];
                   const isMediaBuy = id === 'mediabuy';
 
                   return (
                     <div key={id} className="contents lg:flex lg:flex-col lg:w-full">
-                      {/* 主按鈕 */}
                       <button
+                        type="button"
+                        aria-expanded={isPressReleaseGroup ? isPressReleaseExpanded : undefined}
                         onClick={() => {
+                          if (isPressReleaseGroup) {
+                            setIsPressReleaseExpanded((expanded) => !expanded);
+                            return;
+                          }
                           setActiveId(id);
                           setLocation(`/media-marketing-pricing?tab=${id}`);
                         }}
@@ -372,10 +600,42 @@ export default function MarketingPricing() {
                       >
                         <Icon className="w-4 h-4 flex-shrink-0" />
                         {t(labelKey)}
-                        {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
+                        <ChevronRight
+                          className={`w-3.5 h-3.5 ml-auto flex-shrink-0 transition-transform ${
+                            isPressReleaseGroup && isPressReleaseExpanded ? 'rotate-90' : ''
+                          } ${!isActive && !isPressReleaseGroup ? 'hidden' : ''}`}
+                        />
                       </button>
 
-                      {/* 如果是媒體採購方案，則在其下方渲染「廣告版面」子按鈕 */}
+                      {isPressReleaseGroup && isPressReleaseExpanded && (
+                        <div className="contents lg:flex lg:flex-col lg:w-full lg:ml-2 lg:border-l lg:border-gray-200">
+                          {pressReleaseCategories.map(({ id: childId, labelKey: childLabelKey, icon: ChildIcon }) => {
+                            const isChildActive = activeId === childId;
+
+                            return (
+                              <button
+                                key={childId}
+                                type="button"
+                                onClick={() => {
+                                  setActiveId(childId);
+                                  setIsPressReleaseExpanded(true);
+                                  setLocation(`/media-marketing-pricing?tab=${childId}`);
+                                }}
+                                className={`flex shrink-0 lg:w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 lg:pl-4 ${
+                                  isChildActive
+                                    ? 'bg-sky-50 text-sky-700 shadow-sm'
+                                    : 'text-gray-500 hover:bg-sky-50 hover:text-sky-700'
+                                }`}
+                              >
+                                <ChildIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                                {t(childLabelKey)}
+                                {isChildActive && <ChevronRight className="ml-auto h-3 w-3 flex-shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
                       {isMediaBuy && (
                         <Link
                           href="/media-marketing-pricing/ad-space"
@@ -397,6 +657,11 @@ export default function MarketingPricing() {
                   accentFrom={plans[activeId].accentFrom}
                   accentTo={plans[activeId].accentTo}
                 />
+              ) : activeId === 'pressrelease-media' ? (
+                <PressReleaseMediaDetails
+                  accentFrom={plans[activeId].accentFrom}
+                  accentTo={plans[activeId].accentTo}
+                />
               ) : (
                 <PricingCard planId={activeId} />
               )}
@@ -406,6 +671,7 @@ export default function MarketingPricing() {
       </main>
 
       <Footer />
+      <CartDrawer />
     </div>
   );
 }

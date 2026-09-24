@@ -1,3 +1,8 @@
+import {
+  getPressReleaseMediaServiceId,
+  pressReleaseMediaSeeds,
+} from '@shared/pressReleaseMedia';
+
 export type ComparisonRow = {
   label: string;
   basic: string[];
@@ -148,3 +153,32 @@ export const websiteSocialGeoTables: ComparisonTable[] = [
     totals: ['NT$45,000', 'NT$75,000'],
   },
 ];
+
+export type MediaListingRow = {
+  serviceId: string;
+  media: string;
+  priceValue: number;
+  price: string;
+  note: string;
+};
+
+export type MediaListingTable = {
+  headers: [string, string, string, string];
+  rows: MediaListingRow[];
+  footerNotes?: string[];
+};
+
+export const pressReleaseMediaTable: MediaListingTable = {
+  headers: ['媒體', '報價', '特殊稿子', '加入購物車'],
+  rows: pressReleaseMediaSeeds.map(({ media, price, note }) => ({
+    serviceId: getPressReleaseMediaServiceId(media),
+    media,
+    priceValue: price,
+    price: `NT$${price.toLocaleString('en-US')}`,
+    note: note || '—',
+  })),
+  footerNotes: [
+    '標題 25 字內、內文 1,000 字左右，三張圖片以照片為主',
+    '不要 DM 格式，修改費一次 NT$3,000，內容最終以該編輯台修改為主',
+  ],
+};

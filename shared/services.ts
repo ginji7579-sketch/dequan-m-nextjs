@@ -1,3 +1,5 @@
+import { pressReleaseMediaServices } from './pressReleaseMedia';
+
 export type ServiceCatalogItem = {
   id: string;
   title: string;
@@ -90,10 +92,11 @@ export const serviceCatalog: ServiceCatalogItem[] = [
     id: 'press-release',
     title: '新聞稿撰寫',
     titleEn: 'Press Release',
-    description: '$3000',
-    descriptionEn: '$3000.',
+    description: 'NT$3,000',
+    descriptionEn: 'NT$3,000.',
     price: 3000,
   },
+  ...pressReleaseMediaServices,
   {
     id: 'interview',
     title: '人物專訪',
