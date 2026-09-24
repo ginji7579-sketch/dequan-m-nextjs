@@ -51,6 +51,7 @@ export default function Header() {
   ];
 
   const mediaMarketingSubCategories = [
+    { label: t('media.websiteSocialGeo'), href: '/media-marketing-pricing?tab=website-social-geo' },
     { label: t('media.brandplan'),   href: '/media-marketing-pricing?tab=brandplan' },
     { label: t('media.launch'),      href: '/media-marketing-pricing?tab=launch' },
     { label: t('media.celebrity'),   href: '/media-marketing-pricing?tab=celebrity' },

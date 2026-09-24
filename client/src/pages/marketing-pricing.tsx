@@ -8,9 +8,14 @@ import {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import {
+  websiteSocialGeoTables,
+  type ComparisonTable,
+} from '@/data/mediaMarketingPricing';
 
 // ─── 行銷方案分類設定 ──────────────────────────────────────────────
 const categories = [
+  { id: 'website-social-geo', labelKey: 'media.websiteSocialGeo', icon: Globe },
   { id: 'brandplan',   labelKey: 'media.brandplan',   icon: Target },
   { id: 'launch',      labelKey: 'media.launch',      icon: Rocket },
   { id: 'celebrity',   labelKey: 'media.celebrity',   icon: Star },
@@ -32,6 +37,12 @@ const plans: Record<string, {
   accentTo: string;
   glowColor: string;
 }> = {
+  'website-social-geo': {
+    titleKey: 'media.websiteSocialGeo',
+    accentFrom: '#0F766E',
+    accentTo: '#2DD4BF',
+    glowColor: '#0F766E',
+  },
   brandplan: {
     titleKey: 'media.brandplan',
     accentFrom: '#7C3AED',
@@ -146,6 +157,149 @@ function PricingCard({ planId }: { planId: string }) {
   );
 }
 
+function ComparisonCell({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2">
+      {items.map((item, index) => (
+        <li
+          key={`${index}-${item}`}
+          className="relative pl-4 text-sm leading-7 text-gray-700"
+        >
+          <span className="absolute left-0 top-2.5 h-1.5 w-1.5 rounded-full bg-[#1B6E86]" />
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ComparisonTable({
+  table,
+  accentFrom,
+}: {
+  table: ComparisonTable;
+  accentFrom: string;
+}) {
+  return (
+    <section
+      className="overflow-hidden rounded-2xl border border-[#D8E1E5] bg-white shadow-sm"
+      style={{ borderTop: `4px solid ${accentFrom}` }}
+    >
+      <div className="bg-[#1B6E86] px-5 py-4 text-white sm:px-6">
+        <h2 className="text-lg font-bold sm:text-xl">{table.title}</h2>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[820px] border-collapse text-left">
+          <thead>
+            <tr>
+              {table.headers.map((header, index) => (
+                <th
+                  key={header}
+                  scope="col"
+                  className={`px-4 py-3 text-base font-bold text-[#2C3E50] ${
+                    index === 0 ? 'w-[22%]' : 'w-[39%]'
+                  } ${index === 0 ? 'bg-[#C5CDD3]' : 'bg-[#D4DDE2]'}`}
+                >
+                  <span className="block text-center">{header}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row) => (
+              <tr key={row.label} className="border-b border-[#D8E1E5] last:border-0">
+                <th
+                  scope="row"
+                  className="bg-[#C5CDD3] px-4 py-4 align-middle text-center text-sm font-bold leading-6 text-[#2C3E50]"
+                >
+                  {row.label}
+                </th>
+                <td className="bg-[#E5E7EB] px-4 py-4 align-top">
+                  <ComparisonCell items={row.basic} />
+                </td>
+                <td className="bg-[#E5E7EB] px-4 py-4 align-top">
+                  <ComparisonCell items={row.advanced} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-[#D1D5DB]">
+              <th
+                scope="row"
+                className="px-4 py-5 text-center text-base font-bold leading-6 text-[#2C3E50]"
+              >
+                {table.totalLabel}
+                {table.totalNote && (
+                  <span className="mt-1 block text-xs font-normal text-gray-600">
+                    {table.totalNote}
+                  </span>
+                )}
+              </th>
+              <td className="px-4 py-5 text-center text-xl font-extrabold text-[#2C3E50] sm:text-2xl">
+                {table.totals[0]}
+              </td>
+              <td className="px-4 py-5 text-center text-xl font-extrabold text-[#2C3E50] sm:text-2xl">
+                {table.totals[1]}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function WebsiteSocialGeoDetails({
+  accentFrom,
+  accentTo,
+}: {
+  accentFrom: string;
+  accentTo: string;
+}) {
+  const { t } = useLanguage();
+
+  return (
+    <div className="space-y-8">
+      <div
+        className="rounded-2xl p-6 text-white shadow-lg sm:p-8"
+        style={{ background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})` }}
+      >
+        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-white/80">
+          Media Marketing
+        </p>
+        <h2 className="text-2xl font-extrabold sm:text-3xl">
+          {t('media.websiteSocialGeo')}
+        </h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-white/90 sm:text-base">
+          整合網站內容、社群經營與 GEO 搜尋曝光，依品牌需求選擇基礎或進階方案。
+        </p>
+      </div>
+
+      {[...websiteSocialGeoTables].reverse().map((table) => (
+        <ComparisonTable key={table.title} table={table} accentFrom={accentFrom} />
+      ))}
+
+      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-[#D8E1E5] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:p-6">
+        <div>
+          <h3 className="text-lg font-bold text-[#2C3E50]">想依品牌現況調整方案？</h3>
+          <p className="mt-1 text-sm leading-6 text-gray-600">
+            送出需求後，由專人依網站與社群現況協助確認合適的執行範圍。
+          </p>
+        </div>
+        <a
+          href="/contact"
+          className="inline-flex shrink-0 items-center justify-center rounded-xl px-5 py-3 font-bold text-white transition-opacity hover:opacity-90"
+          style={{ background: `linear-gradient(135deg, ${accentFrom}, ${accentTo})` }}
+        >
+          {t('pricing.inquireNow')}
+        </a>
+      </div>
+    </div>
+  );
+}
+
 // ─── 頁面元件 ─────────────────────────────────────────────────────
 export default function MarketingPricing() {
   const { t } = useLanguage();
@@ -237,8 +391,15 @@ export default function MarketingPricing() {
               </nav>
             </aside>
 
-            <div className="flex-1 min-h-[400px]">
-              <PricingCard planId={activeId} />
+            <div className="min-w-0 flex-1 min-h-[400px]">
+              {activeId === 'website-social-geo' ? (
+                <WebsiteSocialGeoDetails
+                  accentFrom={plans[activeId].accentFrom}
+                  accentTo={plans[activeId].accentTo}
+                />
+              ) : (
+                <PricingCard planId={activeId} />
+              )}
             </div>
           </div>
         </section>
