@@ -1,4 +1,4 @@
-import { IdCard, Palette, Megaphone, Video, Gift, Wind } from 'lucide-react';
+import { Globe, IdCard, Palette, Megaphone, Video, Gift, Wind } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { serviceCatalog, type ServiceCatalogItem } from '@shared/services';
 
@@ -8,24 +8,37 @@ export type ServiceItem = ServiceCatalogItem & {
   isNew?: boolean;
 };
 
+const websiteServiceIds = [
+  'website-branding',
+  'website-shopping',
+  'website-blog',
+  'website-onepage',
+  'website-special',
+  'website-fixedshop',
+] as const;
+
 export const services: ServiceItem[] = [
+  ...websiteServiceIds.map((id) => ({
+    ...serviceCatalog.find((service) => service.id === id)!,
+    icon: Globe,
+  })),
   {
-    ...serviceCatalog[0], // 影音製作
+    ...serviceCatalog.find((s) => s.id === 'video-production')!,
     icon: Video,
     image: '/images/service_cloud_library.png',
   },
   {
-    ...serviceCatalog[1], // 名片設計
+    ...serviceCatalog.find((s) => s.id === 'business-card')!,
     icon: IdCard,
     image: '/images/service_bloom_sky.png',
   },
   {
-    ...serviceCatalog[2], // logo設計
+    ...serviceCatalog.find((s) => s.id === 'logo-design')!,
     icon: Palette,
     image: '/images/service_writing_room.png',
   },
   {
-    ...serviceCatalog[3], // 廣告文宣
+    ...serviceCatalog.find((s) => s.id === 'ad-copy')!,
     icon: Megaphone,
     image: '/images/service_cloud_library.png',
   },

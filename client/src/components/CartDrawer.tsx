@@ -19,8 +19,9 @@ const currencyFormatter = new Intl.NumberFormat('zh-TW', {
   maximumFractionDigits: 0,
 });
 
-function formatPrice(price?: number) {
-  return price ? currencyFormatter.format(price) : '依需求報價';
+function formatPrice(price?: number, priceFrom?: boolean) {
+  if (!price) return '依需求報價';
+  return `${priceFrom ? '起 ' : ''}${currencyFormatter.format(price)}`;
 }
 
 export default function CartDrawer() {
@@ -43,9 +44,9 @@ export default function CartDrawer() {
     '',
     ...items.map((item) => {
       const subtotal = item.price
-        ? `，小計 ${currencyFormatter.format(item.price * item.quantity)}`
+        ? `，小計${item.priceFrom ? '起 ' : ''}${currencyFormatter.format(item.price * item.quantity)}`
         : '';
-      return `- ${item.title} x ${item.quantity}（${formatPrice(item.price)}${subtotal}）`;
+      return `- ${item.title} x ${item.quantity}（${formatPrice(item.price, item.priceFrom)}${subtotal}）`;
     }),
     '',
     `固定價格小計：${currencyFormatter.format(fixedSubtotal)}`,
@@ -104,7 +105,7 @@ export default function CartDrawer() {
                         {item.title}
                       </h3>
                       <p className="mt-1 text-sm" style={{ color: 'rgba(44, 62, 80, 0.7)' }}>
-                        {formatPrice(item.price)}
+                        {formatPrice(item.price, item.priceFrom)}
                       </p>
                     </div>
                     <Button
@@ -142,7 +143,9 @@ export default function CartDrawer() {
                       </Button>
                     </div>
                     <p className="text-sm font-semibold" style={{ color: '#2B8A8A' }}>
-                      {item.price ? currencyFormatter.format(item.price * item.quantity) : '需報價'}
+                      {item.price
+                        ? `${item.priceFrom ? '起 ' : ''}${currencyFormatter.format(item.price * item.quantity)}`
+                        : '需報價'}
                     </p>
                   </div>
                 </div>

@@ -1,106 +1,121 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { Link } from 'wouter';
 import {
-  ChevronRight, ArrowLeft,
-  Globe, ShoppingCart, BookOpen, Layout, Zap, Store,
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  Globe,
+  Layout,
+  ShoppingCart,
+  Store,
+  Zap,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CartDrawer from '@/components/CartDrawer';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
+import { services } from '@/data/services';
+import { pricingPlans, type PricingPlanId } from '@/data/websitePricing';
+import { toast } from 'sonner';
 
 // ─── Category Config ──────────────────────────────────────────────────────────
 
-const categories = [
-  { id: 'branding',  labelKey: 'website.branding',   icon: Globe },
-  { id: 'shopping',  labelKey: 'website.shopping',   icon: ShoppingCart },
-  { id: 'blog',      labelKey: 'website.blog',       icon: BookOpen },
-  { id: 'onepage',   labelKey: 'website.onepage',    icon: Layout },
-  { id: 'special',   labelKey: 'website.special',    icon: Zap },
-  { id: 'fixedshop', labelKey: 'website.fixedshop',  icon: Store },
+const categories: { id: PricingPlanId; labelKey: string; icon: ComponentType<{ className?: string }> }[] = [
+  { id: 'branding', labelKey: 'website.branding', icon: Globe },
+  { id: 'shopping', labelKey: 'website.shopping', icon: ShoppingCart },
+  { id: 'blog', labelKey: 'website.blog', icon: BookOpen },
+  { id: 'onepage', labelKey: 'website.onepage', icon: Layout },
+  { id: 'special', labelKey: 'website.special', icon: Zap },
+  { id: 'fixedshop', labelKey: 'website.fixedshop', icon: Store },
 ];
 
-// ─── Feature Data ─────────────────────────────────────────────────────────────
+// ─── Pricing Card ─────────────────────────────────────────────────────────────
 
-const plans: Record<string, { titleKey: string; accentFrom: string; accentTo: string; glowColor: string }> = {
-  branding: {
-    titleKey: 'website.branding',
-    accentFrom: '#F25C05',
-    accentTo: '#F5A623',
-    glowColor: '#2B8A8A',
-  },
-  shopping: {
-    titleKey: 'website.shopping',
-    accentFrom: '#1a6b3a',
-    accentTo: '#2B8A8A',
-    glowColor: '#1a6b3a',
-  },
-  blog: {
-    titleKey: 'website.blog',
-    accentFrom: '#6B21A8',
-    accentTo: '#A855F7',
-    glowColor: '#6B21A8',
-  },
-  onepage: {
-    titleKey: 'website.onepage',
-    accentFrom: '#0369A1',
-    accentTo: '#38BDF8',
-    glowColor: '#0369A1',
-  },
-  special: {
-    titleKey: 'website.special',
-    accentFrom: '#B45309',
-    accentTo: '#F59E0B',
-    glowColor: '#B45309',
-  },
-  fixedshop: {
-    titleKey: 'website.fixedshop',
-    accentFrom: '#0F766E',
-    accentTo: '#2DD4BF',
-    glowColor: '#0F766E',
-  },
-};
-
-// ─── Shared Pricing Card ──────────────────────────────────────────────────────
-
-function PricingCard({ planId }: { planId: string }) {
+function PricingCard({ planId }: { planId: PricingPlanId }) {
   const { t } = useLanguage();
-  const plan = plans[planId];
-  if (!plan) return null;
+  const { addItem } = useCart();
+  const plan = pricingPlans[planId];
+  const serviceItem = services.find((service) => service.id === plan.serviceId);
+
+  const handleAddToCart = () => {
+    if (!serviceItem) return;
+    addItem(serviceItem);
+    toast.success(`${serviceItem.title} 已加入購物車`);
+  };
 
   return (
-    <div className="animate-fade-in-up flex justify-center">
+    <div
+      key={plan.id}
+      className="animate-fade-in-up relative w-full overflow-hidden rounded-2xl shadow-2xl"
+      style={{ background: 'linear-gradient(160deg, #0f2027, #203a43, #2c5364)' }}
+    >
       <div
-        className="relative w-full max-w-sm rounded-2xl overflow-hidden shadow-2xl"
-        style={{ background: 'linear-gradient(160deg, #0f2027, #203a43, #2c5364)' }}
-      >
-        {/* Top accent bar */}
-        <div
-          className="h-1.5 w-full"
-          style={{ background: `linear-gradient(to right, ${plan.accentFrom}, ${plan.accentTo})` }}
-        />
+        className="h-1.5 w-full"
+        style={{ background: `linear-gradient(to right, ${plan.accentFrom}, ${plan.accentTo})` }}
+      />
 
-        {/* Title */}
-        <div className="text-center px-8 mt-8">
-          <h2 className="text-white text-2xl font-bold mb-1">{t(plan.titleKey)}</h2>
+      <div className="relative z-10 px-6 pb-8 pt-9 sm:px-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-white">{t(plan.titleKey)}</h2>
+          <p className="mt-1 text-sm text-gray-400">（{plan.priceNote}）</p>
         </div>
 
-        {/* CTA */}
-        <div className="px-8 pb-8 pt-6">
-          <a
-            href="/contact"
-            className="block w-full text-center py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5"
+        <div
+          className="mb-7 mt-5 flex items-start justify-center gap-1"
+          aria-label={`基本價格 ${plan.price.toLocaleString()} 元起`}
+        >
+          <span className="mt-2 text-lg text-gray-400">$</span>
+          <span
+            className="text-4xl font-extrabold sm:text-5xl"
+            style={{ color: plan.accentTo }}
+          >
+            {plan.price.toLocaleString()}
+          </span>
+          {plan.priceFrom && <span className="mt-3 text-sm text-gray-300">以上</span>}
+        </div>
+
+        <div className="mb-6 space-y-0">
+          {plan.features.map((feature) => (
+            <div
+              key={feature}
+              className="flex items-start gap-3 border-b border-white/10 py-2.5 last:border-none"
+            >
+              <CheckCircle2
+                className="mt-0.5 h-4 w-4 flex-shrink-0"
+                style={{ color: plan.accentTo }}
+                aria-hidden="true"
+              />
+              <span className="text-sm leading-relaxed text-gray-200">{feature}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!serviceItem}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
             style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
           >
-            {t('pricing.inquireNow')}
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+            加入購物車
+          </button>
+          <a
+            href="/contact"
+            className="block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            {plan.cta}
           </a>
         </div>
-
-        {/* Decorative glow */}
-        <div
-          className="pointer-events-none absolute -bottom-10 -right-10 w-40 h-40 rounded-full opacity-20 blur-2xl"
-          style={{ background: plan.glowColor }}
-        />
       </div>
+
+      <div
+        className="pointer-events-none absolute -bottom-10 -right-10 h-40 w-40 rounded-full opacity-20 blur-2xl"
+        style={{ background: plan.glowColor }}
+      />
     </div>
   );
 }
@@ -109,13 +124,13 @@ function PricingCard({ planId }: { planId: string }) {
 
 export default function WebsitePricing() {
   const { t } = useLanguage();
-  const [activeId, setActiveId] = useState('branding');
+  const [activeId, setActiveId] = useState<PricingPlanId>('branding');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    if (tab && categories.some((c) => c.id === tab)) {
-      setActiveId(tab);
+    if (tab && categories.some((category) => category.id === tab)) {
+      setActiveId(tab as PricingPlanId);
     }
   }, []);
 
@@ -143,8 +158,8 @@ export default function WebsitePricing() {
             <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
               {t('pricing.websiteTitle')}
             </h1>
-            <p className="text-gray-300 text-base md:text-lg max-w-xl">
-              {t('pricing.websiteDesc')}
+            <p className="max-w-3xl text-sm leading-7 text-white/70">
+              以下各類型網站均為基本架構與基本方案報價，且都是客製化設計，絕非套版。精確報價須雙方共同討論後決定；若功能需求較簡單，有時會低於基本方案價格。
             </p>
           </div>
         </section>
@@ -159,7 +174,7 @@ export default function WebsitePricing() {
               <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
                 {categories.map(({ id, labelKey, icon: Icon }) => {
                   const isActive = activeId === id;
-                  const plan = plans[id];
+                  const plan = pricingPlans[id];
                   return (
                     <button
                       key={id}
@@ -190,6 +205,7 @@ export default function WebsitePricing() {
       </main>
 
       <Footer />
+      <CartDrawer />
     </div>
   );
 }
