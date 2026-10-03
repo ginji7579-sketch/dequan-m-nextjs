@@ -6,12 +6,18 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import PricingCard from '@/components/PricingCard';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getPlanHref, isPricingPlanId, websitePlanOrder } from '@/data/websitePricing';
+import { getPlanHref, isPricingPlanId, planMeta, websitePlanOrder } from '@/data/websitePricing';
 
 /**
  * 網站架設報價索引頁
- * 手機版依 smallway.tw/price/ 的做法：所有方案卡片由 3 欄網格改為單欄滿版堆疊，
- * 每張卡片完整呈現標題／價格／特色／CTA，點擊進入該方案的獨立頁面。
+ *
+ * 手機版版面比對 smallway.tw/price/：
+ * 1. 標題「基本報價」
+ * 2. 手寫感裝飾分隔線
+ * 3. 大字 intro 文字區塊
+ * 4. 品牌色大面板，內含滿版堆疊的方案按鈕（點擊進入各方案獨立頁面）
+ *
+ * 桌面版則把按鈕改為多欄網格，並在下方補上完整報價卡片供比較。
  */
 export default function WebsitePricing() {
   const { t } = useLanguage();
@@ -30,41 +36,80 @@ export default function WebsitePricing() {
       <Header />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section
-          className="relative overflow-hidden py-12 sm:py-14 md:py-20"
-          style={{ background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' }}
-        >
+        {/* Hero：標題 + 裝飾分隔線 + 說明文字 */}
+        <section className="relative overflow-hidden bg-white py-10 sm:py-14 md:py-16">
           <div
-            className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full opacity-10 blur-3xl sm:h-80 sm:w-80"
-            style={{ background: '#F25C05', transform: 'translate(30%,-30%)' }}
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute bottom-0 left-0 h-52 w-52 rounded-full opacity-10 blur-3xl sm:h-64 sm:w-64"
-            style={{ background: '#2B8A8A', transform: 'translate(-30%,30%)' }}
+            className="pointer-events-none absolute inset-0 opacity-[0.06]"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 12% 18%, #2B8A8A 0, transparent 42%), radial-gradient(circle at 88% 78%, #F25C05 0, transparent 42%)',
+            }}
             aria-hidden="true"
           />
 
-          <div className="container relative z-10">
+          <div className="container relative z-10 text-center">
             <Link href="/">
-              <a className="mb-6 inline-flex items-center gap-1.5 text-sm text-white/60 transition-colors hover:text-white">
+              <a className="mb-6 inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-brand-primary">
                 <ArrowLeft className="h-4 w-4" />
                 {t('pricing.backToHome')}
               </a>
             </Link>
-            <div className="mb-4 h-1 w-12 rounded-full bg-[#F25C05]" />
-            <h1 className="mb-3 text-3xl font-extrabold leading-tight text-white md:text-4xl">
-              {t('pricing.websiteTitle')}
+
+            <h1 className="text-3xl font-extrabold leading-tight text-gray-800 sm:text-4xl">
+              {t('pricing.basicPrice')}
             </h1>
-            <p className="max-w-3xl text-sm leading-7 text-white/70">
-              以下各類型網站均為基本架構與基本方案報價，且都是客製化設計，絕非套版。精確報價須雙方共同討論後決定；若功能需求較簡單，有時會低於基本方案價格。
-            </p>
+
+            {/* 手寫感分隔線 */}
+            <svg
+              className="mx-auto mt-3 h-4 w-28 text-[#F25C05]"
+              viewBox="0 0 120 16"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M2 11c10-7 20 3 30-2s20 4 30-1 20 3 30-1 16 2 26 0"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </svg>
+
+            <div className="mx-auto mt-6 max-w-2xl rounded-2xl bg-[#F7F5F0] px-5 py-6 shadow-sm sm:px-8 sm:py-8">
+              <p className="text-base leading-loose text-gray-600 sm:text-lg">
+                以下各類型網站均為<strong className="font-bold text-gray-800">基本架構</strong>與
+                <strong className="font-bold text-gray-800">基本方案報價</strong>
+                ，且都是客製化設計，絕非套版。精確報價須雙方共同討論後決定；若功能需求較簡單，有時會低於基本方案價格。
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* 方案網格：手機單欄滿版，平板 2 欄，桌面 3 欄 */}
-        <section className="container py-10 md:py-16">
+        {/* 方案導覽面板：手機滿版堆疊，桌面多欄網格 */}
+        <section className="container py-8 sm:py-10 md:py-12">
+          <div
+            className="rounded-2xl p-4 shadow-xl sm:p-6 md:p-8"
+            style={{ background: 'linear-gradient(160deg, #1B4F72, #2B8A8A 60%, #2c5364)' }}
+          >
+            <nav
+              aria-label={t('pricing.services')}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4"
+            >
+              {websitePlanOrder.map((planId) => {
+                const meta = planMeta[planId];
+                return (
+                  <Link key={planId} href={getPlanHref(planId)}>
+                    <a className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-lg border-2 border-white/90 px-4 py-3.5 text-center text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] sm:min-h-[64px] sm:text-lg">
+                      {t(meta.labelKey)}
+                    </a>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </section>
+
+        {/* 完整報價卡片（方便比較） */}
+        <section className="container pb-12 md:pb-16">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {websitePlanOrder.map((planId) => (
               <PricingCard key={planId} planId={planId} variant="summary" />
