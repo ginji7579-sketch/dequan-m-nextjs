@@ -1,40 +1,28 @@
-import { CheckCircle2, ChevronRight, ShoppingCart } from 'lucide-react';
-import { Link } from 'wouter';
+import { CheckCircle2, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { services } from '@/data/services';
-import {
-  getPlanHref,
-  planMeta,
-  pricingPlans,
-  type PricingPlanId,
-} from '@/data/websitePricing';
+import { planMeta, pricingPlans, type PricingPlanId } from '@/data/websitePricing';
 
 /**
  * 報價卡片
  * 版面參考 smallway.tw/price/ 的 price-table 結構：
- * 標題 → 副標 → 價格 → 特色清單 → CTA。
+ * 標題 → 副標 → 價格 → 完整特色清單 → 加購 + 請求報價。
  *
- * variant="summary" 用於索引頁的網格卡片（特色列出前幾項即可）
- * variant="full"    用於各方案詳細頁（完整特色清單 + 加購 + 請求報價）
+ * 僅用於各方案詳細頁（/website-pricing/:planId）；
+ * 索引頁只提供方案入口按鈕，不再重複列出報價卡片。
  */
 export type PricingCardProps = {
   planId: PricingPlanId;
-  variant?: 'summary' | 'full';
 };
 
-export default function PricingCard({ planId, variant = 'full' }: PricingCardProps) {
+export default function PricingCard({ planId }: PricingCardProps) {
   const { t } = useLanguage();
   const { addItem } = useCart();
   const plan = pricingPlans[planId];
   const meta = planMeta[planId];
   const serviceItem = services.find((service) => service.id === plan.serviceId);
-  const isSummary = variant === 'summary';
-
-  const features = isSummary
-    ? plan.features.slice(0, meta.summaryFeatureCount)
-    : plan.features;
 
   const handleAddToCart = () => {
     if (!serviceItem) return;
@@ -80,9 +68,9 @@ export default function PricingCard({ planId, variant = 'full' }: PricingCardPro
           {plan.priceFrom && <span className="mt-2 text-sm text-gray-300 sm:mt-3">以上</span>}
         </div>
 
-        <div className="mb-6 flex-1">
+        <div className="mb-6">
           <ul>
-            {features.map((feature) => (
+            {plan.features.map((feature) => (
               <li
                 key={feature}
                 className="flex items-start gap-3 border-b border-white/10 py-2.5 last:border-none"
@@ -96,45 +84,28 @@ export default function PricingCard({ planId, variant = 'full' }: PricingCardPro
               </li>
             ))}
           </ul>
-
-          {isSummary && plan.features.length > features.length && (
-            <p className="pt-3 text-center text-xs text-gray-400">
-              另有 {plan.features.length - features.length} 項功能，點擊查看完整方案
-            </p>
-          )}
         </div>
 
         <div className="mt-auto space-y-3">
-          <Link href={getPlanHref(planId)}>
-            <a className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-semibold text-gray-200 transition-colors hover:bg-white/20 hover:text-white">
-              查看完整方案
-              <ChevronRight className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-            </a>
-          </Link>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!serviceItem}
+            className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)`,
+            }}
+          >
+            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+            加入購物車
+          </button>
 
-          {!isSummary && (
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={!serviceItem}
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60"
-              style={{
-                background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)`,
-              }}
-            >
-              <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-              加入購物車
-            </button>
-          )}
-
-          {!isSummary && (
-            <a
-              href="/contact"
-              className="flex min-h-[44px] w-full items-center justify-center rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-semibold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
-            >
-              {plan.cta}
-            </a>
-          )}
+          <a
+            href="/contact"
+            className="flex min-h-[44px] w-full items-center justify-center rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-semibold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
+          >
+            {plan.cta}
+          </a>
         </div>
       </div>
 

@@ -4,7 +4,6 @@ import { ArrowLeft } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
-import PricingCard from '@/components/PricingCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getPlanHref, isPricingPlanId, planMeta, websitePlanOrder } from '@/data/websitePricing';
 
@@ -17,7 +16,8 @@ import { getPlanHref, isPricingPlanId, planMeta, websitePlanOrder } from '@/data
  * 3. 大字 intro 文字區塊
  * 4. 品牌色大面板，內含滿版堆疊的方案按鈕（點擊進入各方案獨立頁面）
  *
- * 桌面版則把按鈕改為多欄網格，並在下方補上完整報價卡片供比較。
+ * 桌面版則把按鈕改為多欄網格。本頁只保留方案入口，
+ * 價格與完整功能說明一律放在各方案的獨立頁面，避免重複資訊。
  */
 export default function WebsitePricing() {
   const { t } = useLanguage();
@@ -85,7 +85,7 @@ export default function WebsitePricing() {
         </section>
 
         {/* 方案導覽面板：手機滿版堆疊，桌面多欄網格 */}
-        <section className="container py-8 sm:py-10 md:py-12">
+        <section className="container pb-14 pt-8 sm:pb-16 sm:pt-10 md:pb-20 md:pt-12">
           <div
             className="rounded-2xl p-4 shadow-xl sm:p-6 md:p-8"
             style={{ background: 'linear-gradient(160deg, #1B4F72, #2B8A8A 60%, #2c5364)' }}
@@ -105,15 +105,6 @@ export default function WebsitePricing() {
                 );
               })}
             </nav>
-          </div>
-        </section>
-
-        {/* 完整報價卡片（方便比較） */}
-        <section className="container pb-12 md:pb-16">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-            {websitePlanOrder.map((planId) => (
-              <PricingCard key={planId} planId={planId} variant="summary" />
-            ))}
           </div>
         </section>
       </main>

@@ -183,8 +183,6 @@ export type PlanMeta = {
   id: PricingPlanId;
   labelKey: string;
   icon: LucideIcon;
-  /** 摘要卡片顯示的特色筆數 */
-  summaryFeatureCount: number;
 };
 
 export const websitePlanOrder: PricingPlanId[] = [
@@ -201,37 +199,31 @@ export const planMeta: Record<PricingPlanId, PlanMeta> = {
     id: 'branding',
     labelKey: 'website.branding',
     icon: Globe,
-    summaryFeatureCount: 5,
   },
   shopping: {
     id: 'shopping',
     labelKey: 'website.shopping',
     icon: ShoppingCart,
-    summaryFeatureCount: 5,
   },
   blog: {
     id: 'blog',
     labelKey: 'website.blog',
     icon: BookOpen,
-    summaryFeatureCount: 5,
   },
   onepage: {
     id: 'onepage',
     labelKey: 'website.onepage',
     icon: Layout,
-    summaryFeatureCount: 5,
   },
   special: {
     id: 'special',
     labelKey: 'website.special',
     icon: Zap,
-    summaryFeatureCount: 5,
   },
   fixedshop: {
     id: 'fixedshop',
     labelKey: 'website.fixedshop',
     icon: Store,
-    summaryFeatureCount: 5,
   },
 };
 

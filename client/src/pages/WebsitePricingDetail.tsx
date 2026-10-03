@@ -116,7 +116,7 @@ function PlanDetailBody({
     <section className="container py-8 md:py-12">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-10">
         <div className="min-w-0">
-          <PricingCard planId={planId} variant="full" />
+          <PricingCard planId={planId} />
 
           {/* 上一個／下一個方案 */}
           <nav aria-label="方案切換" className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
