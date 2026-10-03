@@ -31,6 +31,42 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/branding</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/shopping</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/blog</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/onepage</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/special</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://dequan-m.vercel.app/website-pricing/fixedshop</loc>
+    <lastmod>2026-06-15T00:00:00Z</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://dequan-m.vercel.app/media-marketing-pricing</loc>
     <lastmod>2026-06-15T00:00:00Z</lastmod>
     <changefreq>monthly</changefreq>

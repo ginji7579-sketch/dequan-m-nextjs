@@ -13,7 +13,8 @@ import Register from "./pages/Register";
 import Admin from "./pages/Admin";
 import Checkout from "./pages/Checkout";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
-import WebsitePricing from "./pages/WebsitePricing";
+import WebsitePricing from "./pages/WebsitePricingIndex";
+import WebsitePricingDetail from "./pages/WebsitePricingDetail";
 import MediaMarketingPricing from "./pages/marketing-pricing";
 import AdSpaceMainPage from "./pages/AdSpaceMainPage";
 import AboutPage from "./pages/AboutPage";
@@ -53,6 +54,8 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/privacy" component={PrivacyPolicy} />
+      {/* 網站架設：詳細頁需排在索引頁之前，wouter 以先比對者為準 */}
+      <Route path="/website-pricing/:planId" component={WebsitePricingDetail} />
       <Route path="/website-pricing" component={WebsitePricing} />
       
       {/* 媒體採購相關路由：廣告版面獨立頁面優先 */}

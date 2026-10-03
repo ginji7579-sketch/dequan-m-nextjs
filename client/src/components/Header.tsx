@@ -42,12 +42,12 @@ export default function Header() {
   ];
 
   const websiteSubCategories = [
-    { label: t('website.branding'),      href: '/website-pricing?tab=branding' },
-    { label: t('website.shopping'),      href: '/website-pricing?tab=shopping' },
-    { label: t('website.blog'),          href: '/website-pricing?tab=blog' },
-    { label: t('website.onepage'),       href: '/website-pricing?tab=onepage' },
-    { label: t('website.special'),       href: '/website-pricing?tab=special' },
-    { label: t('website.fixedshop'),     href: '/website-pricing?tab=fixedshop' },
+    { label: t('website.branding'),      href: '/website-pricing/branding' },
+    { label: t('website.shopping'),      href: '/website-pricing/shopping' },
+    { label: t('website.blog'),          href: '/website-pricing/blog' },
+    { label: t('website.onepage'),       href: '/website-pricing/onepage' },
+    { label: t('website.special'),       href: '/website-pricing/special' },
+    { label: t('website.fixedshop'),     href: '/website-pricing/fixedshop' },
   ];
 
   const pressReleaseSubCategories = [
