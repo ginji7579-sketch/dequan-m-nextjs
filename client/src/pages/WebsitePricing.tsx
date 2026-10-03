@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { Link } from 'wouter';
 import {
   ArrowLeft,
@@ -63,17 +63,17 @@ function PricingCard({ planId }: { planId: PricingPlanId }) {
         </div>
 
         <div
-          className="mb-7 mt-5 flex items-start justify-center gap-1"
+          className="mb-7 mt-5 flex flex-wrap items-start justify-center gap-x-1 gap-y-1"
           aria-label={`基本價格 ${plan.price.toLocaleString()} 元起`}
         >
-          <span className="mt-2 text-lg text-gray-400">$</span>
+          <span className="mt-1.5 text-base text-gray-400 sm:mt-2 sm:text-lg">$</span>
           <span
-            className="text-4xl font-extrabold sm:text-5xl"
+            className="text-[2rem] leading-none font-extrabold tabular-nums sm:text-4xl sm:leading-tight md:text-5xl"
             style={{ color: plan.accentTo }}
           >
             {plan.price.toLocaleString()}
           </span>
-          {plan.priceFrom && <span className="mt-3 text-sm text-gray-300">以上</span>}
+          {plan.priceFrom && <span className="mt-2 text-sm text-gray-300 sm:mt-3">以上</span>}
         </div>
 
         <div className="mb-6 space-y-0">
@@ -105,7 +105,7 @@ function PricingCard({ planId }: { planId: PricingPlanId }) {
           </button>
           <a
             href="/contact"
-            className="block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
+            className="flex min-h-[44px] w-full items-center justify-center rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-semibold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
           >
             {plan.cta}
           </a>
@@ -125,6 +125,8 @@ function PricingCard({ planId }: { planId: PricingPlanId }) {
 export default function WebsitePricing() {
   const { t } = useLanguage();
   const [activeId, setActiveId] = useState<PricingPlanId>('branding');
+  const navRef = useRef<HTMLElement | null>(null);
+  const tabRefs = useRef<Partial<Record<PricingPlanId, HTMLButtonElement | null>>>({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -134,6 +136,27 @@ export default function WebsitePricing() {
     }
   }, []);
 
+  // RWD：手機上選取的項目可能在橫向捲動軸之外（例如由 Header 直接連到 ?tab=fixedshop），
+  // 因此在 activeId 變更後把該分頁捲進可視範圍。使用 scrollTo 而非 scrollIntoView，
+  // 避免連帶觸發頁面垂直捲動。
+  useEffect(() => {
+    const container = navRef.current;
+    const activeTab = tabRefs.current[activeId];
+    if (!container || !activeTab) return;
+
+    // lg 以上為直向側邊欄，不需要自動捲動
+    if (window.matchMedia('(min-width: 1024px)').matches) return;
+
+    const target =
+      activeTab.offsetLeft - (container.clientWidth - activeTab.offsetWidth) / 2;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+
+    container.scrollTo({
+      left: Math.max(0, Math.min(target, maxScroll)),
+      behavior: 'smooth',
+    });
+  }, [activeId]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F1E8]">
       <Header />
@@ -141,7 +164,7 @@ export default function WebsitePricing() {
       <main className="flex-1">
         {/* Hero */}
         <section
-          className="relative py-16 md:py-20 overflow-hidden"
+          className="relative py-12 sm:py-14 md:py-20 overflow-hidden"
           style={{ background: 'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)' }}
         >
           <div className="pointer-events-none absolute top-0 right-0 w-80 h-80 rounded-full opacity-10 blur-3xl" style={{ background: '#F25C05', transform: 'translate(30%,-30%)' }} />
@@ -171,7 +194,12 @@ export default function WebsitePricing() {
             {/* Sidebar */}
             <aside className="lg:w-56 flex-shrink-0">
               <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">{t('pricing.services')}</p>
-              <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <nav
+                ref={navRef}
+                role="tablist"
+                aria-label={t('pricing.services')}
+                className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory lg:snap-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch]"
+              >
                 {categories.map(({ id, labelKey, icon: Icon }) => {
                   const isActive = activeId === id;
                   const plan = pricingPlans[id];
@@ -179,10 +207,17 @@ export default function WebsitePricing() {
                     <button
                       key={id}
                       id={`tab-${id}`}
+                      ref={(node) => {
+                        tabRefs.current[id] = node;
+                      }}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      aria-controls="pricing-panel"
                       onClick={() => setActiveId(id)}
-                      className={`flex shrink-0 lg:w-full items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                      className={`flex shrink-0 lg:w-full snap-start items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
                         isActive
-                          ? 'text-white shadow-md scale-[1.02]'
+                          ? 'text-white shadow-md lg:scale-[1.02]'
                           : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
                       }`}
                       style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
@@ -197,7 +232,12 @@ export default function WebsitePricing() {
             </aside>
 
             {/* Card Panel */}
-            <div className="flex-1 min-h-[400px]">
+            <div
+              id="pricing-panel"
+              role="tabpanel"
+              aria-labelledby={`tab-${activeId}`}
+              className="flex-1 min-w-0 min-h-[400px]"
+            >
               <PricingCard planId={activeId} />
             </div>
           </div>
