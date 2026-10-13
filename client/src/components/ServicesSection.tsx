@@ -9,12 +9,17 @@ import { services } from '@/data/services';
 import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const categories = [
-  { id: 'video-production', labelKey: 'video.production', icon: Video },
+const videoCategory = { id: 'video-production', labelKey: 'video.production', icon: Video };
+
+const graphicCategories = [
   { id: 'business-card', labelKey: 'graphic.businesscard', icon: IdCard },
   { id: 'logo-design',   labelKey: 'graphic.logodesign',   icon: Palette },
   { id: 'ad-copy',       labelKey: 'graphic.adcopy',       icon: Megaphone },
 ];
+
+type ServicesSectionProps = {
+  mode?: 'video' | 'graphic';
+};
 
 const planStyles: Record<string, {
   accentFrom: string;
@@ -43,19 +48,22 @@ const planStyles: Record<string, {
   },
 };
 
-export default function ServicesSection() {
+export default function ServicesSection({ mode = 'graphic' }: ServicesSectionProps) {
   const { addItem, openCart } = useCart();
   const { t, lang } = useLanguage();
-  const [activeId, setActiveId] = useState('business-card');
+  const categories = mode === 'video' ? [videoCategory] : graphicCategories;
+  const [activeId, setActiveId] = useState(mode === 'video' ? videoCategory.id : 'business-card');
   const [_, setLocation] = useLocation();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    if (tab && categories.some((c) => c.id === tab)) {
+    if (tab && (mode === 'video' ? tab === videoCategory.id : graphicCategories.some((category) => category.id === tab))) {
       setActiveId(tab);
+    } else if (mode === 'graphic' && tab === videoCategory.id) {
+      setLocation('/video-production', { replace: true });
     }
-  }, []);
+  }, [mode, setLocation]);
 
   const activeService = services.find(s => s.id === activeId);
   const style = planStyles[activeId] || planStyles['business-card'];
@@ -71,11 +79,18 @@ export default function ServicesSection() {
     <section id="services" className="container py-10 md:py-16">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
         {/* Sidebar */}
-        <aside className="lg:w-56 flex-shrink-0">
-          <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">
+        <aside className="flex-shrink-0 lg:w-56">
+          <p className="mb-3 hidden px-1 text-xs font-bold uppercase tracking-widest text-gray-400 lg:block">
             {t('pricing.services')}
           </p>
-          <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <nav
+            aria-label={t('pricing.services')}
+            className="rounded-2xl bg-[linear-gradient(160deg,#1B4F72,#2B8A8A_60%,#2c5364)] p-4 shadow-xl sm:p-6 lg:rounded-none lg:bg-none lg:p-0 lg:shadow-none"
+          >
+            <p className="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-white/70 lg:hidden">
+              {t('pricing.services')}
+            </p>
+            <div className="flex flex-col gap-3 lg:gap-2">
             {categories.map(({ id, labelKey, icon: Icon }) => {
               const isActive = activeId === id;
               const colorStyle = planStyles[id];
@@ -83,43 +98,46 @@ export default function ServicesSection() {
                 <button
                   key={id}
                   id={`tab-${id}`}
+                  type="button"
                   onClick={() => {
                     setActiveId(id);
-                    setLocation(`/services?tab=${id}`);
+                    setLocation(mode === 'video' ? '/video-production' : `/services?tab=${id}`);
                   }}
-                  className={`flex shrink-0 lg:w-full items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`flex min-h-[56px] w-full items-center gap-2.5 rounded-lg border-2 border-white/90 px-4 py-3.5 text-left text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] lg:min-h-0 lg:rounded-xl lg:border lg:px-4 lg:py-3 lg:text-sm lg:font-semibold ${
                     isActive
-                      ? 'text-white shadow-md scale-[1.02]'
-                      : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
+                      ? 'shadow-md lg:scale-[1.02]'
+                      : 'lg:border-gray-100 lg:bg-white lg:text-gray-600 lg:hover:bg-gray-50'
                   }`}
-                  style={isActive ? { background: `linear-gradient(135deg, ${colorStyle.accentFrom} 0%, ${colorStyle.accentTo} 100%)` } : {}}
+                  style={isActive ? { background: `linear-gradient(135deg, ${colorStyle.accentFrom} 0%, ${colorStyle.accentTo} 100%)` } : undefined}
                 >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <Icon className="h-4 w-4 flex-shrink-0" />
                   {t(labelKey)}
-                  {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto flex-shrink-0" />}
+                  {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5 flex-shrink-0" />}
                 </button>
               );
             })}
+            </div>
           </nav>
         </aside>
 
         {/* Card Panel */}
-        <div className="flex-1 min-h-[400px] flex justify-center items-start">
+        <div className="flex min-h-[400px] min-w-0 flex-1 items-start justify-center">
           {activeService && (
-            <div className="animate-fade-in-up w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col md:flex-row">
+            <div className="animate-fade-in-up flex w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-2xl md:flex-row">
               {/* Left Side: Image */}
               {activeService.image && (
-                <div className="md:w-1/2 relative min-h-[250px] md:min-h-full bg-gray-50">
+                <div className="relative min-h-[200px] bg-gray-50 sm:min-h-[250px] md:min-h-full md:w-1/2">
                   <img
                     src={activeService.image}
                     alt={activeService.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
               )}
 
               {/* Right Side: Content */}
-              <div className="flex-1 p-8 flex flex-col justify-between relative bg-gradient-to-br from-[#0f2027] to-[#2c5364] text-white">
+              <div className="relative flex flex-1 flex-col justify-between bg-gradient-to-br from-[#0f2027] to-[#2c5364] p-5 text-white sm:p-8">
                 <div className="relative z-10">
                   {/* Accent Line */}
                   <div 
@@ -127,21 +145,21 @@ export default function ServicesSection() {
                     style={{ background: `linear-gradient(to right, ${style.accentFrom}, ${style.accentTo})` }}
                   />
                   
-                  <h2 className="text-2xl font-bold mb-2">
+                  <h2 className="mb-2 text-2xl font-bold">
                     {lang === 'en' && activeService.titleEn ? activeService.titleEn : activeService.title}
                   </h2>
                   
-                  <p className="text-gray-300 text-sm leading-relaxed mb-6">
+                  <p className="mb-6 break-words text-sm leading-relaxed text-gray-300">
                     {lang === 'en' && activeService.descriptionEn ? activeService.descriptionEn : activeService.description}
                   </p>
                 </div>
 
-                <div className="mt-8 space-y-4 relative z-10">
+                <div className="relative z-10 mt-6 space-y-3 sm:mt-8 sm:space-y-4">
                   {/* Shopping Cart Button */}
                   <button
                     type="button"
                     onClick={handleAddToCart}
-                    className="w-full flex justify-center items-center gap-2 py-3 rounded-xl font-bold text-white transition-all duration-300 hover:opacity-90 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                    className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
                     style={{ background: `linear-gradient(135deg, ${style.accentFrom} 0%, ${style.accentTo} 100%)` }}
                   >
                     <ShoppingCart className="w-5 h-5" />
@@ -152,7 +170,7 @@ export default function ServicesSection() {
                   <button
                     type="button"
                     onClick={openCart}
-                    className="w-full text-center py-3 rounded-xl font-bold text-gray-300 hover:text-white transition-colors bg-white/10 hover:bg-white/20 border border-white/10 cursor-pointer"
+                    className="min-h-11 w-full cursor-pointer rounded-xl border border-white/10 bg-white/10 py-3 text-center font-bold text-gray-300 transition-colors hover:bg-white/20 hover:text-white"
                   >
                     <span>查看購物車</span>
                   </button>

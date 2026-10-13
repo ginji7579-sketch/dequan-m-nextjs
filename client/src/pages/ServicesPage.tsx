@@ -6,8 +6,13 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-export default function ServicesPage() {
+type ServicesPageProps = {
+  mode?: 'video' | 'graphic';
+};
+
+function ServicePage({ mode }: ServicesPageProps) {
   const { t } = useLanguage();
+  const isVideoPage = mode === 'video';
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F1E8]">
@@ -30,18 +35,28 @@ export default function ServicesPage() {
             </Link>
             <div className="h-1 w-12 rounded-full bg-[#7C3AED] mb-4" />
             <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
-              {t('services.title')}
+              {isVideoPage ? t('video.production') : t('services.title')}
             </h1>
-            <p className="text-gray-300 text-base md:text-lg max-w-xl">
-              {t('services.desc')}
-            </p>
+            {!isVideoPage && (
+              <p className="text-gray-300 text-base md:text-lg max-w-xl">
+                {t('services.desc')}
+              </p>
+            )}
           </div>
         </section>
 
-        <ServicesSection />
+        <ServicesSection mode={mode} />
       </main>
       <Footer />
       <CartDrawer />
     </div>
   );
+}
+
+export default function ServicesPage() {
+  return <ServicePage mode="graphic" />;
+}
+
+export function VideoProductionPage() {
+  return <ServicePage mode="video" />;
 }

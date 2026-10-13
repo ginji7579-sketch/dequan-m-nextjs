@@ -18,7 +18,7 @@ import WebsitePricingDetail from "./pages/WebsitePricingDetail";
 import MediaMarketingPricing, { MarketingPricingDetail } from "./pages/marketing-pricing";
 import AdSpaceMainPage from "./pages/AdSpaceMainPage";
 import AboutPage from "./pages/AboutPage";
-import ServicesPage from "./pages/ServicesPage";
+import ServicesPage, { VideoProductionPage } from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContactPage from "./pages/ContactPage";
 import GroupBuyPage from "./pages/GroupBuyPage";
@@ -64,6 +64,7 @@ function Router() {
       <Route path="/media-marketing-pricing" component={MediaMarketingPricing} />
       
       <Route path="/about" component={AboutPage} />
+      <Route path="/video-production" component={VideoProductionPage} />
       <Route path="/services" component={ServicesPage} />
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/contact" component={ContactPage} />
