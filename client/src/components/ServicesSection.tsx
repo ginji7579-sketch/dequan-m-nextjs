@@ -155,16 +155,17 @@ export default function ServicesSection({ mode = 'graphic' }: ServicesSectionPro
                 </div>
 
                 <div className="relative z-10 mt-6 space-y-3 sm:mt-8 sm:space-y-4">
-                  {/* Shopping Cart Button */}
-                  <button
-                    type="button"
-                    onClick={handleAddToCart}
-                    className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
-                    style={{ background: `linear-gradient(135deg, ${style.accentFrom} 0%, ${style.accentTo} 100%)` }}
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    <span>加入購物車</span>
-                  </button>
+                  {mode === 'video' && (
+                    <button
+                      type="button"
+                      onClick={handleAddToCart}
+                      className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
+                      style={{ background: `linear-gradient(135deg, ${style.accentFrom} 0%, ${style.accentTo} 100%)` }}
+                    >
+                      <ShoppingCart className="w-5 h-5" />
+                      <span>加入購物車</span>
+                    </button>
+                  )}
 
                   {/* View Cart Button */}
                   <button

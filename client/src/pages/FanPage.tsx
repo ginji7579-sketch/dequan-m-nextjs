@@ -1,36 +1,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingCart, Check, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Check, Heart, Shield, Truck, RotateCcw } from 'lucide-react';
 import { Link } from 'wouter';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
-import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { services } from '@/data/services';
-import { toast } from 'sonner';
 
 export default function FanPage() {
   const { t } = useLanguage();
-  const { addItem, openCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
-
-  // Find the fan service item to add to the cart
-  const fanItem = services.find((s) => s.id === 'groupbuy-fan');
-
-  const handleAddToCart = () => {
-    if (fanItem) {
-      // Add multiple times based on selected quantity
-      for (let i = 0; i < quantity; i++) {
-        addItem(fanItem);
-      }
-      toast.success(`${fanItem.title} 已成功加入購物車！`);
-      openCart();
-    } else {
-      toast.error('商品資料加載錯誤，請稍後再試。');
-    }
-  };
+  const fanItem = services.find((service) => service.id === 'groupbuy-fan');
 
   const productFeatures = [
     '採用日本最新DC變頻馬達，最低僅 13dB 運轉音，比落葉還安靜。',
@@ -129,24 +110,8 @@ export default function FanPage() {
               </div>
 
               {/* Purchase Actions */}
-              <div className="space-y-4 pt-4 border-t border-gray-100">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-gray-300 rounded-xl bg-gray-50 overflow-hidden h-12">
-                    <button
-                      onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      className="px-4 py-2 hover:bg-gray-100 transition-colors font-bold text-gray-600"
-                    >
-                      -
-                    </button>
-                    <span className="w-12 text-center font-bold text-gray-800">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity((q) => Math.min(99, q + 1))}
-                      className="px-4 py-2 hover:bg-gray-100 transition-colors font-bold text-gray-600"
-                    >
-                      +
-                    </button>
-                  </div>
-
+              <div className="border-t border-gray-100 pt-4">
+                <div className="flex items-center">
                   <button
                     onClick={() => setIsLiked(!isLiked)}
                     className={`p-3 rounded-xl border transition-colors flex items-center justify-center h-12 w-12 ${
@@ -154,16 +119,6 @@ export default function FanPage() {
                     }`}
                   >
                     <Heart className="w-5 h-5 fill-current" />
-                  </button>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex-1 inline-flex items-center justify-center gap-2 bg-[#2B8A8A] hover:bg-[#206969] text-white py-4 px-6 rounded-xl font-bold transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-[0.99] text-base"
-                  >
-                    <ShoppingCart className="w-5 h-5" />
-                    立即搶購
                   </button>
                 </div>
               </div>
