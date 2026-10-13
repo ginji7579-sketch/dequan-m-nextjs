@@ -567,9 +567,18 @@ export default function MarketingPricing() {
         {/* Tabs + Card */}
         <section className="container py-10 md:py-16">
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-            <aside className="lg:w-64 flex-shrink-0">
-              <p className="text-xs font-bold tracking-widest text-gray-400 uppercase mb-3 px-1">{t('pricing.services')}</p>
-              <nav className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <aside className="flex-shrink-0 lg:w-64">
+              <p className="mb-3 hidden px-1 text-xs font-bold uppercase tracking-widest text-gray-400 lg:block">
+                {t('pricing.services')}
+              </p>
+              <nav
+                aria-label={t('pricing.services')}
+                className="rounded-2xl bg-[linear-gradient(160deg,#1B4F72,#2B8A8A_60%,#2c5364)] p-4 shadow-xl sm:p-6 lg:rounded-none lg:bg-none lg:p-0 lg:shadow-none"
+              >
+                <p className="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-white/70 lg:hidden">
+                  {t('pricing.services')}
+                </p>
+                <div className="flex flex-col gap-3 lg:gap-2">
                 {categories.map(({ id, labelKey, icon: Icon }) => {
                   const isPressReleaseGroup = id === 'pressrelease-group';
                   const isActive = isPressReleaseGroup
@@ -579,7 +588,7 @@ export default function MarketingPricing() {
                   const isMediaBuy = id === 'mediabuy';
 
                   return (
-                    <div key={id} className="contents lg:flex lg:flex-col lg:w-full">
+                    <div key={id} className="flex w-full flex-col">
                       <button
                         type="button"
                         aria-expanded={isPressReleaseGroup ? isPressReleaseExpanded : undefined}
@@ -591,24 +600,24 @@ export default function MarketingPricing() {
                           setActiveId(id);
                           setLocation(`/media-marketing-pricing?tab=${id}`);
                         }}
-                        className={`flex shrink-0 lg:w-full items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-all duration-200 ${
+                        className={`flex min-h-[56px] w-full items-center gap-2.5 rounded-lg border-2 border-white/90 px-4 py-3.5 text-left text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] lg:min-h-0 lg:rounded-xl lg:border lg:px-4 lg:py-3 lg:text-sm lg:font-semibold ${
                           isActive
-                            ? 'text-white shadow-md scale-[1.02]'
-                            : 'text-gray-600 bg-white hover:bg-gray-50 border border-gray-100'
+                            ? 'shadow-md lg:scale-[1.02]'
+                            : 'lg:border-gray-100 lg:bg-white lg:text-gray-600 lg:hover:bg-gray-50'
                         }`}
                         style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
                       >
-                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <Icon className="h-4 w-4 flex-shrink-0" />
                         {t(labelKey)}
                         <ChevronRight
-                          className={`w-3.5 h-3.5 ml-auto flex-shrink-0 transition-transform ${
+                          className={`ml-auto h-3.5 w-3.5 flex-shrink-0 transition-transform ${
                             isPressReleaseGroup && isPressReleaseExpanded ? 'rotate-90' : ''
                           } ${!isActive && !isPressReleaseGroup ? 'hidden' : ''}`}
                         />
                       </button>
 
                       {isPressReleaseGroup && isPressReleaseExpanded && (
-                        <div className="contents lg:flex lg:flex-col lg:w-full lg:ml-2 lg:border-l lg:border-gray-200">
+                        <div className="mt-2 flex w-full flex-col gap-1 border-l border-white/40 pl-2 lg:ml-2 lg:border-gray-200">
                           {pressReleaseCategories.map(({ id: childId, labelKey: childLabelKey, icon: ChildIcon }) => {
                             const isChildActive = activeId === childId;
 
@@ -621,10 +630,10 @@ export default function MarketingPricing() {
                                   setIsPressReleaseExpanded(true);
                                   setLocation(`/media-marketing-pricing?tab=${childId}`);
                                 }}
-                                className={`flex shrink-0 lg:w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 lg:pl-4 ${
+                                className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-200 lg:pl-4 ${
                                   isChildActive
-                                    ? 'bg-sky-50 text-sky-700 shadow-sm'
-                                    : 'text-gray-500 hover:bg-sky-50 hover:text-sky-700'
+                                    ? 'bg-white/20 text-white shadow-sm lg:bg-sky-50 lg:text-sky-700'
+                                    : 'text-white/80 hover:bg-white/10 lg:text-gray-500 lg:hover:bg-sky-50 lg:hover:text-sky-700'
                                 }`}
                               >
                                 <ChildIcon className="h-3.5 w-3.5 flex-shrink-0" />
@@ -639,15 +648,16 @@ export default function MarketingPricing() {
                       {isMediaBuy && (
                         <Link
                           href="/media-marketing-pricing/ad-space"
-                          className="flex shrink-0 items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap text-gray-600 bg-white hover:bg-orange-50 hover:text-[#F25C05] transition-colors border border-gray-100 lg:mt-1 lg:ml-2 lg:pl-10 lg:pr-4 lg:py-2 lg:rounded-lg lg:bg-gray-50 lg:border-l-2 lg:border-y-0 lg:border-r-0 lg:border-gray-200"
+                          className="mt-2 flex min-h-[56px] w-full items-center gap-2.5 rounded-lg border-2 border-white/90 px-4 py-3.5 text-base font-bold text-white transition-colors hover:bg-white/15 lg:mt-1 lg:ml-2 lg:min-h-0 lg:w-auto lg:rounded-lg lg:border-y-0 lg:border-r-0 lg:border-l-2 lg:border-gray-200 lg:bg-gray-50 lg:px-4 lg:py-2 lg:pl-10 lg:text-sm lg:font-semibold lg:text-gray-600 lg:hover:bg-orange-50 lg:hover:text-[#F25C05]"
                         >
-                          <ChevronRight className="w-3 h-3 text-[#F25C05]" />
+                          <ChevronRight className="h-3 w-3 text-white lg:text-[#F25C05]" />
                           <span>{t('media.adspace')}</span>
                         </Link>
                       )}
                     </div>
                   );
                 })}
+                </div>
               </nav>
             </aside>
 

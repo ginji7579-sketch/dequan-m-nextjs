@@ -103,7 +103,7 @@ const translations: Record<Language, Record<string, string>> = {
     'pricing.websiteTitle': '網站架設',
     'pricing.basicPrice': '基本報價',
     'pricing.websiteDesc': '依您的需求選擇最適合的網站方案，透明報價、專業開發、快速交件。',
-    'pricing.marketingTitle': '媒體行銷方案',
+    'pricing.marketingTitle': '媒體行銷',
     'pricing.marketingDesc': '品牌曝光、口碑操作、社群投放…全方位行銷服務，透明報價，彈性組合。',
     'pricing.services': '服務項目',
     'pricing.inquireNow': '立即諮詢',
