@@ -1,4 +1,4 @@
-import { FileText, Globe, IdCard, Palette, Megaphone, Newspaper, Video, Gift, Wind } from 'lucide-react';
+import { FileText, Globe, IdCard, Palette, Megaphone, Newspaper, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { serviceCatalog, type ServiceCatalogItem } from '@shared/services';
 import { pressReleaseMediaServices } from '@shared/pressReleaseMedia';
@@ -62,14 +62,4 @@ export const services: ServiceItem[] = [
     ...service,
     icon: FileText,
   })),
-  {
-    ...serviceCatalog.find((s) => s.id === 'groupbuy-mooncake')!,
-    icon: Gift,
-    image: '/images/service_mooncake.png',
-  },
-  {
-    ...serviceCatalog.find((s) => s.id === 'groupbuy-fan')!,
-    icon: Wind,
-    image: '/images/service_fan.png',
-  },
 ];

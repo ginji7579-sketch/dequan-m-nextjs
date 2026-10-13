@@ -22,8 +22,6 @@ import ServicesPage, { VideoProductionPage } from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContactPage from "./pages/ContactPage";
 import GroupBuyPage from "./pages/GroupBuyPage";
-import MooncakePage from "./pages/MooncakePage";
-import FanPage from "./pages/FanPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
@@ -69,8 +67,6 @@ function Router() {
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/contact" component={ContactPage} />
       <Route path="/group-buy" component={GroupBuyPage} />
-      <Route path="/group-buy/mooncake" component={MooncakePage} />
-      <Route path="/group-buy/fan" component={FanPage} />
       
       <Route path="/404" component={NotFound} />
       <Route path="/" component={Home} />

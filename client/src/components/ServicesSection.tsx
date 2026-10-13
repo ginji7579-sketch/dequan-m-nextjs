@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { 
-  ChevronRight, ShoppingCart, 
-  IdCard, Palette, Megaphone, Video 
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { ChevronRight, IdCard, Palette, Megaphone, Video } from 'lucide-react';
 import { services } from '@/data/services';
 import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -49,7 +45,7 @@ const planStyles: Record<string, {
 };
 
 export default function ServicesSection({ mode = 'graphic' }: ServicesSectionProps) {
-  const { addItem, openCart } = useCart();
+  const { openCart } = useCart();
   const { t, lang } = useLanguage();
   const categories = mode === 'video' ? [videoCategory] : graphicCategories;
   const [activeId, setActiveId] = useState(mode === 'video' ? videoCategory.id : 'business-card');
@@ -67,13 +63,6 @@ export default function ServicesSection({ mode = 'graphic' }: ServicesSectionPro
 
   const activeService = services.find(s => s.id === activeId);
   const style = planStyles[activeId] || planStyles['business-card'];
-
-  const handleAddToCart = () => {
-    if (activeService) {
-      addItem(activeService);
-      toast.success(`${activeService.title} 已加入購物車`);
-    }
-  };
 
   return (
     <section id="services" className="container py-10 md:py-16">
@@ -155,18 +144,6 @@ export default function ServicesSection({ mode = 'graphic' }: ServicesSectionPro
                 </div>
 
                 <div className="relative z-10 mt-6 space-y-3 sm:mt-8 sm:space-y-4">
-                  {mode === 'video' && (
-                    <button
-                      type="button"
-                      onClick={handleAddToCart}
-                      className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3 font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:opacity-90 hover:shadow-lg"
-                      style={{ background: `linear-gradient(135deg, ${style.accentFrom} 0%, ${style.accentTo} 100%)` }}
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                      <span>加入購物車</span>
-                    </button>
-                  )}
-
                   {/* View Cart Button */}
                   <button
                     type="button"
