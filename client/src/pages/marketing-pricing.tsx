@@ -392,7 +392,42 @@ function MediaListingTable({
       className="overflow-hidden rounded-2xl border border-[#D8E1E5] bg-white shadow-sm"
       style={{ borderTop: `4px solid ${accentFrom}` }}
     >
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-[#D8E1E5] md:hidden">
+        {table.rows.map((row) => (
+          <article key={row.serviceId} className="space-y-4 p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="min-w-0 text-base font-bold leading-6 text-[#2C3E50]">
+                {row.media}
+              </h3>
+              <span
+                className="inline-flex flex-shrink-0 rounded-lg border border-current/15 bg-white px-3 py-1.5 text-sm font-extrabold shadow-sm"
+                style={{ color: accentFrom }}
+              >
+                {row.price}
+              </span>
+            </div>
+            <div className="rounded-lg bg-[#F8FAFC] p-3">
+              <p className="mb-1 text-xs font-bold tracking-wide text-gray-500">
+                {table.headers[2]}
+              </p>
+              <p className="whitespace-pre-line break-words text-sm leading-6 text-gray-700">
+                {row.note}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleAddToCart(row.serviceId, `${row.media}新聞稿刊登`, row.priceValue)}
+              className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-[#F97316] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2"
+              aria-label={`將 ${row.media} 新聞稿刊登加入購物車`}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {t('pricing.addToCart')}
+            </button>
+          </article>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[920px] border-collapse text-left">
           <thead>
             <tr className="bg-[#F97316]">
