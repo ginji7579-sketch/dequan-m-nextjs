@@ -51,24 +51,24 @@ export default function Header() {
   ];
 
   const pressReleaseSubCategories = [
-    { label: t('media.pressrelease'), href: '/media-marketing-pricing?tab=pressrelease' },
-    { label: t('media.pressreleaseMedia'), href: '/media-marketing-pricing?tab=pressrelease-media' },
+    { label: t('media.pressrelease'), href: '/media-marketing-pricing/pressrelease' },
+    { label: t('media.pressreleaseMedia'), href: '/media-marketing-pricing/pressrelease-media' },
   ];
 
   const mediaMarketingSubCategories = [
-    { label: t('media.websiteSocialGeo'), href: '/media-marketing-pricing?tab=website-social-geo' },
-    { label: t('media.brandplan'),   href: '/media-marketing-pricing?tab=brandplan' },
-    { label: t('media.launch'),      href: '/media-marketing-pricing?tab=launch' },
-    { label: t('media.celebrity'),   href: '/media-marketing-pricing?tab=celebrity' },
-    { label: t('media.reputation'),  href: '/media-marketing-pricing?tab=reputation' },
-    { label: t('media.socialads'),   href: '/media-marketing-pricing?tab=socialads' },
-    { label: t('media.mediabuy'),    href: '/media-marketing-pricing?tab=mediabuy' },
-    { label: t('media.crowdfunding'), href: '/media-marketing-pricing?tab=crowdfunding' },
-    { label: t('media.pressreleaseGroup'), href: '/media-marketing-pricing?tab=pressrelease' },
-    { label: t('media.interview'),   href: '/media-marketing-pricing?tab=interview' },
-    { label: t('media.publicrelations'), href: '/media-marketing-pricing?tab=publicrelations' },
-    { label: t('media.integratedmarketing'), href: '/media-marketing-pricing?tab=integratedmarketing' },
-    { label: t('media.grantplan'),   href: '/media-marketing-pricing?tab=grantplan' },
+    { label: t('media.websiteSocialGeo'), href: '/media-marketing-pricing/website-social-geo' },
+    { label: t('media.brandplan'),   href: '/media-marketing-pricing/brandplan' },
+    { label: t('media.launch'),      href: '/media-marketing-pricing/launch' },
+    { label: t('media.celebrity'),   href: '/media-marketing-pricing/celebrity' },
+    { label: t('media.reputation'),  href: '/media-marketing-pricing/reputation' },
+    { label: t('media.socialads'),   href: '/media-marketing-pricing/socialads' },
+    { label: t('media.mediabuy'),    href: '/media-marketing-pricing/mediabuy' },
+    { label: t('media.crowdfunding'), href: '/media-marketing-pricing/crowdfunding' },
+    { label: t('media.pressreleaseGroup'), href: '/media-marketing-pricing/pressrelease-group' },
+    { label: t('media.interview'),   href: '/media-marketing-pricing/interview' },
+    { label: t('media.publicrelations'), href: '/media-marketing-pricing/publicrelations' },
+    { label: t('media.integratedmarketing'), href: '/media-marketing-pricing/integratedmarketing' },
+    { label: t('media.grantplan'),   href: '/media-marketing-pricing/grantplan' },
   ];
 
   interface CategoryItem {
@@ -313,9 +313,9 @@ export default function Header() {
                                     isMediaExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
                                   }`}
                                 >
-                                  {/* 依照原本陣列順序渲染，但針對「媒體採購方案」額外顯示廣告版面子項 */}
+                                  {/* 依照原本陣列順序渲染，並顯示新聞稿與媒體採購子項 */}
                                   {mediaMarketingSubCategories.map((sub) => {
-                                    if (sub.href.includes('tab=pressrelease')) {
+                                    if (sub.href.endsWith('/pressrelease-group')) {
                                       return (
                                         <div key={sub.label} className="border-t border-gray-50">
                                           <Link
@@ -342,7 +342,7 @@ export default function Header() {
                                         </div>
                                       );
                                     }
-                                    if (sub.href.includes('tab=mediabuy')) {
+                                    if (sub.href.endsWith('/mediabuy')) {
                                       return (
                                         <div key={sub.label} className="border-t border-gray-50">
                                           <Link

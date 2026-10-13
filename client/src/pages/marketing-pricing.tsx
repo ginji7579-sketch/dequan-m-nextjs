@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useEffect } from 'react';
+import { Link, useLocation, useParams } from 'wouter';
 import {
-  ChevronRight, ArrowLeft,
+  ChevronRight, ArrowLeft, ChevronLeft,
   Target, Rocket, Star, MessageCircle, Share2, Tv, HandCoins, Globe,
   Newspaper, FileText, Mic2, Heart, TrendingUp, ShoppingCart,
 } from 'lucide-react';
@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import CartDrawer from '@/components/CartDrawer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
+import NotFound from '@/pages/NotFound';
 import { services } from '@/data/services';
 import { toast } from 'sonner';
 import {
@@ -40,12 +41,6 @@ const categories = [
   { id: 'integratedmarketing', labelKey: 'media.integratedmarketing', icon: TrendingUp },
   { id: 'grantplan',   labelKey: 'media.grantplan',   icon: Heart },
 ];
-
-const pressReleaseCategoryIds = new Set(pressReleaseCategories.map((category) => category.id));
-const validCategoryIds = new Set([
-  ...categories.map((category) => category.id),
-  ...Array.from(pressReleaseCategoryIds),
-]);
 
 // ─── 各方案詳細內容 ────────────────────────────────────────────────
 const plans: Record<string, {
@@ -145,6 +140,22 @@ const plans: Record<string, {
     glowColor: '#EC4899',
   },
 };
+
+const marketingPlanOrder = categories.flatMap((category) =>
+  category.id === 'pressrelease-group'
+    ? [category, ...pressReleaseCategories]
+    : [category],
+);
+const validCategoryIds = new Set(marketingPlanOrder.map(({ id }) => id));
+const marketingCategoryOrder = [...marketingPlanOrder.map(({ id }) => id), 'adspace'];
+
+function getMarketingPlanHref(planId: string) {
+  return `/media-marketing-pricing/${planId}`;
+}
+
+function isMarketingPlanId(planId: string | undefined): planId is string {
+  return typeof planId === 'string' && Object.prototype.hasOwnProperty.call(plans, planId);
+}
 
 // ─── 共用報價卡片（與網站架設頁面相同結構） ───────────────────────────
 function PricingCard({ planId }: { planId: string }) {
@@ -518,21 +529,64 @@ function PressReleaseMediaDetails({
   );
 }
 
-// ─── 頁面元件 ─────────────────────────────────────────────────────
+function MarketingPlanNavigation({ activeId }: { activeId?: string }) {
+  const { t } = useLanguage();
+
+  return (
+    <nav className="flex flex-col gap-2" aria-label={t('pricing.services')}>
+      {marketingPlanOrder.map(({ id, labelKey, icon: Icon }) => {
+        const plan = plans[id];
+        const isActive = activeId === id;
+        return (
+          <Link key={id} href={getMarketingPlanHref(id)}>
+            <span
+              aria-current={isActive ? 'page' : undefined}
+              className={`flex min-h-[48px] items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                isActive
+                  ? 'text-white shadow-md'
+                  : 'border border-gray-100 bg-white text-gray-600 hover:bg-gray-50'
+              }`}
+              style={
+                isActive
+                  ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }
+                  : undefined
+              }
+            >
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              <span className="min-w-0 truncate">{t(labelKey)}</span>
+              {isActive && <ChevronRight className="ml-auto h-3.5 w-3.5 flex-shrink-0" />}
+            </span>
+          </Link>
+        );
+      })}
+      <Link href="/media-marketing-pricing/ad-space">
+        <span
+          aria-current={activeId === 'adspace' ? 'page' : undefined}
+          className={`flex min-h-[48px] items-center gap-2.5 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+            activeId === 'adspace'
+              ? 'bg-orange-500 text-white shadow-md'
+              : 'border border-gray-100 bg-white text-gray-600 hover:bg-orange-50 hover:text-[#F25C05]'
+          }`}
+        >
+          <ChevronRight className="h-4 w-4 flex-shrink-0" />
+          <span>{t('media.adspace')}</span>
+        </span>
+      </Link>
+    </nav>
+  );
+}
+
+// ─── 媒體行銷分類索引頁 ─────────────────────────────────────────────
 export default function MarketingPricing() {
   const { t } = useLanguage();
-  const [activeId, setActiveId] = useState('brandplan');
-  const [isPressReleaseExpanded, setIsPressReleaseExpanded] = useState(false);
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
+    const tab = new URLSearchParams(window.location.search).get('tab');
     if (tab && validCategoryIds.has(tab)) {
-      setActiveId(tab);
-      setIsPressReleaseExpanded(pressReleaseCategoryIds.has(tab));
+      navigate(getMarketingPlanHref(tab), { replace: true });
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F5F1E8]">
@@ -549,10 +603,10 @@ export default function MarketingPricing() {
 
           <div className="container relative z-10">
             <Link href="/">
-              <a className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-6 transition-colors">
+              <span className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-sm mb-6 transition-colors">
                 <ArrowLeft className="w-4 h-4" />
                 {t('pricing.backToHome')}
-              </a>
+              </span>
             </Link>
             <div className="h-1 w-12 rounded-full bg-[#7C3AED] mb-4" />
             <h1 className="text-white text-3xl md:text-4xl font-extrabold mb-3 leading-tight">
@@ -564,122 +618,180 @@ export default function MarketingPricing() {
           </div>
         </section>
 
-        {/* Tabs + Card */}
-        <section className="container py-10 md:py-16">
-          <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-            <aside className="flex-shrink-0 lg:w-64">
-              <p className="mb-3 hidden px-1 text-xs font-bold uppercase tracking-widest text-gray-400 lg:block">
-                {t('pricing.services')}
-              </p>
-              <nav
-                aria-label={t('pricing.services')}
-                className="rounded-2xl bg-[linear-gradient(160deg,#1B4F72,#2B8A8A_60%,#2c5364)] p-4 shadow-xl sm:p-6 lg:rounded-none lg:bg-none lg:p-0 lg:shadow-none"
-              >
-                <p className="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-white/70 lg:hidden">
-                  {t('pricing.services')}
-                </p>
-                <div className="flex flex-col gap-3 lg:gap-2">
-                {categories.map(({ id, labelKey, icon: Icon }) => {
-                  const isPressReleaseGroup = id === 'pressrelease-group';
-                  const isActive = isPressReleaseGroup
-                    ? pressReleaseCategoryIds.has(activeId)
-                    : activeId === id;
-                  const plan = plans[id];
-                  const isMediaBuy = id === 'mediabuy';
-
-                  return (
-                    <div key={id} className="flex w-full flex-col">
-                      <button
-                        type="button"
-                        aria-expanded={isPressReleaseGroup ? isPressReleaseExpanded : undefined}
-                        onClick={() => {
-                          if (isPressReleaseGroup) {
-                            setIsPressReleaseExpanded((expanded) => !expanded);
-                            return;
-                          }
-                          setActiveId(id);
-                          setLocation(`/media-marketing-pricing?tab=${id}`);
-                        }}
-                        className={`flex min-h-[56px] w-full items-center gap-2.5 rounded-lg border-2 border-white/90 px-4 py-3.5 text-left text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] lg:min-h-0 lg:rounded-xl lg:border lg:px-4 lg:py-3 lg:text-sm lg:font-semibold ${
-                          isActive
-                            ? 'shadow-md lg:scale-[1.02]'
-                            : 'lg:border-gray-100 lg:bg-white lg:text-gray-600 lg:hover:bg-gray-50'
-                        }`}
-                        style={isActive ? { background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` } : {}}
-                      >
-                        <Icon className="h-4 w-4 flex-shrink-0" />
-                        {t(labelKey)}
-                        <ChevronRight
-                          className={`ml-auto h-3.5 w-3.5 flex-shrink-0 transition-transform ${
-                            isPressReleaseGroup && isPressReleaseExpanded ? 'rotate-90' : ''
-                          } ${!isActive && !isPressReleaseGroup ? 'hidden' : ''}`}
-                        />
-                      </button>
-
-                      {isPressReleaseGroup && isPressReleaseExpanded && (
-                        <div className="mt-2 flex w-full flex-col gap-1 border-l border-white/40 pl-2 lg:ml-2 lg:border-gray-200">
-                          {pressReleaseCategories.map(({ id: childId, labelKey: childLabelKey, icon: ChildIcon }) => {
-                            const isChildActive = activeId === childId;
-
-                            return (
-                              <button
-                                key={childId}
-                                type="button"
-                                onClick={() => {
-                                  setActiveId(childId);
-                                  setIsPressReleaseExpanded(true);
-                                  setLocation(`/media-marketing-pricing?tab=${childId}`);
-                                }}
-                                className={`flex min-h-11 w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-200 lg:pl-4 ${
-                                  isChildActive
-                                    ? 'bg-white/20 text-white shadow-sm lg:bg-sky-50 lg:text-sky-700'
-                                    : 'text-white/80 hover:bg-white/10 lg:text-gray-500 lg:hover:bg-sky-50 lg:hover:text-sky-700'
-                                }`}
-                              >
-                                <ChildIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                                {t(childLabelKey)}
-                                {isChildActive && <ChevronRight className="ml-auto h-3 w-3 flex-shrink-0" />}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {isMediaBuy && (
-                        <Link
-                          href="/media-marketing-pricing/ad-space"
-                          className="mt-2 flex min-h-[56px] w-full items-center gap-2.5 rounded-lg border-2 border-white/90 px-4 py-3.5 text-base font-bold text-white transition-colors hover:bg-white/15 lg:mt-1 lg:ml-2 lg:min-h-0 lg:w-auto lg:rounded-lg lg:border-y-0 lg:border-r-0 lg:border-l-2 lg:border-gray-200 lg:bg-gray-50 lg:px-4 lg:py-2 lg:pl-10 lg:text-sm lg:font-semibold lg:text-gray-600 lg:hover:bg-orange-50 lg:hover:text-[#F25C05]"
-                        >
-                          <ChevronRight className="h-3 w-3 text-white lg:text-[#F25C05]" />
-                          <span>{t('media.adspace')}</span>
-                        </Link>
-                      )}
-                    </div>
-                  );
-                })}
-                </div>
-              </nav>
-            </aside>
-
-            <div className="min-w-0 flex-1 min-h-[400px]">
-              {activeId === 'website-social-geo' ? (
-                <WebsiteSocialGeoDetails
-                  accentFrom={plans[activeId].accentFrom}
-                  accentTo={plans[activeId].accentTo}
-                />
-              ) : activeId === 'pressrelease-media' ? (
-                <PressReleaseMediaDetails
-                  accentFrom={plans[activeId].accentFrom}
-                  accentTo={plans[activeId].accentTo}
-                />
-              ) : (
-                <PricingCard planId={activeId} />
-              )}
-            </div>
+        <section className="container pb-14 pt-8 sm:pb-16 sm:pt-10 md:pb-20 md:pt-12">
+          <div
+            className="rounded-2xl p-4 shadow-xl sm:p-6 md:p-8"
+            style={{ background: 'linear-gradient(160deg, #1B4F72, #2B8A8A 60%, #2c5364)' }}
+          >
+            <nav
+              aria-label={t('pricing.services')}
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3"
+            >
+              {marketingPlanOrder.map(({ id, labelKey }) => (
+                <Link key={id} href={getMarketingPlanHref(id)}>
+                  <span className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-lg border-2 border-white/90 px-4 py-3.5 text-center text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] sm:min-h-[64px] sm:text-lg">
+                    {t(labelKey)}
+                  </span>
+                </Link>
+              ))}
+              <Link href="/media-marketing-pricing/ad-space">
+                <span className="flex min-h-[56px] w-full items-center justify-center gap-2 rounded-lg border-2 border-white/90 px-4 py-3.5 text-center text-base font-bold text-white transition-all duration-200 hover:bg-white/15 active:scale-[0.98] sm:min-h-[64px] sm:text-lg">
+                  {t('media.adspace')}
+                </span>
+              </Link>
+            </nav>
           </div>
         </section>
       </main>
 
+      <Footer />
+      <CartDrawer />
+    </div>
+  );
+}
+
+// ─── 媒體行銷分類詳細頁 ────────────────────────────────────────────
+export function MarketingPricingDetail() {
+  const { t } = useLanguage();
+  const { planId } = useParams<{ planId?: string }>();
+
+  if (!isMarketingPlanId(planId)) {
+    return <NotFound />;
+  }
+
+  const plan = plans[planId];
+  const category = marketingPlanOrder.find((item) => item.id === planId);
+  const CategoryIcon = category?.icon;
+  const currentIndex = marketingCategoryOrder.indexOf(planId);
+  const previousId = marketingCategoryOrder[
+    (currentIndex - 1 + marketingCategoryOrder.length) % marketingCategoryOrder.length
+  ];
+  const nextId = marketingCategoryOrder[(currentIndex + 1) % marketingCategoryOrder.length];
+  const previousHref = previousId === 'adspace'
+    ? '/media-marketing-pricing/ad-space'
+    : getMarketingPlanHref(previousId);
+  const nextHref = nextId === 'adspace'
+    ? '/media-marketing-pricing/ad-space'
+    : getMarketingPlanHref(nextId);
+  const previousLabel = previousId === 'adspace'
+    ? t('media.adspace')
+    : t(marketingPlanOrder.find((item) => item.id === previousId)!.labelKey);
+  const nextLabel = nextId === 'adspace'
+    ? t('media.adspace')
+    : t(marketingPlanOrder.find((item) => item.id === nextId)!.labelKey);
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[#F5F1E8]">
+      <Header />
+      <main className="flex-1">
+        <section
+          className="relative overflow-hidden py-10 sm:py-12 md:py-16"
+          style={{ background: `linear-gradient(135deg, ${plan.accentFrom} 0%, ${plan.accentTo} 100%)` }}
+        >
+          <div
+            className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full opacity-20 blur-3xl"
+            style={{ background: plan.glowColor }}
+            aria-hidden="true"
+          />
+          <div className="container relative z-10">
+            <Link href="/">
+              <span className="mb-5 inline-flex items-center gap-1.5 text-sm text-white/80 transition-colors hover:text-white">
+                <ArrowLeft className="h-4 w-4" />
+                {t('pricing.backToHome')}
+              </span>
+            </Link>
+            <nav aria-label="麵包屑" className="mb-4">
+              <ol className="flex flex-wrap items-center gap-1.5 text-sm text-white/70">
+                <li>
+                  <Link href="/media-marketing-pricing">
+                    <span className="transition-colors hover:text-white">{t('pricing.marketingTitle')}</span>
+                  </Link>
+                </li>
+                <li aria-hidden="true"><ChevronRight className="h-3.5 w-3.5" /></li>
+                <li className="font-semibold text-white" aria-current="page">
+                  {t(plan.titleKey)}
+                </li>
+              </ol>
+            </nav>
+            <div className="flex items-center gap-3">
+              {CategoryIcon && (
+                <span className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-white/20" aria-hidden="true">
+                  <CategoryIcon className="h-6 w-6 text-white" />
+                </span>
+              )}
+              <h1 className="text-2xl font-extrabold leading-tight text-white sm:text-3xl md:text-4xl">
+                {t(plan.titleKey)}
+              </h1>
+            </div>
+          </div>
+        </section>
+
+        <section className="container py-8 md:py-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-10">
+            <div className="min-w-0">
+              {planId === 'website-social-geo' ? (
+                <WebsiteSocialGeoDetails
+                  accentFrom={plan.accentFrom}
+                  accentTo={plan.accentTo}
+                />
+              ) : planId === 'pressrelease-media' ? (
+                <PressReleaseMediaDetails
+                  accentFrom={plan.accentFrom}
+                  accentTo={plan.accentTo}
+                />
+              ) : planId === 'pressrelease-group' ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {pressReleaseCategories.map(({ id, labelKey, icon: Icon }) => (
+                    <Link key={id} href={getMarketingPlanHref(id)}>
+                      <span className="flex min-h-[120px] items-center gap-4 rounded-2xl border border-gray-200 bg-white p-5 text-lg font-bold text-gray-700 shadow-sm transition-colors hover:border-sky-300 hover:bg-sky-50">
+                        <Icon className="h-6 w-6 flex-shrink-0 text-sky-600" />
+                        <span>{t(labelKey)}</span>
+                        <ChevronRight className="ml-auto h-4 w-4 flex-shrink-0 text-gray-400" />
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <PricingCard planId={planId} />
+              )}
+
+              <nav aria-label="分類切換" className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+                <Link href={previousHref}>
+                  <span className="flex min-h-[56px] items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:px-4">
+                    <ChevronLeft className="h-4 w-4 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                    <span className="min-w-0">
+                      <span className="block text-xs font-normal text-gray-400">上一個</span>
+                      <span className="block truncate">{previousLabel}</span>
+                    </span>
+                  </span>
+                </Link>
+                <Link href={nextHref}>
+                  <span className="flex min-h-[56px] items-center justify-end gap-2 rounded-xl border border-gray-200 bg-white px-3 py-3 text-right text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:px-4">
+                    <span className="min-w-0">
+                      <span className="block text-xs font-normal text-gray-400">下一個</span>
+                      <span className="block truncate">{nextLabel}</span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 flex-shrink-0 text-gray-400" aria-hidden="true" />
+                  </span>
+                </Link>
+              </nav>
+              <Link href="/media-marketing-pricing">
+                <span className="mt-4 flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 lg:hidden">
+                  <ArrowLeft className="h-4 w-4" />
+                  查看所有分類
+                </span>
+              </Link>
+            </div>
+
+            <aside className="hidden lg:block">
+              <p className="mb-3 px-1 text-xs font-bold uppercase tracking-widest text-gray-400">
+                {t('pricing.services')}
+              </p>
+              <MarketingPlanNavigation activeId={planId} />
+            </aside>
+          </div>
+        </section>
+      </main>
       <Footer />
       <CartDrawer />
     </div>
