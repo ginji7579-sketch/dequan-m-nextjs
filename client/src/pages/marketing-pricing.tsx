@@ -406,6 +406,9 @@ function MediaListingTable({
                 {row.price}
               </span>
             </div>
+            <p className="whitespace-pre-line break-words text-sm leading-6 text-gray-700">
+              {row.note}
+            </p>
             <button
               type="button"
               onClick={() => handleAddToCart(row.serviceId, `${row.media}新聞稿刊登`, row.priceValue)}
