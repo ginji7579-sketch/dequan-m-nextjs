@@ -247,6 +247,33 @@ function ComparisonTable({
   table: ComparisonTable;
   accentFrom: string;
 }) {
+  const { t } = useLanguage();
+  const { addItem } = useCart();
+
+  const handleAddTotalToCart = (index: 0 | 1) => {
+    const cartItem = table.totalCartItems?.[index];
+    const service = cartItem && services.find((item) => item.id === cartItem.serviceId);
+
+    if (!cartItem || !service || service.price !== cartItem.price) {
+      toast.error('方案價格資料尚未同步，請稍後再試');
+      return;
+    }
+
+    addItem(service);
+    toast.success(`${service.title} 已加入購物車`);
+  };
+
+  const totalCartButton = (index: 0 | 1) => table.totalCartItems && (
+    <button
+      type="button"
+      onClick={() => handleAddTotalToCart(index)}
+      className="mt-2 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-[#F97316] px-3 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-[#EA580C] focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:ring-offset-2"
+    >
+      <ShoppingCart className="h-4 w-4" />
+      {t('pricing.addToCart')}
+    </button>
+  );
+
   return (
     <section
       className="overflow-hidden rounded-2xl border border-[#D8E1E5] bg-white shadow-sm"
@@ -288,12 +315,13 @@ function ComparisonTable({
             )}
           </h3>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {table.totals.map((total, index) => (
+            {([0, 1] as const).map((index) => (
               <div key={table.headers[index + 1]} className="rounded-lg bg-white/70 p-3 text-center">
                 <p className="text-xs font-semibold leading-5 text-gray-600">
                   {table.headers[index + 1]}
                 </p>
-                <p className="mt-1 text-base font-extrabold text-[#2C3E50]">{total}</p>
+                <p className="mt-1 text-base font-extrabold text-[#2C3E50]">{table.totals[index]}</p>
+                {totalCartButton(index)}
               </div>
             ))}
           </div>
@@ -348,11 +376,13 @@ function ComparisonTable({
                   </span>
                 )}
               </th>
-              <td className="px-4 py-5 text-center text-xl font-extrabold text-[#2C3E50] sm:text-2xl">
-                {table.totals[0]}
+              <td className="px-4 py-5 text-center">
+                <p className="text-xl font-extrabold text-[#2C3E50] sm:text-2xl">{table.totals[0]}</p>
+                {totalCartButton(0)}
               </td>
-              <td className="px-4 py-5 text-center text-xl font-extrabold text-[#2C3E50] sm:text-2xl">
-                {table.totals[1]}
+              <td className="px-4 py-5 text-center">
+                <p className="text-xl font-extrabold text-[#2C3E50] sm:text-2xl">{table.totals[1]}</p>
+                {totalCartButton(1)}
               </td>
             </tr>
           </tfoot>

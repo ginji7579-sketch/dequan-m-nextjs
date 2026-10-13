@@ -18,8 +18,19 @@ const websiteServiceIds = [
   'website-fixedshop',
 ] as const;
 
+const websiteSocialGeoServiceIds = [
+  'media-geo-maintenance-basic',
+  'media-geo-maintenance-advanced',
+  'media-geo-setup-basic',
+  'media-geo-setup-advanced',
+] as const;
+
 export const services: ServiceItem[] = [
   ...websiteServiceIds.map((id) => ({
+    ...serviceCatalog.find((service) => service.id === id)!,
+    icon: Globe,
+  })),
+  ...websiteSocialGeoServiceIds.map((id) => ({
     ...serviceCatalog.find((service) => service.id === id)!,
     icon: Globe,
   })),

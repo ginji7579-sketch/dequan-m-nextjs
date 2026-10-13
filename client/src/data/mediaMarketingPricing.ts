@@ -15,6 +15,10 @@ export type ComparisonTable = {
   rows: ComparisonRow[];
   totalLabel: string;
   totals: [string, string];
+  totalCartItems?: [
+    { serviceId: string; price: number },
+    { serviceId: string; price: number },
+  ];
   totalNote?: string;
 };
 
@@ -98,6 +102,10 @@ export const websiteSocialGeoTables: ComparisonTable[] = [
     ],
     totalLabel: '總計費用（每月費用，不含選購）',
     totals: ['NT$90,000', 'NT$210,000'],
+    totalCartItems: [
+      { serviceId: 'media-geo-maintenance-basic', price: 90000 },
+      { serviceId: 'media-geo-maintenance-advanced', price: 210000 },
+    ],
   },
   {
     title: '專案啟動費（第一個月的隱形成本，可攤提進總價）',
@@ -151,6 +159,10 @@ export const websiteSocialGeoTables: ComparisonTable[] = [
     ],
     totalLabel: '總計費用',
     totals: ['NT$45,000', 'NT$75,000'],
+    totalCartItems: [
+      { serviceId: 'media-geo-setup-basic', price: 45000 },
+      { serviceId: 'media-geo-setup-advanced', price: 75000 },
+    ],
   },
 ];
 
