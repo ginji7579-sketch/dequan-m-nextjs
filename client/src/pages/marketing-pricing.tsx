@@ -256,7 +256,51 @@ function ComparisonTable({
         <h2 className="text-lg font-bold sm:text-xl">{table.title}</h2>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="space-y-3 p-3 md:hidden sm:p-4">
+        {table.rows.map((row) => (
+          <article
+            key={row.label}
+            className="overflow-hidden rounded-xl border border-[#D8E1E5] bg-white"
+          >
+            <h3 className="bg-[#C5CDD3] px-4 py-3 text-sm font-bold leading-6 text-[#2C3E50]">
+              {row.label}
+            </h3>
+            <div className="grid gap-3 p-3 sm:p-4">
+              <section className="rounded-lg bg-[#F3F4F6] p-3">
+                <h4 className="mb-2 text-sm font-bold text-[#2C3E50]">{table.headers[1]}</h4>
+                <ComparisonCell items={row.basic} />
+              </section>
+              <section className="rounded-lg bg-[#F3F4F6] p-3">
+                <h4 className="mb-2 text-sm font-bold text-[#2C3E50]">{table.headers[2]}</h4>
+                <ComparisonCell items={row.advanced} />
+              </section>
+            </div>
+          </article>
+        ))}
+
+        <section className="rounded-xl bg-[#D1D5DB] p-4">
+          <h3 className="text-center text-sm font-bold leading-6 text-[#2C3E50]">
+            {table.totalLabel}
+            {table.totalNote && (
+              <span className="mt-1 block text-xs font-normal text-gray-600">
+                {table.totalNote}
+              </span>
+            )}
+          </h3>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {table.totals.map((total, index) => (
+              <div key={table.headers[index + 1]} className="rounded-lg bg-white/70 p-3 text-center">
+                <p className="text-xs font-semibold leading-5 text-gray-600">
+                  {table.headers[index + 1]}
+                </p>
+                <p className="mt-1 text-base font-extrabold text-[#2C3E50]">{total}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[820px] border-collapse text-left">
           <thead>
             <tr>
