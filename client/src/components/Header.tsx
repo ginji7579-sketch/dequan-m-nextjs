@@ -81,6 +81,7 @@ export default function Header() {
 
   const categories: CategoryItem[] = [
     { label: t('nav.websitepricing'), href: '/website-pricing', hasSub: true, isWebsite: true },
+    { label: t('nav.enterprisesecurity'), href: '/enterprise-security' },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', hasSub: true, isMedia: true },
     { label: t('nav.videoproduction'), href: '/video-production' },
     { label: t('nav.services'), href: '/services', hasSub: true, isGraphic: true },
@@ -101,6 +102,7 @@ export default function Header() {
     { label: t('nav.about'), href: '/about' },
     { label: t('nav.portfolio'), href: '/portfolio' },
     { label: t('nav.websitepricing'), href: '/website-pricing', isWebsite: true, subItems: websiteSubCategories },
+    { label: t('nav.enterprisesecurity'), href: '/enterprise-security' },
     { label: t('nav.mediamarketing'), href: '/media-marketing-pricing', isMedia: true, subItems: mediaMarketingSubCategories },
     { label: t('nav.videoproduction'), href: '/video-production' },
     { label: t('nav.services'), href: '/services', isGraphic: true, subItems: graphicDesignSubCategories },

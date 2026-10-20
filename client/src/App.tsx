@@ -22,6 +22,7 @@ import ServicesPage, { VideoProductionPage } from "./pages/ServicesPage";
 import PortfolioPage from "./pages/PortfolioPage";
 import ContactPage from "./pages/ContactPage";
 import GroupBuyPage from "./pages/GroupBuyPage";
+import EnterpriseSecurityPage from "./pages/EnterpriseSecurityPage";
 import { LanguageProvider } from "./contexts/LanguageContext";
 
 /**
@@ -60,6 +61,7 @@ function Router() {
       <Route path="/media-marketing-pricing/ad-space" component={AdSpaceMainPage} />
       <Route path="/media-marketing-pricing/:planId" component={MarketingPricingDetail} />
       <Route path="/media-marketing-pricing" component={MediaMarketingPricing} />
+      <Route path="/enterprise-security" component={EnterpriseSecurityPage} />
       
       <Route path="/about" component={AboutPage} />
       <Route path="/video-production" component={VideoProductionPage} />
