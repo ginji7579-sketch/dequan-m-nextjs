@@ -61,6 +61,14 @@ export const serviceCatalog: ServiceCatalogItem[] = [
     price: 28000,
   },
   {
+    id: 'enterprise-security',
+    title: '企業資安服務',
+    titleEn: 'Enterprise Cybersecurity Service',
+    description: '企業資安服務專案',
+    descriptionEn: 'Enterprise cybersecurity service package',
+    price: 150000,
+  },
+  {
     id: 'video-production',
     title: '影音製作',
     titleEn: 'Video Production',

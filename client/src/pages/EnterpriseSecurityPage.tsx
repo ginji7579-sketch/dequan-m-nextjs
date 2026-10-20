@@ -1,9 +1,12 @@
-import { ArrowRight, ClipboardCheck, KeyRound, ScanSearch, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ClipboardCheck, KeyRound, ScanSearch, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { Link } from 'wouter';
+import { toast } from 'sonner';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { services } from '@/data/services';
 
 const serviceCards = [
   { icon: ScanSearch, title: 'security.assessment.title', description: 'security.assessment.desc' },
@@ -19,6 +22,19 @@ const approachSteps = [
 
 export default function EnterpriseSecurityPage() {
   const { t } = useLanguage();
+  const { addItem, openCart } = useCart();
+  const securityService = services.find((service) => service.id === 'enterprise-security');
+
+  const handleAddToCart = () => {
+    if (!securityService) {
+      toast.error('目前無法加入企業資安服務，請聯絡客服');
+      return;
+    }
+
+    addItem(securityService);
+    toast.success(`${securityService.title} 已加入購物車`);
+    openCart();
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F5F1E8]">
@@ -47,13 +63,31 @@ export default function EnterpriseSecurityPage() {
             <p className="mx-auto mt-6 max-w-3xl text-base leading-8 text-gray-600 sm:text-lg">
               {t('security.intro')}
             </p>
-            <Link
-              href="/contact"
-              className="mt-8 inline-flex items-center gap-2 rounded-lg bg-[#F25C05] px-6 py-3.5 font-bold text-white transition-colors hover:bg-[#d94f00]"
-            >
-              {t('security.cta.button')}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
+            <div className="mt-8 inline-flex flex-col items-center gap-4 rounded-2xl bg-[#F5F1E8] px-6 py-5 sm:flex-row sm:gap-7">
+              <div className="text-center sm:text-left">
+                <p className="text-sm text-gray-600">{t('security.price.note')}</p>
+                <p className="mt-1 text-3xl font-extrabold tabular-nums text-[#1B4F72]">
+                  NT$150,000
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-[#F25C05] px-6 py-3 font-bold text-white transition-colors hover:bg-[#d94f00]"
+              >
+                <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                {t('security.addToCart')}
+              </button>
+            </div>
+            <div>
+              <Link
+                href="/contact"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#2B8A8A] transition-colors hover:text-[#1B4F72]"
+              >
+                {t('security.cta.button')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </section>
 

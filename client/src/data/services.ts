@@ -1,4 +1,4 @@
-import { FileText, Globe, IdCard, Palette, Megaphone, Newspaper, Video } from 'lucide-react';
+import { FileText, Globe, IdCard, Palette, Megaphone, Newspaper, ShieldCheck, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { serviceCatalog, type ServiceCatalogItem } from '@shared/services';
 import { pressReleaseMediaServices } from '@shared/pressReleaseMedia';
@@ -34,6 +34,10 @@ export const services: ServiceItem[] = [
     ...serviceCatalog.find((service) => service.id === id)!,
     icon: Globe,
   })),
+  {
+    ...serviceCatalog.find((service) => service.id === 'enterprise-security')!,
+    icon: ShieldCheck,
+  },
   {
     ...serviceCatalog.find((s) => s.id === 'video-production')!,
     icon: Video,

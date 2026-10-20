@@ -7,6 +7,7 @@ const serviceCatalog = new Map([
   ['website-onepage', ['一頁式網站', 16000]],
   ['website-special', ['特殊功能網站', 60000]],
   ['website-fixedshop', ['定版式購物網站', 28000]],
+  ['enterprise-security', ['企業資安服務', 150000]],
   ['video-production', ['影音製作', null]],
   ['business-card', ['名片設計', null]],
   ['logo-design', ['logo設計', null]],
