@@ -176,7 +176,7 @@ export default function Header() {
                     <Menu className="w-6 h-6" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-full p-0 flex flex-col bg-white">
+                <SheetContent side="left" showCloseButton={false} className="w-full p-0 flex flex-col bg-white">
                   <SheetHeader className="flex flex-row items-center justify-between px-4 py-4 border-b border-gray-100">
                     <SheetClose className="p-2">
                       <ChevronDown className="w-6 h-6 text-gray-500" />
@@ -189,8 +189,8 @@ export default function Header() {
                       />
                       <SheetTitle className="text-lg font-bold">德全有限公司 DEQUAN</SheetTitle>
                     </div>
-                    <SheetClose className="p-2">
-                      <X className="w-6 h-6 text-gray-500" />
+                    <SheetClose className="p-2" aria-label="關閉選單">
+                      <X className="w-6 h-6 text-gray-500" aria-hidden="true" />
                     </SheetClose>
                   </SheetHeader>
 
