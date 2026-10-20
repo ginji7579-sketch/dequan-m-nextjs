@@ -47,10 +47,24 @@ export default function Checkout() {
           recipient: formData,
         }),
       });
+      const contentType = response.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("付款服務目前無法使用，請聯絡客服");
+      }
       const payload = await response.json();
 
       if (!response.ok) {
-        throw new Error(payload.message || "建立付款單失敗");
+        throw new Error(
+          typeof payload.message === "string" ? payload.message : "建立付款單失敗"
+        );
+      }
+
+      if (
+        typeof payload.action !== "string" ||
+        !payload.fields ||
+        typeof payload.fields !== "object"
+      ) {
+        throw new Error("付款服務回應格式錯誤，請稍後再試");
       }
 
       const form = document.createElement("form");

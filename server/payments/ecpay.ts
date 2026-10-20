@@ -30,13 +30,19 @@ export type EcpayCheckoutResponse = {
 };
 
 function getEcpayConfig(): EcpayConfig {
-  // 使用 ECPAY_ENV 控制環境：設為 'stage' 強制測試環境，否則預設正式環境
-  const isProduction = process.env.ECPAY_ENV !== 'stage';
+  const isProduction = process.env.ECPAY_STAGE === 'false';
+  const merchantId = process.env.ECPAY_MERCHANT_ID || '';
+  const hashKey = process.env.ECPAY_HASH_KEY || '';
+  const hashIv = process.env.ECPAY_HASH_IV || '';
+
+  if (!merchantId || !hashKey || !hashIv) {
+    throw new Error('綠界付款服務尚未設定，請聯絡客服');
+  }
 
   return {
-    merchantId: process.env.ECPAY_MERCHANT_ID || '',
-    hashKey: process.env.ECPAY_HASH_KEY || '',
-    hashIv: process.env.ECPAY_HASH_IV || '',
+    merchantId,
+    hashKey,
+    hashIv,
     checkoutUrl:
       process.env.ECPAY_CHECKOUT_URL ||
       (isProduction

@@ -1,4 +1,4 @@
-import { verifyCheckMacValue } from './ecpay-logic.js';
+import { verifyCheckMacValue } from './ecpay-logic';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

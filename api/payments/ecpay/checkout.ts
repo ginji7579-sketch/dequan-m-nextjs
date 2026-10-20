@@ -1,4 +1,4 @@
-import { createEcpayCheckout } from './ecpay-logic.js';
+import { createEcpayCheckout } from './ecpay-logic';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {

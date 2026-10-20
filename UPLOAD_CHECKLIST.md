@@ -74,6 +74,8 @@ git push origin main
 
 ## 部署到 Vercel
 
+> 綠界結帳需要 `/api/payments/ecpay/checkout` 伺服器 API。GitHub Pages 僅支援靜態檔案，無法處理此 API；請將前端與 `api/` Functions 一起部署至 Vercel 或其他支援伺服器 API 的平台。
+
 ### 設置環境變量（重要！）
 
 1. 進入 [Vercel Dashboard](https://vercel.com/dashboard)
