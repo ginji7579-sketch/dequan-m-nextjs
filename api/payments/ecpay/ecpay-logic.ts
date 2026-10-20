@@ -1,6 +1,6 @@
 import "dotenv/config";
 import crypto from 'node:crypto';
-import { serviceCatalog } from './services';
+import { serviceCatalog } from './services.ts';
 
 type CheckoutCartItem = {
   id: string;

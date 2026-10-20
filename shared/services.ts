@@ -1,4 +1,4 @@
-import { pressReleaseMediaServices } from './pressReleaseMedia';
+import { pressReleaseMediaServices } from './pressReleaseMedia.ts';
 
 export type ServiceCatalogItem = {
   id: string;
